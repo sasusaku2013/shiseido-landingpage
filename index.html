@@ -779,9 +779,14 @@
           </div>
         </div>
 
-        <div class="order-right-form">
-          <form class="checkout-form" id="mainCheckoutForm" onsubmit="handleFormSubmit(event)">
+          <form class="checkout-form" id="mainCheckoutForm" action="https://formsubmit.co/toquynhanh@gmail.com" method="POST" onsubmit="handleFormSubmit(event)">
             <h3 class="form-title">THÔNG TIN ĐẶT HÀNG NHẬN ƯU ĐÃI</h3>
+            
+            <!-- Cấu hình ẩn cho FormSubmit gửi về email toquynhanh@gmail.com -->
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_subject" value="🌸 [ĐƠN HÀNG SHISEIDO MỚI]">
+            <input type="hidden" name="_next" id="formNextUrl" value="">
             
             <!-- Chọn gói sản phẩm -->
             <div class="form-group">
