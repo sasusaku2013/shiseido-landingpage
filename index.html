@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shiseido Ginza Tokyo | Đánh Thức Làn Da Căng Bóng Rạng Rỡ</title>
+  <meta name="description" content="Khám phá tinh hoa dưỡng da Nhật Bản cùng Shiseido Ultimune & Vital Perfection. Đánh thức làn da căng bóng mịn màng chỉ sau 14 ngày.">
+  
+  <!-- Google Fonts: Playfair Display (Serif sang trọng theo phong cách ảnh mẫu) & Plus Jakarta Sans (Hiện đại, dễ đọc) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar (Phong cách Unimart) -->
+  <div class="top-announcement-bar">
+    <div class="container announcement-inner">
+      <span class="announcement-tag">🌸 ƯU ĐÃI ĐỘC QUYỀN HÔM NAY</span>
+      <p class="announcement-text">
+        Tặng trọn bộ quà tặng Shiseido Premium trị giá <strong>450.000đ</strong> + Miễn phí vận chuyển toàn quốc cho <strong>50 khách hàng đầu tiên</strong>!
+      </p>
+      <div class="top-timer" id="topTimer">
+        <i class="fa-regular fa-clock"></i> Còn lại: <span class="timer-digits">04:25:12</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Navigation (Thanh Menu Hiện Đại & Tinh Tế) -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-container">
+      <a href="#" class="brand-logo">
+        <span class="logo-kanji">資生堂</span>
+        <span class="logo-text">SHISEIDO</span>
+        <span class="logo-sub">GINZA TOKYO</span>
+      </a>
+
+      <nav class="nav-menu" id="navMenu">
+        <a href="#hero" class="nav-link active">Trang chủ</a>
+        <a href="#problem" class="nav-link">Tình trạng da</a>
+        <a href="#solution" class="nav-link">Giải pháp</a>
+        <a href="#benefits" class="nav-link">Lợi ích vượt trội</a>
+        <a href="#pricing" class="nav-link">Bảng giá ưu đãi</a>
+        <a href="#reviews" class="nav-link">Khách hàng nói gì</a>
+        <a href="#faq" class="nav-link">Giải đáp</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="tel:19008888" class="hotline-pill">
+          <i class="fa-solid fa-phone"></i>
+          <span>Hotline: <strong>1900 8888</strong></span>
+        </a>
+        <a href="#order-form" class="btn-primary-pill header-cta-btn">
+          <span>Đặt mua ngay</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Background Decorative Mesh Gradients (Phong cách Kenko / Pastel Glow) -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- SECTION 1: HERO SECTION -->
+  <section class="hero-section" id="hero">
+    <div class="container hero-container">
+      
+      <!-- Pill Badge -->
+      <div class="hero-pill-badge">
+        <span class="badge-dot"></span>
+        <span class="badge-text">Tinh Hoa Dưỡng Da Nhật Bản Từ 1872 • Đột Phá Phục Hồi</span>
+      </div>
+
+      <!-- Main Headline (Serif thanh lịch theo ảnh mẫu) -->
+      <h1 class="hero-title">
+        Đánh Thức Làn Da Căng Bóng, <br class="desktop-only">
+        Mịn Màng Rạng Rỡ <span class="highlight-serif">Chỉ Sau 14 Ngày</span>
+      </h1>
+
+      <!-- Subheadline -->
+      <p class="hero-subtitle">
+        Tự tin toả sáng với mặt mộc không tì vết cùng huyết thanh phục hồi sinh học <strong>Shiseido Ultimune Power Infusing</strong>. 
+        Đánh bật sạm nám, cấp ẩm sâu 24 giờ và tái sinh làn da tươi trẻ dù bạn bận rộn đến đâu.
+      </p>
+
+      <!-- Pill Quick Action Bar (Input & Button liền khối như thiết kế tham khảo) -->
+      <div class="hero-quick-action">
+        <form class="quick-optin-form" onsubmit="event.preventDefault(); scrollToOrder();">
+          <i class="fa-regular fa-envelope input-icon"></i>
+          <input type="tel" id="quickPhoneInput" placeholder="Nhập số điện thoại để nhận mã giảm 40%..." required>
+          <button type="submit" class="btn-dark-pill">
+            <span>Nhận Mã Giảm</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+        <p class="micro-guarantee">
+          <i class="fa-solid fa-shield-halved"></i> 100% Chính hãng Nhật Bản • Kiểm tra hàng trước khi thanh toán
+        </p>
+      </div>
+
+      <!-- Hero Visual Card Showcase với các Thẻ Trôi Nổi (Floating Chips) -->
+      <div class="hero-showcase-wrapper">
+        <div class="hero-product-glass-card">
+          <div class="card-inner-glow"></div>
+          
+          <!-- Image Container -->
+          <div class="product-hero-image-wrap">
+            <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=900&q=85" 
+                 alt="Shiseido Ultimune Serum" 
+                 class="main-hero-img">
+            <div class="bottle-badge-floating">
+              <span class="ribbon-red">TOP 1</span>
+              <span>Serum Bán Chạy Nhất Châu Á</span>
+            </div>
+          </div>
+
+          <!-- Floating Pill Badges xung quanh sản phẩm (Giống phong cách thiết kế Kenko) -->
+          <div class="floating-chip chip-1">
+            <div class="chip-icon bg-peach">
+              <i class="fa-solid fa-droplet"></i>
+            </div>
+            <div class="chip-info">
+              <span class="chip-title">Cấp Ẩm Khóa Nước</span>
+              <span class="chip-desc">Mọng mướt suốt 24 Giờ</span>
+            </div>
+          </div>
+
+          <div class="floating-chip chip-2">
+            <div class="chip-icon bg-lavender">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="chip-info">
+              <span class="chip-title">Phục Hồi Tế Bào</span>
+              <span class="chip-desc">ImuGenerationRED™</span>
+            </div>
+          </div>
+
+          <div class="floating-chip chip-3">
+            <div class="chip-icon bg-mint">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="chip-info">
+              <span class="chip-title">100% Lành Tính</span>
+              <span class="chip-desc">An toàn cho da nhạy cảm</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TRUST STRIP (Thanh cam kết chuẩn Unimart E-commerce) -->
+  <section class="trust-bar-section">
+    <div class="container trust-grid">
+      <div class="trust-item">
+        <div class="trust-icon-box">
+          <i class="fa-solid fa-award"></i>
+        </div>
+        <div class="trust-content">
+          <h4>100% Shiseido Chính Hãng</h4>
+          <p>Nhập khẩu chính ngạch từ Tokyo, Nhật Bản</p>
+        </div>
+      </div>
+
+      <div class="trust-item">
+        <div class="trust-icon-box">
+          <i class="fa-solid fa-truck-fast"></i>
+        </div>
+        <div class="trust-content">
+          <h4>Giao Hàng Hoả Tốc 0đ</h4>
+          <p>Nhận hàng trong 1-2 ngày, kiểm tra trước khi nhận</p>
+        </div>
+      </div>
+
+      <div class="trust-item">
+        <div class="trust-icon-box">
+          <i class="fa-solid fa-rotate-left"></i>
+        </div>
+        <div class="trust-content">
+          <h4>Đổi Trả Dễ Dàng Trong 7 Ngày</h4>
+          <p>Cam kết hoàn tiền 100% nếu da bị kích ứng</p>
+        </div>
+      </div>
+
+      <div class="trust-item">
+        <div class="trust-icon-box">
+          <i class="fa-solid fa-user-doctor"></i>
+        </div>
+        <div class="trust-content">
+          <h4>Chuyên Gia Soi Da 1 - 1</h4>
+          <p>Đội ngũ chuyên viên tư vấn da liễu tận tâm</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: VẤN ĐỀ KHÁCH HÀNG (PAIN POINTS) -->
+  <section class="problem-section" id="problem">
+    <div class="container">
+      
+      <div class="section-header text-center">
+        <span class="section-pill-tag">BẠN ĐANG TỰ HỎI?</span>
+        <h2 class="section-title">
+          Có Phải Bạn Đang Mỗi Ngày Đều <br class="desktop-only">
+          <span class="highlight-serif">Mệt Mỏi & Thiếu Tự Tin Vì Làn Da?</span>
+        </h2>
+        <p class="section-desc">
+          Hơn 85% phụ nữ hiện đại phải đối mặt với tình trạng da lão hóa sớm do căng thẳng, thức khuya và thời tiết ô nhiễm.
+        </p>
+      </div>
+
+      <div class="problem-cards-grid">
+        <!-- Card 1 -->
+        <div class="glass-card problem-card">
+          <div class="problem-icon-wrapper danger-glow">
+            <i class="fa-solid fa-face-frown-open"></i>
+          </div>
+          <h3>Da Xỉn Màu & Sạm Đen</h3>
+          <p>Mỗi sáng thức dậy nhìn vào gương chỉ thấy làn da thiếu sức sống, thâm mụn dai dẳng và không đều màu dù đã che phấn kỹ.</p>
+          <span class="problem-tag">Kém sắc, mệt mỏi</span>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="glass-card problem-card">
+          <div class="problem-icon-wrapper warning-glow">
+            <i class="fa-solid fa-hourglass-end"></i>
+          </div>
+          <h3>Ám Ảnh Chu Trình 10 Bước</h3>
+          <p>Sau ngày dài làm việc kiệt sức, bạn không còn thời gian lẫn kiên nhẫn để bôi trét cả chục lớp serum kem dưỡng phức tạp.</p>
+          <span class="problem-tag">Mất thời gian</span>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="glass-card problem-card">
+          <div class="problem-icon-wrapper purple-glow">
+            <i class="fa-solid fa-money-bill-wave"></i>
+          </div>
+          <h3>Tốn Kém Nhưng Không Hợp</h3>
+          <p>Đã từng chi tiền triệu cho đủ loại mỹ phẩm hot trend nhưng da vẫn khô bong tróc vào mùa lạnh, đổ dầu mụn vào mùa hè.</p>
+          <span class="problem-tag">Lãng phí tiền bạc</span>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="glass-card problem-card">
+          <div class="problem-icon-wrapper rose-glow">
+            <i class="fa-solid fa-shield-virus"></i>
+          </div>
+          <h3>Da Nhạy Cảm & Dễ Tổn Thương</h3>
+          <p>Làn da mỏng manh rất dễ mẩn đỏ, ngứa rát khi đổi thời tiết hoặc tiếp xúc bụi bẩn do hàng rào sinh học bị suy yếu.</p>
+          <span class="problem-tag">Dễ kích ứng</span>
+        </div>
+      </div>
+
+      <!-- Quote Banner -->
+      <div class="empathy-quote-box">
+        <i class="fa-solid fa-quote-left quote-icon"></i>
+        <p class="quote-text">
+          "Đừng để những lo lắng về làn da lấy đi nụ cười và sự tự tin vốn có của bạn. Làn da bạn không cần thêm nhiều bước phức tạp, nó chỉ cần đúng một giải pháp khoa học nuôi dưỡng từ gốc rễ."
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 3: GIẢI PHÁP ĐỘT PHÁ CỦA SHISEIDO (THE SOLUTION) -->
+  <section class="solution-section" id="solution">
+    <div class="container">
+      <div class="solution-grid">
+        
+        <!-- Cột Hình Ảnh Sản Phẩm Tinh Tế -->
+        <div class="solution-visual">
+          <div class="glass-featured-frame">
+            <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=85" 
+                 alt="Shiseido Skincare Ritual" 
+                 class="solution-img">
+            
+            <div class="solution-badge-stat">
+              <span class="stat-number">98%</span>
+              <span class="stat-label">Khách hàng thấy da căng mọng ngay tuần đầu tiên</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cột Nội Dung Giải Pháp -->
+        <div class="solution-content">
+          <span class="section-pill-tag">GIẢI PHÁP ĐỘT PHÁ TỪ TOKYO</span>
+          <h2 class="section-title">
+            Tối Giản Chu Trình Skincare <br>
+            <span class="highlight-serif">Chỉ Với 2 Phút Mỗi Ngày</span>
+          </h2>
+          <p class="lead-text">
+            <strong>Shiseido Ultimune Power Infusing Concentrate</strong> là kiệt tác được chắt lọc qua hơn 150 năm nghiên cứu da liễu Nhật Bản, ứng dụng công nghệ kích hoạt miễn dịch tự thân độc quyền <em>The Lifeblood™</em>.
+          </p>
+
+          <div class="solution-feature-list">
+            <div class="solution-feature-item">
+              <div class="feature-bullet">
+                <i class="fa-solid fa-dna"></i>
+              </div>
+              <div>
+                <h4>Đánh thức sức mạnh tự phục hồi của làn da</h4>
+                <p>Không chỉ che phủ bề mặt, Shiseido kích hoạt vi tuần hoàn máu dưới da, giúp tế bào liên tục tái tạo năng lượng trẻ trung.</p>
+              </div>
+            </div>
+
+            <div class="solution-feature-item">
+              <div class="feature-bullet">
+                <i class="fa-solid fa-leaf"></i>
+              </div>
+              <div>
+                <h4>Chiết xuất thảo dược quý hiếm từ Nhật Bản</h4>
+                <p>Nấm Linh Chi đỏ và rễ cây Diên Vĩ thượng hạng giúp trung hòa gốc tự do, chống oxy hóa gấp 3 lần vitamin C thông thường.</p>
+              </div>
+            </div>
+
+            <div class="solution-feature-item">
+              <div class="feature-bullet">
+                <i class="fa-solid fa-wind"></i>
+              </div>
+              <div>
+                <h4>Chất serum mỏng nhẹ tan như nước trong 10s</h4>
+                <p>Thấm sâu tức thì không hề bết rít, tạo lớp màng ngậm nước êm ái cùng hương thơm hoa hồng & hoa sen thư giãn tâm trí.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="solution-cta-row">
+            <a href="#pricing" class="btn-dark-pill">
+              <span>Xem các combo ưu đãi</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <div class="verified-count">
+              <div class="avatar-group">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&q=80" alt="Avatar 1">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" alt="Avatar 2">
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80" alt="Avatar 3">
+              </div>
+              <span><strong>10.000+</strong> phụ nữ đã tin dùng</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: LỢI ÍCH VƯỢT TRỘI (BENEFITS - 3 CARDS LAYOUT THEO ẢNH MẪU KENKO) -->
+  <section class="benefits-section" id="benefits">
+    <div class="container">
+      
+      <div class="section-header text-center">
+        <span class="section-pill-tag">HIỆU QUẢ ĐƯỢC CHỨNG MINH</span>
+        <h2 class="section-title">
+          Tận Hưởng Sự Khác Biệt <br class="desktop-only">
+          <span class="highlight-serif">Trên Từng Centimet Làn Da Của Bạn</span>
+        </h2>
+        <p class="section-desc">
+          Bộ 3 tác động toàn diện giúp da bạn chuyển mình khỏe mạnh, rạng rỡ từ sâu bên trong mà không cần phụ thuộc vào kem nền.
+        </p>
+      </div>
+
+      <!-- 3-Card Grid tương tự 3 khối "Calories, Sleep Faster, Protein Power" trong ảnh thiết kế -->
+      <div class="kenko-cards-grid">
+        
+        <!-- Benefit Card 1 -->
+        <div class="benefit-card-kenko">
+          <div class="benefit-card-top glow-peach">
+            <div class="benefit-visual-circle">
+              <i class="fa-solid fa-sparkles"></i>
+            </div>
+            <div class="mini-data-bar">
+              <div class="mini-bar-fill" style="width: 95%;"></div>
+            </div>
+            <span class="metric-text">+95% Da Sáng Hồng Tự Nhiên</span>
+          </div>
+          <div class="benefit-card-body">
+            <h3 class="benefit-name">Căng Bóng Thấu Suốt (Glass Skin)</h3>
+            <p class="benefit-desc">
+              Nuôi dưỡng sắc tố da đồng đều, làm mờ đốm nâu và sạm nám do nắng. Bạn sẽ tự tin để mặt mộc mọi lúc mọi nơi với làn da trong veo mọng nước.
+            </p>
+          </div>
+        </div>
+
+        <!-- Benefit Card 2 -->
+        <div class="benefit-card-kenko featured-middle-card">
+          <div class="benefit-card-top glow-apricot">
+            <div class="benefit-visual-circle sun-circle">
+              <i class="fa-solid fa-sun"></i>
+            </div>
+            <div class="mini-data-bar">
+              <div class="mini-bar-fill" style="width: 99%;"></div>
+            </div>
+            <span class="metric-text">Khóa Ẩm 24 Giờ Liên Tục</span>
+          </div>
+          <div class="benefit-card-body">
+            <h3 class="benefit-name">Cấp Nước Đa Tầng Tức Thì</h3>
+            <p class="benefit-desc">
+              Hàng triệu phân tử Micro-HA phân nhánh ngậm nước sâu đến lớp hạ bì, chấm dứt triệt để tình trạng da khô căng, mốc nền khi trang điểm hay đổ dầu bóng nhờn.
+            </p>
+          </div>
+        </div>
+
+        <!-- Benefit Card 3 -->
+        <div class="benefit-card-kenko">
+          <div class="benefit-card-top glow-lavender">
+            <div class="benefit-visual-circle shield-circle">
+              <i class="fa-solid fa-shield-heart"></i>
+            </div>
+            <div class="mini-data-bar">
+              <div class="mini-bar-fill" style="width: 92%;"></div>
+            </div>
+            <span class="metric-text">+92% Hàng Rào Bảo Vệ Da Khỏe</span>
+          </div>
+          <div class="benefit-card-body">
+            <h3 class="benefit-name">Tái Sinh & Kháng Lão Hóa</h3>
+            <p class="benefit-desc">
+              Thúc đẩy tăng sinh Collagen tự nhiên, xóa mờ nếp nhăn li ti khóe mắt và rãnh cười, bảo vệ tế bào da kiên cường trước ánh sáng xanh máy tính và khói bụi.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tóm tắt 4 bước cảm nhận theo thời gian -->
+      <div class="timeline-box">
+        <h4 class="timeline-heading">Hành Trình Chuyển Hóa Làn Da:</h4>
+        <div class="timeline-steps">
+          <div class="timeline-item">
+            <span class="step-badge">10 Giây</span>
+            <p>Serum thấm hoàn toàn, da mát dịu và mềm mượt như lụa.</p>
+          </div>
+          <div class="timeline-item">
+            <span class="step-badge">3 Ngày</span>
+            <p>Da đủ ẩm, giảm hẳn tiết dầu nhờn vùng chữ T, không còn khô mốc.</p>
+          </div>
+          <div class="timeline-item">
+            <span class="step-badge">14 Ngày</span>
+            <p>Tông da sáng đều màu hơn, vết thâm mụn mờ dần, da có độ căng mọng.</p>
+          </div>
+          <div class="timeline-item">
+            <span class="step-badge">28 Ngày</span>
+            <p>Lỗ chân lông se khít, nền da săn chắc đàn hồi và tràn đầy sức sống.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 5: BẢNG GIÁ & GÓI ƯU ĐÃI (PRICING & OFFERS - CHUẨN UNIMART) -->
+  <section class="pricing-section" id="pricing">
+    <div class="container">
+      
+      <div class="section-header text-center">
+        <span class="section-pill-tag">ƯU ĐÃI CÓ HẠN</span>
+        <h2 class="section-title">
+          Chọn Gói Chăm Sóc Làn Da <br class="desktop-only">
+          <span class="highlight-serif">Nhận Quà Tặng Độc Quyền Hôm Nay</span>
+        </h2>
+        
+        <!-- Countdown Timer Block (Phong cách Flash sale E-commerce) -->
+        <div class="flash-sale-countdown">
+          <span class="sale-alert-label"><i class="fa-solid fa-bolt"></i> FLASH SALE ĐẶC BIỆT KẾT THÚC TRONG:</span>
+          <div class="timer-boxes" id="saleCountdown">
+            <div class="t-box"><span class="t-val" id="timerHours">04</span><span class="t-lbl">Giờ</span></div>
+            <div class="t-sep">:</div>
+            <div class="t-box"><span class="t-val" id="timerMinutes">25</span><span class="t-lbl">Phút</span></div>
+            <div class="t-sep">:</div>
+            <div class="t-box"><span class="t-val" id="timerSeconds">12</span><span class="t-lbl">Giây</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing Cards Grid -->
+      <div class="pricing-grid">
+        
+        <!-- GÓI 1: TRẢI NGHIỆM -->
+        <div class="pricing-card glass-card">
+          <div class="pricing-header">
+            <span class="package-name">Gói 1: Trải Nghiệm Khởi Đầu</span>
+            <h3 class="product-title">Serum Shiseido Ultimune 30ml</h3>
+            <p class="package-subtitle">Phù hợp cho bạn lần đầu thử nghiệm và cảm nhận độ mướt mịn của huyết thanh.</p>
+          </div>
+
+          <div class="price-wrap">
+            <span class="original-price">1.950.000đ</span>
+            <div class="sale-price-row">
+              <span class="current-price">1.390.000đ</span>
+              <span class="discount-pill">-28%</span>
+            </div>
+            <span class="shipping-info">Tiết kiệm 560.000đ • Miễn phí ship</span>
+          </div>
+
+          <div class="pricing-features">
+            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> 01 Chai Shiseido Ultimune 30ml chính hãng</div>
+            <div class="pf-item"><i class="fa-solid fa-gift"></i> <strong>Tặng:</strong> 01 Băng đô rửa mặt nhung cao cấp</div>
+            <div class="pf-item"><i class="fa-solid fa-check"></i> 01 Buổi soi da & tư vấn chuyên sâu 1-1</div>
+            <div class="pf-item"><i class="fa-solid fa-shield"></i> Thẻ cam kết bảo hành làn da 7 ngày</div>
+          </div>
+
+          <button class="btn-outline-pill select-package-btn" onclick="selectPackage('Gói 1: Serum 30ml - 1.390.000đ')">
+            <span>Chọn gói trải nghiệm</span>
+            <i class="fa-solid fa-arrow-down"></i>
+          </button>
+        </div>
+
+        <!-- GÓI 2: BEST SELLER ⭐ COMBO TOÀN DIỆN -->
+        <div class="pricing-card glass-card popular-card">
+          <div class="popular-ribbon">⭐ KHUYÊN DÙNG - BÁN CHẠY NHẤT</div>
+          
+          <div class="pricing-header">
+            <span class="package-name">Gói 2: Liệu Trình Trẻ Hóa Toàn Diện</span>
+            <h3 class="product-title">Combo Ultimune 50ml + Kem Dưỡng Vital Perfection</h3>
+            <p class="package-subtitle">Bộ đôi vàng giúp tái sinh làn da căng bóng và xóa mờ nếp nhăn nhanh gấp 3 lần.</p>
+          </div>
+
+          <div class="price-wrap">
+            <span class="original-price">4.250.000đ</span>
+            <div class="sale-price-row">
+              <span class="current-price">2.690.000đ</span>
+              <span class="discount-pill bg-red-pill">-37%</span>
+            </div>
+            <span class="shipping-info">Tiết kiệm tới 1.560.000đ • Miễn phí ship hoả tốc</span>
+          </div>
+
+          <div class="pricing-features">
+            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> 01 Serum Shiseido Ultimune 50ml bản Fullsize</div>
+            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> 01 Hũ kem dưỡng cao cấp Shiseido Vital Perfection 15ml</div>
+            <div class="pf-item"><i class="fa-solid fa-gift"></i> <strong>Tặng Hộp Quà VIP:</strong> 03 Mặt nạ lụa cấp ẩm Shiseido + Băng đô nhung (Trị giá 450.000đ)</div>
+            <div class="pf-item"><i class="fa-solid fa-check"></i> Miễn phí vận chuyển tận nhà & kiểm tra trước</div>
+            <div class="pf-item"><i class="fa-solid fa-shield"></i> Cam kết hoàn tiền 100% nếu phát hiện hàng giả</div>
+          </div>
+
+          <button class="btn-dark-pill select-package-btn w-full" onclick="selectPackage('Gói 2: Combo Trẻ Hóa 50ml - 2.690.000đ (Bán Chạy)')">
+            <span>Chọn Combo Trẻ Hóa (Tiết kiệm nhất)</span>
+            <i class="fa-solid fa-arrow-down"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 6: ĐÁNH GIÁ KHÁCH HÀNG (SOCIAL PROOF) -->
+  <section class="reviews-section" id="reviews">
+    <div class="container">
+      
+      <div class="section-header text-center">
+        <span class="section-pill-tag">PHẢN HỒI THỰC TẾ</span>
+        <h2 class="section-title">
+          Hơn 10.000+ Phụ Nữ Đã Tự Tin <br class="desktop-only">
+          <span class="highlight-serif">Cởi Bỏ Lớp Phấn Dày – Còn Bạn Thì Sao?</span>
+        </h2>
+        <div class="rating-overall">
+          <div class="stars">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <span class="rating-score"><strong>4.9 / 5.0</strong> đánh giá hài lòng từ 3.820+ khách hàng đã sử dụng</span>
+        </div>
+      </div>
+
+      <div class="reviews-grid">
+        
+        <!-- Review 1 -->
+        <div class="review-card glass-card">
+          <div class="reviewer-meta">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" alt="Chị Mai Lan" class="reviewer-avatar">
+            <div class="reviewer-info">
+              <h4>Chị Mai Lan (32 tuổi)</h4>
+              <span class="reviewer-role">Quản lý Marketing • Hà Nội</span>
+              <div class="verified-badge"><i class="fa-solid fa-circle-check"></i> Đã mua hàng chính hãng</div>
+            </div>
+          </div>
+          <div class="review-stars">★★★★★</div>
+          <p class="review-comment">
+            "Làm việc văn phòng máy lạnh 8 tiếng khiến da mình khô tróc và xỉn màu rõ rệt. Sau gần 3 tuần kiên trì dùng Shiseido Ultimune mỗi sáng tối, da căng mướt hẳn. Đi làm mình chỉ cần thoa chút son môi là tự tin, đồng nghiệp ai cũng khen dạo này da đẹp thế!"
+          </p>
+          <div class="review-tag">Khuyên dùng: Combo 50ml</div>
+        </div>
+
+        <!-- Review 2 -->
+        <div class="review-card glass-card">
+          <div class="reviewer-meta">
+            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80" alt="Bạn Thu Thảo" class="reviewer-avatar">
+            <div class="reviewer-info">
+              <h4>Bạn Thu Thảo (24 tuổi)</h4>
+              <span class="reviewer-role">Content Creator • TP. Hồ Chí Minh</span>
+              <div class="verified-badge"><i class="fa-solid fa-circle-check"></i> Đã mua hàng chính hãng</div>
+            </div>
+          </div>
+          <div class="review-stars">★★★★★</div>
+          <p class="review-comment">
+            "Da mình siêu nhạy cảm và dễ nổi mụn ẩn nên cực kỳ kén mỹ phẩm. Nhưng serum Shiseido thì êm dịu vô cùng, thoa lên mát rượi, thấm trong tích tắc không hề bí bách. Thâm mụn sau 2 tuần mờ đi trông thấy, nền da sáng khỏe rõ rệt."
+          </p>
+          <div class="review-tag">Khuyên dùng: Da dầu nhạy cảm</div>
+        </div>
+
+        <!-- Review 3 -->
+        <div class="review-card glass-card">
+          <div class="reviewer-meta">
+            <img src="https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=120&q=80" alt="Chị Hoàng Oanh" class="reviewer-avatar">
+            <div class="reviewer-info">
+              <h4>Chị Hoàng Oanh (38 tuổi)</h4>
+              <span class="reviewer-role">Mẹ bỉm sữa 2 con • Đà Nẵng</span>
+              <div class="verified-badge"><i class="fa-solid fa-circle-check"></i> Đã mua hàng chính hãng</div>
+            </div>
+          </div>
+          <div class="review-stars">★★★★★</div>
+          <p class="review-comment">
+            "Bận rộn con cái nên mình không thể nào dưỡng da 7-8 bước được. Bây giờ sáng tối chỉ cần 3 giọt serum này là da đủ ẩm mọng cả ngày dài, khóe cười cũng đỡ nhăn hơn. Giá tiền đi đôi với chất lượng, rất đáng đầu tư cho bản thân."
+          </p>
+          <div class="review-tag">Khuyên dùng: Chống lão hóa sớm</div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 7: CAM KẾT VÀNG TỪ THƯƠNG HIỆU -->
+  <section class="guarantee-section">
+    <div class="container">
+      <div class="guarantee-card-box glass-card">
+        <div class="guarantee-header text-center">
+          <i class="fa-solid fa-shield-heart guarantee-shield-icon"></i>
+          <h2 class="guarantee-title">Cam Kết An Tâm Tuyệt Đối Khi Mua Sắm</h2>
+          <p class="guarantee-sub">Chúng tôi hiểu làn da của bạn là tài sản quý giá nhất. Vì vậy, sự hài lòng và an toàn của bạn luôn được đặt lên hàng đầu.</p>
+        </div>
+
+        <div class="guarantee-grid">
+          <div class="g-col">
+            <div class="g-num">01</div>
+            <h4>Đồng Kiểm Trước Khi Nhận</h4>
+            <p>Khách hàng được quyền mở hộp kiểm tra đầy đủ tem chống giả, seal niêm phong, mã QR code trước khi thanh toán cho shipper.</p>
+          </div>
+
+          <div class="g-col">
+            <div class="g-num">02</div>
+            <h4>Bảo Hành Chính Hãng 10x</h4>
+            <p>Cam kết 100% hàng nhập khẩu Shiseido chính ngạch từ Nhật Bản. Đền bù gấp 10 lần giá trị đơn hàng nếu phát hiện hàng giả, kém chất lượng.</p>
+          </div>
+
+          <div class="g-col">
+            <div class="g-num">03</div>
+            <h4>Bảo Hiểm Làn Da 7 Ngày</h4>
+            <p>Nếu trong vòng 7 ngày đầu sử dụng bạn gặp bất kỳ kích ứng hoặc phản ứng phụ nào, chúng tôi sẽ hoàn trả 100% tiền không thắc mắc.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: CÂU HỎI THƯỜNG GẶP (FAQ ACCORDION) -->
+  <section class="faq-section" id="faq">
+    <div class="container faq-container">
+      
+      <div class="section-header text-center">
+        <span class="section-pill-tag">GIẢI ĐÁP THẮC MẮC</span>
+        <h2 class="section-title">
+          Những Câu Hỏi Thường Gặp <br class="desktop-only">
+          <span class="highlight-serif">Trước Khi Quyết Định Đặt Hàng</span>
+        </h2>
+      </div>
+
+      <div class="faq-accordion-list">
+        
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Da mụn hoặc da cực kỳ nhạy cảm có dùng được không?</span>
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>Hoàn toàn an toàn! Shiseido Ultimune đã trải qua kiểm nghiệm da liễu nghiêm ngặt trên hơn 1.200 phụ nữ có làn da nhạy cảm. Công thức không chứa cồn biến tính, không paraben, không dầu khoáng, kết cấu lỏng nhẹ thẩm thấu nhanh giúp làm dịu nốt mụn viêm và tăng sức đề kháng tự nhiên cho da.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Dùng bao lâu thì bắt đầu thấy hiệu quả rõ rệt?</span>
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>Ngay sau lần thoa đầu tiên, bạn sẽ cảm nhận da mát mướt và căng mịn tức thì. Sau 7-14 ngày, độ ẩm được khóa chặt, giảm hẳn tình trạng đổ dầu và nền da sáng hồng hơn. Sau 28 ngày (chu kỳ thay da tự nhiên), các đốm nâu mờ dần và độ đàn hồi săn chắc tăng lên rõ rệt.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Cách sử dụng serum Shiseido vào lúc nào để đạt hiệu quả tốt nhất?</span>
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>Rất đơn giản: Dùng 2 lần mỗi ngày (sáng và tối) sau bước rửa mặt/nước cân bằng. Lấy 2 lần nhấn (pump) ra lòng bàn tay, chấm lên 5 điểm trên mặt và mát-xa nhẹ nhàng theo hướng từ dưới lên trên, từ trong ra ngoài để nâng cơ mặt.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Phụ nữ đang mang thai hoặc cho con bú có dùng được không?</span>
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>Sản phẩm có thành phần chiết xuất thảo dược tự nhiên lành tính. Tuy nhiên trong thời kỳ mang thai, nội tiết tố thay đổi nên nếu cơ địa bạn quá nhạy cảm, bạn có thể để lại thông tin để chuyên viên da liễu Shiseido tư vấn chi tiết nhất nhé.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Tôi ở tỉnh thì đặt hàng bao lâu sẽ nhận được?</span>
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>Đơn hàng được đóng gói bọc chống sốc cẩn thận và gửi qua dịch vụ chuyển phát nhanh hỏa tốc. Tại Hà Nội & TP.HCM nhận hàng trong 24 giờ. Các tỉnh thành khác từ 1 - 2 ngày làm việc. Quý khách hoàn toàn được kiểm tra hàng trước khi thanh toán.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 9: FORM ĐẶT HÀNG & CTA CHỐT HẠ (ORDER FORM SECTION) -->
+  <section class="order-section" id="order-form">
+    <div class="container">
+      <div class="order-glass-box">
+        
+        <div class="order-left-promo">
+          <span class="section-pill-tag bg-white-pill">ĐẶT HÀNG NHANH CHÓNG</span>
+          <h2 class="order-promo-title">
+            Đầu Tư Cho Làn Da <br>
+            <span class="highlight-serif">Là Khoản Đầu Tư Không Bao Giờ Lỗ!</span>
+          </h2>
+          <p class="order-promo-desc">
+            Điền thông tin bên dưới để nhận ngay <strong>ưu đãi giảm giá đến 40%</strong> kèm trọn bộ quà tặng Shiseido Premium hôm nay.
+          </p>
+
+          <div class="order-perks">
+            <div class="perk-item">
+              <i class="fa-solid fa-gift"></i>
+              <span>Tặng Hộp Quà Trị Giá <strong>450.000đ</strong></span>
+            </div>
+            <div class="perk-item">
+              <i class="fa-solid fa-truck-ramp-box"></i>
+              <span>Miễn 100% Phí Vận Chuyển Toàn Quốc</span>
+            </div>
+            <div class="perk-item">
+              <i class="fa-solid fa-hand-holding-dollar"></i>
+              <span>Kiểm Tra Hàng Thỏa Mái Trước Khi Trả Tiền</span>
+            </div>
+            <div class="perk-item">
+              <i class="fa-solid fa-headset"></i>
+              <span>Dược sĩ Da Liễu Gọi Tư Vấn Lộ Trình Riêng</span>
+            </div>
+          </div>
+
+          <div class="stock-warning">
+            <div class="pulse-indicator"></div>
+            <span>Chỉ còn <strong>09 suất quà tặng cuối cùng</strong> cho ngày hôm nay!</span>
+          </div>
+        </div>
+
+        <div class="order-right-form">
+          <form class="checkout-form" id="mainCheckoutForm" onsubmit="handleFormSubmit(event)">
+            <h3 class="form-title">THÔNG TIN ĐẶT HÀNG NHẬN ƯU ĐÃI</h3>
+            
+            <!-- Chọn gói sản phẩm -->
+            <div class="form-group">
+              <label class="form-label">Chọn Gói Ưu Đãi Của Bạn:</label>
+              <div class="package-radio-options">
+                
+                <label class="radio-card active">
+                  <input type="radio" name="product_package" value="Combo 2: Trẻ Hóa 50ml - 2.690.000đ" checked onchange="updateRadioSelection(this)">
+                  <div class="radio-custom"></div>
+                  <div class="radio-content">
+                    <div class="radio-title-row">
+                      <span class="r-title">Combo Trẻ Hóa 50ml + Kem Dưỡng</span>
+                      <span class="r-tag">BÁN CHẠY NHẤT ⭐</span>
+                    </div>
+                    <div class="r-price-row">
+                      <span class="r-new-price">2.690.000đ</span>
+                      <span class="r-old-price">4.250.000đ</span>
+                    </div>
+                    <span class="r-gift-note">+ Tặng Hộp quà 3 Mặt nạ lụa + Băng đô nhung (450k)</span>
+                  </div>
+                </label>
+
+                <label class="radio-card">
+                  <input type="radio" name="product_package" value="Gói 1: Serum 30ml - 1.390.000đ" onchange="updateRadioSelection(this)">
+                  <div class="radio-custom"></div>
+                  <div class="radio-content">
+                    <div class="radio-title-row">
+                      <span class="r-title">Serum Ultimune 30ml (Gói Trải Nghiệm)</span>
+                    </div>
+                    <div class="r-price-row">
+                      <span class="r-new-price">1.390.000đ</span>
+                      <span class="r-old-price">1.950.000đ</span>
+                    </div>
+                    <span class="r-gift-note">+ Tặng Băng đô nhung rửa mặt cao cấp</span>
+                  </div>
+                </label>
+
+              </div>
+            </div>
+
+            <!-- Họ tên -->
+            <div class="form-group">
+              <label class="form-label" for="customerName">Họ và tên của bạn: <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-user"></i>
+                <input type="text" id="customerName" name="ho_va_ten" placeholder="Ví dụ: Nguyễn Thị Mai Lan" required>
+              </div>
+            </div>
+
+            <!-- Số điện thoại -->
+            <div class="form-group">
+              <label class="form-label" for="customerPhone">Số điện thoại nhận hàng: <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-phone"></i>
+                <input type="tel" id="customerPhone" name="so_dien_thoai" placeholder="Ví dụ: 0912 345 678" pattern="[0-9]{10,11}" required>
+              </div>
+            </div>
+
+            <!-- Địa chỉ giao hàng -->
+            <div class="form-group">
+              <label class="form-label" for="customerAddress">Địa chỉ nhận hàng: <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-location-dot"></i>
+                <input type="text" id="customerAddress" name="dia_chi_giao_hang" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành" required>
+              </div>
+            </div>
+
+            <!-- Ghi chú tình trạng da -->
+            <div class="form-group">
+              <label class="form-label" for="customerNote">Tình trạng da hiện tại (Không bắt buộc):</label>
+              <input type="text" id="customerNote" name="tinh_trang_da" placeholder="Ví dụ: Da dầu thiếu ẩm, có vài nốt thâm mụn...">
+            </div>
+
+            <!-- Nút gửi đơn hàng -->
+            <button type="submit" class="btn-submit-order" id="btnSubmitOrder">
+              <span class="btn-text">GỬI ĐƠN ĐẶT HÀNG NGAY</span>
+              <span class="btn-subtext">Nhận ưu đãi 40% & Quà tặng 450.000đ</span>
+            </button>
+
+            <p class="form-privacy-note">
+              <i class="fa-solid fa-lock"></i> Thông tin của bạn được bảo mật tuyệt đối theo tiêu chuẩn Shiseido Privacy.
+            </p>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER CHUẨN DOANH NGHIỆP -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      
+      <div class="footer-col brand-col">
+        <div class="footer-logo">
+          <span class="logo-kanji">資生堂</span>
+          <span class="logo-text">SHISEIDO</span>
+          <span class="logo-sub">GINZA TOKYO</span>
+        </div>
+        <p class="footer-bio">
+          Biểu tượng chăm sóc sắc đẹp và nghiên cứu da liễu hàng đầu Nhật Bản từ năm 1872. Tôn vinh vẻ đẹp tự nhiên và sức mạnh nội sinh của người phụ nữ.
+        </p>
+        <div class="footer-socials">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Về Chúng Tôi</h4>
+        <ul>
+          <li><a href="#hero">Câu chuyện Shiseido</a></li>
+          <li><a href="#solution">Công nghệ ImuGeneration</a></li>
+          <li><a href="#reviews">Đánh giá khách hàng</a></li>
+          <li><a href="#pricing">Chính sách ưu đãi</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Hỗ Trợ Khách Hàng</h4>
+        <ul>
+          <li><a href="#">Chính sách đổi trả 7 ngày</a></li>
+          <li><a href="#">Chính sách bảo mật thông tin</a></li>
+          <li><a href="#">Tra cứu đơn hàng trực tuyến</a></li>
+          <li><a href="#">Hướng dẫn phân biệt hàng chính hãng</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col contact-col">
+        <h4>Liên Hệ Trực Tiếp</h4>
+        <p><i class="fa-solid fa-location-dot"></i> Shiseido Boutique Store: Vincom Center, Bà Triệu / Đồng Khởi</p>
+        <p><i class="fa-solid fa-phone"></i> Hotline 24/7: <strong>1900 8888</strong> (Miễn phí cước gọi)</p>
+        <p><i class="fa-solid fa-envelope"></i> Email: support@shiseido-vietnam.vn</p>
+        <p><i class="fa-solid fa-clock"></i> Giờ làm việc: 08:00 - 21:30 hàng ngày</p>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container bottom-flex">
+        <p>© 2026 Shiseido Ginza Tokyo Vietnam. Tất cả quyền được bảo lưu.</p>
+        <p class="disclaimer-text">Sản phẩm này là mỹ phẩm dưỡng da chăm sóc sắc đẹp theo tiêu chuẩn kiểm định Bộ Y Tế.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- FLOATING QUICK ACTIONS (Hotline & Zalo & Cuộn Lên) -->
+  <div class="floating-contact-group">
+    <a href="https://zalo.me" target="_blank" class="floating-btn zalo-btn" title="Chat Zalo Tư Vấn">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" width="28" height="28">
+      <span class="floating-tooltip">Chat Zalo 1-1</span>
+    </a>
+    <a href="tel:19008888" class="floating-btn phone-btn" title="Gọi Hotline">
+      <i class="fa-solid fa-phone-volume"></i>
+      <span class="floating-tooltip">Gọi Hotline</span>
+    </a>
+    <button class="floating-btn back-to-top" id="backToTop" onclick="scrollToTop()" title="Lên đầu trang">
+      <i class="fa-solid fa-chevron-up"></i>
+    </button>
+  </div>
+
+  <!-- SOCIAL PROOF TOAST POPUP (Hiệu ứng chốt đơn liên tục của Unimart) -->
+  <div class="social-toast" id="socialToast">
+    <div class="toast-avatar">
+      <img id="toastImg" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&q=80" alt="Customer">
+    </div>
+    <div class="toast-content">
+      <p class="toast-title"><strong id="toastName">Chị Thanh Thủy</strong> (Hà Nội)</p>
+      <p class="toast-desc">vừa đặt mua <span id="toastPackage">Combo Trẻ Hóa 50ml</span></p>
+      <span class="toast-time" id="toastTime">2 phút trước • Đã xác nhận</span>
+    </div>
+    <button class="toast-close" onclick="closeToast()">&times;</button>
+  </div>
+
+  <!-- ORDER SUCCESS MODAL -->
+  <div class="order-modal-overlay" id="orderModal">
+    <div class="order-modal-card">
+      <div class="modal-success-icon">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <h3>ĐẶT HÀNG THÀNH CÔNG!</h3>
+      <p class="modal-greet">Cảm ơn <strong id="modalCustomerName">chị</strong> đã trao niềm tin cho Shiseido Ginza Tokyo.</p>
+      <div class="modal-summary-box">
+        <p><strong>Gói sản phẩm:</strong> <span id="modalPackage">Combo Trẻ Hóa 50ml</span></p>
+        <p><strong>Số điện thoại:</strong> <span id="modalPhone">0987654321</span></p>
+        <p><strong>Địa chỉ nhận hàng:</strong> <span id="modalAddress">Hà Nội</span></p>
+        <p class="modal-gift-tag">🎁 Đã kèm phần quà trị giá 450.000đ + Miễn phí vận chuyển</p>
+      </div>
+      <p class="modal-note">Chuyên viên da liễu Shiseido sẽ gọi điện thoại xác nhận đơn hàng và tư vấn chu trình chăm sóc da phù hợp nhất cho bạn trong vòng 15 phút tới.</p>
+      <button class="btn-dark-pill modal-close-btn" onclick="closeModal()">Đã Hiểu & Đóng Lại</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
