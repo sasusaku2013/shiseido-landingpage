@@ -740,6 +740,135 @@
     </div>
   </section>
 
+  <!-- SECTION KHẢO SÁT KHÁCH HÀNG -->
+  <section class="survey-section" id="khao-sat">
+    <div class="container">
+      <div class="survey-glass-box">
+
+        <div class="survey-header">
+          <span class="section-pill-tag bg-white-pill">📋 KHẢO SÁT NHANH</span>
+          <h2 class="survey-title">Giúp Chúng Tôi Hiểu Bạn Hơn!</h2>
+          <p class="survey-subtitle">Chỉ 1 phút — Để nhận tư vấn &amp; ưu đãi phù hợp nhất với bạn 🎁</p>
+        </div>
+
+        <form class="survey-form" id="surveyForm"
+              action="https://formspree.io/f/YOUR_FORMSPREE_ID"
+              method="POST">
+
+          <!-- Câu 1: Tên -->
+          <div class="survey-group">
+            <label class="survey-label">
+              <span class="survey-num">1</span>
+              Tên bạn là gì? <em class="survey-hint">(Để mình xưng hô cho thân thiện nhé 😊)</em>
+            </label>
+            <div class="survey-input-wrap">
+              <i class="fa-regular fa-user"></i>
+              <input type="text" name="ten" placeholder="Ví dụ: Chị Lan, Chị Mai..." required>
+            </div>
+          </div>
+
+          <!-- Câu 2: SĐT/Zalo -->
+          <div class="survey-group">
+            <label class="survey-label">
+              <span class="survey-num">2</span>
+              Số điện thoại / Zalo của bạn? <em class="survey-hint">(Mình sẽ gửi ưu đãi qua đây)</em>
+            </label>
+            <div class="survey-input-wrap">
+              <i class="fa-solid fa-phone"></i>
+              <input type="tel" name="sdt_zalo" placeholder="Ví dụ: 0912 345 678" required>
+            </div>
+          </div>
+
+          <!-- Câu 3: Kênh mua sắm -->
+          <div class="survey-group">
+            <label class="survey-label">
+              <span class="survey-num">3</span>
+              Bạn thường mua sắm mỹ phẩm / thời trang ở đâu?
+            </label>
+            <div class="survey-options">
+              <label class="survey-option">
+                <input type="radio" name="kenh_mua_sam" value="Cửa hàng trực tiếp" required>
+                <span class="survey-option-btn">🛒 Cửa hàng trực tiếp</span>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="kenh_mua_sam" value="Mua online (Shopee, TikTok...)">
+                <span class="survey-option-btn">📱 Mua online (Shopee, TikTok...)</span>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="kenh_mua_sam" value="Qua người quen giới thiệu">
+                <span class="survey-option-btn">👥 Qua người quen giới thiệu</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Câu 4: Sản phẩm quan tâm -->
+          <div class="survey-group">
+            <label class="survey-label">
+              <span class="survey-num">4</span>
+              Bạn đang quan tâm đến sản phẩm nào nhất?
+            </label>
+            <div class="survey-options">
+              <label class="survey-option">
+                <input type="radio" name="san_pham_quan_tam" value="Mỹ phẩm dưỡng da" required>
+                <span class="survey-option-btn">💄 Mỹ phẩm dưỡng da</span>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="san_pham_quan_tam" value="Son / trang điểm">
+                <span class="survey-option-btn">💋 Son / trang điểm</span>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="san_pham_quan_tam" value="Thời trang / quần áo">
+                <span class="survey-option-btn">👗 Thời trang / quần áo</span>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="san_pham_quan_tam" value="Cả hai đều thích">
+                <span class="survey-option-btn">🎁 Cả hai đều thích</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Câu 5: Mức giá -->
+          <div class="survey-group">
+            <label class="survey-label">
+              <span class="survey-num">5</span>
+              Mức giá bạn thường chi cho một sản phẩm?
+            </label>
+            <div class="survey-options">
+              <label class="survey-option">
+                <input type="radio" name="muc_gia" value="Dưới 200.000đ" required>
+                <span class="survey-option-btn">Dưới 200.000đ</span>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="muc_gia" value="200.000 – 500.000đ">
+                <span class="survey-option-btn">200.000 – 500.000đ</span>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="muc_gia" value="500.000 – 1.000.000đ">
+                <span class="survey-option-btn">500.000 – 1.000.000đ</span>
+              </label>
+              <label class="survey-option">
+                <input type="radio" name="muc_gia" value="Trên 1.000.000đ">
+                <span class="survey-option-btn">Trên 1.000.000đ</span>
+              </label>
+            </div>
+          </div>
+
+          <input type="hidden" name="_subject" value="📋 Khảo sát khách hàng mới từ Landing Page">
+          <input type="hidden" name="_captcha" value="false">
+
+          <button type="submit" class="btn-survey-submit">
+            <span>Gửi Khảo Sát &amp; Nhận Ưu Đãi 🎁</span>
+          </button>
+
+          <div id="surveySuccess" style="display:none;" class="survey-success-msg">
+            ✅ Cảm ơn bạn! Mình sẽ liên hệ sớm nhé 💕
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </section>
+
   <!-- SECTION 9: FORM ĐẶT HÀNG & CTA CHỐT HẠ (ORDER FORM SECTION) -->
   <section class="order-section" id="order-form">
     <div class="container">
