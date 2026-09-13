@@ -383,9 +383,9 @@ const CHATBOT_KB = {
 
   buyIntent: {
     text: `<p>Dạ đợt này em đang gom chung cho mấy chị em công ty nên mới được giá ưu đãi này đó chị:</p>
-           <p>• <strong>Gói 1 (Trải nghiệm):</strong> Lọ 30ml chỉ <strong>590.000đ</strong> (giá gốc 850k).<br>
-           • <strong>Gói 2 (Combo 3 phút bán chạy nhất):</strong> 1 Lọ Fullsize 50ml + 1 Hũ kem Vital 15ml chỉ <strong>850.000đ</strong> (tiết kiệm 500k) và được <strong>tặng luôn Hộp Quà VIP 450.000đ</strong> (gồm 3 mặt nạ lụa + băng đô nhung).</p>
-           <p>Em khuyên thật lòng chị nên lấy Combo 850k vì vừa đủ bộ 2 bước khóa ẩm sâu, vừa được hời nguyên hộp quà VIP. Chị bấm nút bên dưới để vào danh sách nhận ưu đãi nhé!</p>`,
+           <p>• <strong>Gói 1 (Trải nghiệm):</strong> Lọ 30ml chỉ <strong>2.480.000đ</strong> (giá gốc 2.980k).<br>
+           • <strong>Gói 2 (Combo 3 phút bán chạy nhất):</strong> 1 Lọ Fullsize 50ml + 1 Hũ kem Vital 15ml chỉ <strong>2.780.000đ</strong> (tiết kiệm 500k) và được <strong>tặng luôn Hộp Quà VIP 450.000đ</strong> (gồm 3 mặt nạ lụa + băng đô nhung).</p>
+           <p>Em khuyên thật lòng chị nên lấy Combo 2.780k vì vừa đủ bộ 2 bước khóa ẩm sâu, vừa được hời nguyên hộp quà VIP. Chị bấm nút bên dưới để vào danh sách nhận ưu đãi nhé!</p>`,
     hasActionCard: true
   },
 
@@ -445,8 +445,8 @@ const CHATBOT_KB = {
   },
 
   faq9_price: {
-    question: "Giá 590k / 850k hơi chát, bên ngoài có chỗ bán rẻ hơn?",
-    text: `<p>Chị bảo bên kia rẻ hơn là đúng thật, nhiều bên họ làm giá mềm lắm chị. Nhưng thật ra tiền nào của nấy: Các bên đó họ bán món đơn lẻ, chị muốn đủ ẩm ngồi điều hòa thì phải mua thêm cả kem dưỡng ẩm lẫn kem chống lão hóa, cộng lại cũng 600k–800k mà sáng ra bôi trát lỉnh kỉnh mất thời gian.</p>
+    question: "Giá 2.480k / 2.780k hơi chát, bên ngoài có chỗ bán rẻ hơn?",
+    text: `<p>Chị bảo bên kia rẻ hơn là đúng thật, nhiều bên họ làm giá mềm lắm chị. Nhưng thật ra tiền nào của nấy: Các bên đó họ bán món đơn lẻ, chị muốn đủ ẩm ngồi điều hòa thì phải mua thêm cả kem dưỡng ẩm lẫn kem chống lão hóa, cộng lại cũng tiền triệu mà sáng ra bôi trát lỉnh kỉnh mất thời gian.</p>
            <p>Món của em là dòng sinh học tích hợp <strong>All-in-one cao cấp:</strong> Thoa 30 giây là xong cả cấp ẩm sâu lẫn phục hồi, không bóng nhờn. Tính ra chị vừa tiết kiệm tiền mua 2 món lỉnh kỉnh khác, vừa mua được thêm 15 phút ngủ thêm mỗi sáng, nhẹ đầu hơn nhiều chị ạ.</p>`,
     hasActionCard: true
   },
@@ -476,7 +476,7 @@ const QUICK_CHIPS = [
   { key: "faq6_sensitive", label: "🛡️ Da nhạy cảm có an toàn?" },
   { key: "faq7_pregnancy", label: "🤰 Bầu bí / cho con bú dùng được?" },
   { key: "faq8_authentic", label: "🇯🇵 Nguồn gốc chính hãng Shiseido?" },
-  { key: "faq9_price", label: "💰 Giá 590k/850k sao cao hơn bên ngoài?" },
+  { key: "faq9_price", label: "💰 Giá 2.480k/2.780k sao cao hơn bên ngoài?" },
   { key: "faq10_lazy", label: "😴 Lười & bận sợ mua về vứt xó?" },
   { key: "hesitate_survey", label: "📋 Chưa vội mua, nhận cẩm nang quà tặng" }
 ];
@@ -609,8 +609,8 @@ function triggerBotReply(htmlContent, hasActionCard = false, hasSurveyCard = fal
       extraHtml = `
         <div class="chat-action-card">
           <div class="chat-card-title"><i class="fa-solid fa-gift"></i> Suất Ưu Đãi Gom Chung Hôm Nay:</div>
-          <div class="chat-pkg-item">• <strong>Gói 30ml:</strong> <span class="chat-pkg-price">590.000đ</span> <em>(Tiết kiệm 260k)</em></div>
-          <div class="chat-pkg-item">• <strong>Combo 50ml + Kem 15ml:</strong> <span class="chat-pkg-price">850.000đ</span> + 🎁 Hộp quà VIP <strong>450.000đ</strong></div>
+          <div class="chat-pkg-item">• <strong>Gói 30ml:</strong> <span class="chat-pkg-price">2.480.000đ</span> <em>(Tiết kiệm 500k)</em></div>
+          <div class="chat-pkg-item">• <strong>Combo 50ml + Kem 15ml:</strong> <span class="chat-pkg-price">2.780.000đ</span> + 🎁 Hộp quà VIP <strong>450.000đ</strong></div>
           <button type="button" class="chat-cta-btn" onclick="goToOrderForm()">
             <i class="fa-solid fa-cart-shopping"></i> ĐẶT HÀNG / VÀO DANH SÁCH CHỜ NGAY
           </button>

@@ -78,7 +78,7 @@
 
 ---
 
-### 9. "Giá 590k / 850k hơi chát em ơi, bên ngoài chị thấy có chỗ bán rẻ hơn..."
+### 9. "Giá 2.480k / 2.780k hơi chát em ơi, bên ngoài chị thấy có chỗ bán rẻ hơn..."
 > *"Chị bảo bên kia rẻ hơn là đúng thật, nhiều bên họ làm giá mềm lắm chị. Nhưng thật ra tiền nào của nấy: Các bên đó họ bán món đơn lẻ, chị muốn đủ ẩm ngồi điều hòa thì phải mua thêm cả kem dưỡng ẩm lẫn kem chống lão hóa, cộng lại cũng 600k–800k mà sáng ra bôi trát lỉnh kỉnh mất thời gian.
 > 
 > Món của em là dòng sinh học tích hợp All-in-one cao cấp: Thoa 30 giây là xong cả cấp ẩm sâu lẫn phục hồi, không bóng nhờn. Tính ra chị vừa tiết kiệm tiền mua 2 món lỉnh kỉnh khác, vừa mua được thêm 15 phút ngủ thêm mỗi sáng, nhẹ đầu hơn nhiều chị ạ."*
@@ -96,10 +96,10 @@
 
 ### Kịch bản 1: Khi khách khen hoặc hỏi về khuyến mãi
 > *"Dạ đợt này em đang gom chung cho mấy chị em công ty nên mới được giá ưu đãi này đó chị:
-> - **Gói 1 (Trải nghiệm):** Lọ 30ml chỉ **590k** (giá gốc 850k).
-> - **Gói 2 (Combo 3 phút bán chạy nhất):** 1 Lọ Fullsize 50ml + 1 Hũ kem Vital 15ml chỉ **850k** (tiết kiệm 500k) và được **tặng luôn Hộp Quà VIP 450.000đ** (gồm 3 mặt nạ lụa + băng đô nhung).
+> - **Gói 1 (Trải nghiệm):** Lọ 30ml chỉ **2.480k** (giá gốc 2.980k).
+> - **Gói 2 (Combo 3 phút bán chạy nhất):** 1 Lọ Fullsize 50ml + 1 Hũ kem Vital 15ml chỉ **2.780k** (tiết kiệm 500k) và được **tặng luôn Hộp Quà VIP 450.000đ** (gồm 3 mặt nạ lụa + băng đô nhung).
 > 
-> Em khuyên thật lòng chị nên lấy Combo 850k vì vừa đủ bộ 2 bước khóa ẩm sâu, vừa được hời nguyên hộp quà VIP. Chị lấy Combo 850k hay lấy lọ 30ml 590k dùng thử trước nè?"*
+> Em khuyên thật lòng chị nên lấy Combo 2.780k vì vừa đủ bộ 2 bước khóa ẩm sâu, vừa được hời nguyên hộp quà VIP. Chị lấy Combo 2.780k hay lấy lọ 30ml 2.480k dùng thử trước nè?"*
 
 ### Kịch bản 2: Khi khách đã ưng nhưng chưa để lại thông tin
 > *"Hôm nay bên vận chuyển đang có chuyến giao hỏa tốc miễn phí ship tận nhà, chị cho em xin Tên + Số điện thoại và Địa chỉ nhận hàng để em đóng gói gửi sớm cho chị nhận trước cuối tuần nhen! Chị kiểm tra hàng thoải mái trước khi thanh toán cho shipper ạ."*
