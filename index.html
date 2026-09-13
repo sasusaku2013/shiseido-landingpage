@@ -1073,6 +1073,77 @@
     </button>
   </div>
 
+  <!-- CHATBOT WIDGET (TƯ VẤN BÁN HÀNG THEO SALES_SCRIPT.MD) -->
+  <div class="chatbot-wrapper" id="chatbotWrapper">
+    <!-- Nút kích hoạt Chatbot nổi -->
+    <div class="chatbot-trigger-wrap">
+      <div class="chatbot-badge" id="chatBadge">1</div>
+      <div class="chatbot-teaser" id="chatTeaser" onclick="toggleChatWindow()">
+        <span class="teaser-text">💬 Chị cần tư vấn da lười 3 phút? Nhắn Quỳnh Anh nhé!</span>
+        <button class="teaser-close" onclick="event.stopPropagation(); closeChatTeaser();" aria-label="Đóng lời nhắn">&times;</button>
+      </div>
+      <button class="chatbot-btn" id="chatToggleBtn" onclick="toggleChatWindow()" aria-label="Mở khung chat tư vấn">
+        <div class="chatbot-avatar-wrap">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" alt="Quỳnh Anh" class="chatbot-avatar-img">
+          <span class="chatbot-online-dot"></span>
+        </div>
+        <i class="fa-solid fa-xmark chat-close-icon"></i>
+      </button>
+    </div>
+
+    <!-- Khung Cửa Sổ Chat -->
+    <div class="chatbot-window" id="chatWindow" aria-hidden="true">
+      <!-- Chat Header -->
+      <div class="chatbot-header">
+        <div class="chatbot-header-info">
+          <div class="header-avatar-wrap">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" alt="Quỳnh Anh" class="header-avatar-img">
+            <span class="header-online-dot"></span>
+          </div>
+          <div class="header-text-wrap">
+            <h4 class="header-name">Quỳnh Anh • Làm đẹp 3 phút</h4>
+            <span class="header-status"><span class="status-pulse"></span> Trực tuyến • Sẵn sàng hỗ trợ chị</span>
+          </div>
+        </div>
+        <div class="chatbot-header-actions">
+          <button class="header-action-btn" onclick="toggleChatWindow()" title="Thu nhỏ khung chat">
+            <i class="fa-solid fa-minus"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Body / Lịch sử tin nhắn -->
+      <div class="chatbot-body" id="chatBody">
+        <div class="chat-time-tag">Hôm nay</div>
+        <div class="chat-messages" id="chatMessages">
+          <!-- Tin nhắn sẽ được render động từ script.js -->
+        </div>
+        <!-- Typing indicator khi bot đang gõ -->
+        <div class="chat-typing-indicator" id="chatTyping" style="display: none;">
+          <div class="typing-bubble">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <span class="typing-text">Quỳnh Anh đang soạn tin...</span>
+        </div>
+      </div>
+
+      <!-- Khung Gợi Ý Câu Hỏi Nhanh (FAQ Chips) -->
+      <div class="chatbot-quick-chips" id="chatQuickChips">
+        <!-- Được sinh động bởi script.js -->
+      </div>
+
+      <!-- Chat Input Footer -->
+      <form class="chatbot-footer" id="chatForm" onsubmit="handleChatSubmit(event)">
+        <input type="text" id="chatInput" placeholder="Nhập câu hỏi (vd: da dầu, giá, cách dùng...)" autocomplete="off">
+        <button type="submit" id="chatSendBtn" aria-label="Gửi tin nhắn">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- SOCIAL PROOF TOAST POPUP (Hiệu ứng chốt đơn liên tục của Unimart) -->
   <div class="social-toast" id="socialToast">
     <div class="toast-avatar">
