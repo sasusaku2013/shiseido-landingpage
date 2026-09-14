@@ -361,21 +361,28 @@ function handleFormSubmit(event) {
       qrLoading.innerHTML = `⚠️ Không tải được QR — <a href="${qrUrl}" target="_blank" style="color:#5b2d8e;font-weight:600;">bấm đây để xem QR</a>`;
     };
 
-    const modal = document.getElementById('orderModal');
-    if (modal) modal.classList.add('active');
+    // Xác định mã gói để truyền qua trang thanh toán
+    let pkgParam = 'combo2';
+    if (packageName.includes('30ml') || packageName.includes('Gói 1')) pkgParam = 'serum30';
+    if (packageName.includes('PDF') || packageName.includes('Checklist')) pkgParam = 'pdf';
+
+    const checkoutUrl = `/thanh-toan?package=${pkgParam}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&ref=${encodeURIComponent(orderRef)}`;
 
     // Tạo đơn pending trên Flask (nếu server đang chạy)
-    const ADMIN_SERVER = localStorage.getItem('adminServerUrl') || 'https://dealngon.online';
-    fetch(ADMIN_SERVER + '/api/orders/from-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, phone, address, package: packageName, payment_ref: orderRef })
-    }).catch(() => {}); // im lặng nếu server không chạy
+    const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
+    const ADMIN_SERVER = isStatic ? (localStorage.getItem('adminServerUrl') || '') : window.location.origin;
 
-    // Poll thanh toán — kiểm tra mỗi 8 giây
-    startPaymentPolling(orderRef, ADMIN_SERVER);
-
-    document.getElementById('mainCheckoutForm').reset();
+    if (ADMIN_SERVER) {
+      fetch(ADMIN_SERVER + '/api/orders/from-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, address, package: packageName, payment_ref: orderRef })
+      }).finally(() => {
+        window.location.href = checkoutUrl;
+      });
+    } else {
+      window.location.href = checkoutUrl;
+    }
   })
   .catch(error => {
     console.warn("Chuyển sang gửi Form chuẩn:", error);
@@ -892,7 +899,7 @@ function goToSurveyForm() {
 
 /* ── Digital Product Checkout ─────────────────────────────── */
 function openDigitalCheckout() {
-  document.getElementById('digitalModal').classList.add('active');
+  window.location.href = '/thanh-toan?package=pdf';
 }
 function closeDigitalModal() {
   document.getElementById('digitalModal').classList.remove('active');

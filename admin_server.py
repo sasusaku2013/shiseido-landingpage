@@ -167,7 +167,7 @@ def init_schema():
             product_name   TEXT,
             amount         INTEGER NOT NULL,
             status         TEXT NOT NULL DEFAULT 'pending'
-                           CHECK(status IN ('pending','confirmed','shipping','delivered','cancelled','refunded')),
+                           CHECK(status IN ('pending','confirmed','success','shipping','delivered','cancelled','refunded')),
             payment_method TEXT DEFAULT 'cod'
                            CHECK(payment_method IN ('cod','bank_transfer','other')),
             payment_ref    TEXT,
@@ -385,7 +385,7 @@ def sepay_webhook():
     for order in pending:
         ref = order.get("payment_ref","")
         if ref and ref.upper() in content.upper():
-            DB.run("UPDATE orders SET status='confirmed', payment_method='bank_transfer', updated_at=CURRENT_TIMESTAMP WHERE id=?",
+            DB.run("UPDATE orders SET status='success', payment_method='bank_transfer', updated_at=CURRENT_TIMESTAMP WHERE id=?",
                    (order["id"],))
             matched_id = order["id"]
             print(f"[SePay] ✅ Order #{matched_id} confirmed")
@@ -394,6 +394,16 @@ def sepay_webhook():
 
 # ─── ADMIN HTML ───────────────────────────────────────────────
 ADMIN_HTML_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "admin.html")
+
+
+# ─── SERVE THANH TOAN HTML ────────────────────────────────────
+THANH_TOAN_HTML_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "thanh-toan.html")
+
+@app.route("/thanh-toan")
+@app.route("/thanh-toan/")
+def thanh_toan():
+    with open(THANH_TOAN_HTML_PATH, encoding="utf-8") as f:
+        return f.read()
 
 @app.route("/admin")
 @app.route("/admin/")
