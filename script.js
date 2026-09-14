@@ -345,7 +345,8 @@ function handleFormSubmit(event) {
     const isCombo2 = packageName.includes('Combo 2') || packageName.includes('2.780');
     const amount = isCombo2 ? 2780000 : 2480000;
     const orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
-    const qrUrl = `https://vietqr.app/img?acc=19025414262027&bank=Techcombank&amount=${amount}&des=${orderRef}&template=compact&showinfo=true`;
+    // Dùng img.vietqr.io — API chính thức, không chặn hotlink từ GitHub Pages
+    const qrUrl = `https://img.vietqr.io/image/TCB-19025414262027-compact.jpg?amount=${amount}&addInfo=${orderRef}&accountName=Quynh%20Anh`;
     const qrImg = document.getElementById('modalQrCode');
     const qrLoading = document.getElementById('modalQrLoading');
     // Reset trạng thái loading
