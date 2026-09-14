@@ -362,15 +362,23 @@ function handleFormSubmit(event) {
     };
 
     const modal = document.getElementById('orderModal');
-    if (modal) {
-      modal.classList.add('active');
-    }
+    if (modal) modal.classList.add('active');
+
+    // Tạo đơn pending trên Flask (nếu server đang chạy)
+    const ADMIN_SERVER = localStorage.getItem('adminServerUrl') || 'https://dealngon.online';
+    fetch(ADMIN_SERVER + '/api/orders/from-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, phone, address, package: packageName, payment_ref: orderRef })
+    }).catch(() => {}); // im lặng nếu server không chạy
+
+    // Poll thanh toán — kiểm tra mỗi 8 giây
+    startPaymentPolling(orderRef, ADMIN_SERVER);
 
     document.getElementById('mainCheckoutForm').reset();
   })
   .catch(error => {
-    console.warn("Chuyển sang gửi Form chuẩn do chính sách bảo mật trình duyệt:", error);
-    // Fallback nếu fetch bị chặn: gửi form chuẩn
+    console.warn("Chuyển sang gửi Form chuẩn:", error);
     const form = document.getElementById('mainCheckoutForm');
     form.submit();
   })
@@ -380,11 +388,54 @@ function handleFormSubmit(event) {
   });
 }
 
+// ── Payment Polling ───────────────────────────────────────────
+let _pollInterval = null;
+function startPaymentPolling(orderRef, serverBase) {
+  if (_pollInterval) clearInterval(_pollInterval);
+  let attempts = 0;
+  const MAX = 60; // poll tối đa 8 phút (60 × 8s)
+
+  _pollInterval = setInterval(async () => {
+    attempts++;
+    if (attempts > MAX) { clearInterval(_pollInterval); return; }
+    try {
+      const res = await fetch(`${serverBase}/api/check-payment/${orderRef}`, { signal: AbortSignal.timeout(4000) });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.found && (data.status === 'confirmed' || data.status === 'delivered')) {
+        clearInterval(_pollInterval);
+        showPaymentSuccess(orderRef);
+      }
+    } catch(e) { /* server offline → bỏ qua */ }
+  }, 8000);
+}
+
+function showPaymentSuccess(orderRef) {
+  // Thay nội dung QR section bằng thông báo thành công
+  const qrSection = document.querySelector('.modal-col-qr') || document.getElementById('modalQrWrap')?.parentElement;
+  if (qrSection) {
+    qrSection.innerHTML = `
+      <div style="text-align:center;padding:12px 8px">
+        <div style="font-size:2.5rem;margin-bottom:6px">✅</div>
+        <p style="font-weight:700;color:#10b981;font-size:.95rem;margin-bottom:4px">Thanh toán thành công!</p>
+        <p style="font-size:.78rem;color:#555">Mã đơn: <strong>${orderRef}</strong></p>
+        <p style="font-size:.75rem;color:#888;margin-top:6px">Quỳnh Anh sẽ gọi xác nhận trong 15 phút tới 🌸</p>
+      </div>`;
+  }
+  // Cũng hiển thị banner nhỏ ở đầu modal
+  const modalCard = document.querySelector('.order-modal-card');
+  if (modalCard) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#d1fae5;border-radius:10px;padding:10px 16px;text-align:center;font-size:.85rem;font-weight:600;color:#065f46;margin-bottom:14px';
+    banner.innerHTML = '🎉 Đã nhận được chuyển khoản! Đơn hàng đang được xử lý.';
+    modalCard.insertBefore(banner, modalCard.firstChild);
+  }
+}
+
 function closeModal() {
   const modal = document.getElementById('orderModal');
-  if (modal) {
-    modal.classList.remove('active');
-  }
+  if (modal) modal.classList.remove('active');
+  if (_pollInterval) { clearInterval(_pollInterval); _pollInterval = null; }
 }
 
 /* ==========================================================================
