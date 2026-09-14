@@ -341,6 +341,25 @@ function handleFormSubmit(event) {
     document.getElementById('modalAddress').textContent = address;
     document.getElementById('modalPackage').textContent = packageName;
 
+    // Cập nhật QR Code động theo gói sản phẩm
+    const isCombo2 = packageName.includes('Combo 2') || packageName.includes('2.780');
+    const amount = isCombo2 ? 2780000 : 2480000;
+    const orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
+    const qrUrl = `https://vietqr.app/img?acc=19025414262027&bank=Techcombank&amount=${amount}&des=${orderRef}&template=compact&showinfo=true`;
+    const qrImg = document.getElementById('modalQrCode');
+    const qrLoading = document.getElementById('modalQrLoading');
+    // Reset trạng thái loading
+    qrImg.style.display = 'none';
+    qrLoading.style.display = 'block';
+    qrLoading.innerHTML = '⏳ Đang tạo mã QR...';
+    // Set src sau để trigger load event
+    qrImg.src = '';
+    setTimeout(() => { qrImg.src = qrUrl; }, 50);
+    // Fallback link nếu ảnh lỗi
+    qrImg.onerror = function() {
+      qrLoading.innerHTML = `⚠️ Không tải được QR — <a href="${qrUrl}" target="_blank" style="color:#5b2d8e;font-weight:600;">bấm đây để xem QR</a>`;
+    };
+
     const modal = document.getElementById('orderModal');
     if (modal) {
       modal.classList.add('active');

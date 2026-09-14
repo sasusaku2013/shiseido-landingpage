@@ -1176,10 +1176,16 @@
       <div class="modal-qr-section">
         <p class="modal-qr-title">💳 Thanh toán chuyển khoản ngay (tuỳ chọn)</p>
         <p class="modal-qr-desc">Quét mã bằng app ngân hàng — tự điền đúng số tiền &amp; nội dung.</p>
-        <img id="modalQrCode"
-             src=""
-             alt="QR Code thanh toán Techcombank"
-             class="modal-qr-img" />
+        <div id="modalQrWrap" style="min-height:210px;display:flex;align-items:center;justify-content:center;">
+          <p id="modalQrLoading" style="color:#aaa;font-size:0.85rem;">⏳ Đang tạo mã QR...</p>
+          <img id="modalQrCode"
+               src=""
+               alt="QR Code thanh toán Techcombank"
+               class="modal-qr-img"
+               style="display:none;"
+               onload="this.style.display='block';document.getElementById('modalQrLoading').style.display='none';"
+               onerror="document.getElementById('modalQrLoading').innerHTML='⚠️ Không tải được QR — <a id=\'qrLink\' href=\'#\' target=\'_blank\'>bấm đây để xem QR</a>';" />
+        </div>
         <p class="modal-qr-note">Hoặc chuyển khoản sau khi nhận hàng &amp; kiểm tra — shipper sẽ thu tiền mặt.</p>
       </div>
 
