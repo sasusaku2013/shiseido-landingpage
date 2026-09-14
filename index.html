@@ -521,7 +521,7 @@
 
         <!-- GÓI 2: BEST SELLER ⭐ COMBO TRỌN GÓI 3 PHÚT -->
         <div class="pricing-card glass-card popular-card">
-          <div class="popular-ribbon">⭐ KHUYÊN DÙNG - BÁN CHẠY NHẤT</div>
+          <div class="popular-ribbon">⭐ BÁN CHẠY NHẤT</div>
           
           <div class="pricing-header">
             <span class="package-name">Gói 2: Combo 3 Phút Buổi Sáng</span>
@@ -552,10 +552,77 @@
           </button>
         </div>
 
-      </div>
+        <!-- GÓI 3: SẢN PHẨM SỐ — CHECKLIST PDF -->
+        <div class="pricing-card glass-card digital-card">
+          <div class="digital-ribbon">📄 TẢI NGAY · KHÔNG CẦN GIAO HÀNG</div>
 
+          <div class="pricing-header">
+            <span class="package-name">Sản phẩm số · Dùng được ngay hôm nay</span>
+            <h3 class="product-title">Checklist Da Đẹp 3 Phút</h3>
+            <p class="package-subtitle">1 trang A4 in được hoặc lưu vào điện thoại. Buổi sáng nhìn vào làm theo — không cần nhớ, không cần tra Google, không cần biết gì về skincare.</p>
+          </div>
+
+          <div class="price-wrap">
+            <span class="original-price">149.000đ</span>
+            <div class="sale-price-row">
+              <span class="current-price" style="color:#C8896A">49.000đ</span>
+              <span class="discount-pill" style="background:#C8896A">-67%</span>
+            </div>
+            <span class="shipping-info">Nhận file PDF ngay sau khi chuyển khoản · Không cần chờ ship</span>
+          </div>
+
+          <div class="pricing-features">
+            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> Checklist buổi sáng 5 bước · đúng 3 phút</div>
+            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> Checklist buổi tối 6 bước · không bỏ sót bước nào</div>
+            <div class="pf-item"><i class="fa-solid fa-triangle-exclamation"></i> 5 dấu hiệu da đang kêu cứu (nhìn là biết ngay)</div>
+            <div class="pf-item"><i class="fa-solid fa-lightbulb"></i> 5 mẹo vàng không ai nói: đổi vỏ gối, test sản phẩm mới...</div>
+            <div class="pf-item"><i class="fa-solid fa-file-pdf" style="color:#ef4444"></i> File PDF · in được · lưu điện thoại được</div>
+          </div>
+
+          <button class="btn-outline-pill select-package-btn" style="border-color:#C8896A;color:#C8896A" onclick="openDigitalCheckout()">
+            <span>Mua &amp; Tải Ngay — 49.000đ</span>
+            <i class="fa-solid fa-download"></i>
+          </button>
+          <p style="text-align:center;font-size:.75rem;color:#A0806E;margin-top:8px">Chuyển khoản → Quỳnh Anh gửi file trong 5 phút qua Zalo</p>
+        </div>
+
+      </div>
     </div>
   </section>
+
+  <!-- MODAL: Mua sản phẩm số -->
+  <div class="order-modal-overlay" id="digitalModal">
+    <div class="order-modal-card" style="max-width:440px;padding:28px 28px 24px">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:2rem;margin-bottom:6px">📄</div>
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">Checklist Da Đẹp 3 Phút</h3>
+        <p style="font-size:.83rem;color:#6B4C3B">Chuyển khoản <strong style="color:#C8896A">49.000đ</strong> → nhận file PDF qua Zalo trong 5 phút</p>
+      </div>
+      <div style="background:#FDF8F4;border:1px solid #E8D5C4;border-radius:12px;padding:14px;text-align:center;margin-bottom:16px">
+        <p style="font-size:.78rem;font-weight:700;color:#9E5C3A;margin-bottom:8px">💳 Quét mã chuyển khoản</p>
+        <img src="https://img.vietqr.io/image/TCB-19025414262027-compact.jpg?amount=49000&addInfo=ChecklistPDF&accountName=Quynh%20Anh"
+             alt="QR 49k Techcombank"
+             style="width:175px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.12);display:block;margin:0 auto 8px" />
+        <p style="font-size:.75rem;color:#888">Nội dung: <strong>ChecklistPDF</strong> · TCB · 19025414262027</p>
+      </div>
+      <form id="digitalForm" onsubmit="submitDigitalOrder(event)">
+        <div style="margin-bottom:12px">
+          <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:5px">Số Zalo để nhận file *</label>
+          <input type="text" id="digitalContact" required placeholder="Số điện thoại Zalo của bạn"
+                 style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.88rem">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:5px">Tên bạn</label>
+          <input type="text" id="digitalName" placeholder="Để mình gửi đúng người nha"
+                 style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.88rem">
+        </div>
+        <button type="submit" class="btn-dark-pill" style="width:100%;padding:12px;font-size:.9rem">
+          ✅ Đã chuyển khoản — Gửi thông tin nhận file
+        </button>
+      </form>
+      <button onclick="closeDigitalModal()" style="display:block;width:100%;margin-top:10px;background:none;border:none;color:#94a3b8;font-size:.8rem;cursor:pointer">Đóng lại</button>
+    </div>
+  </div>
 
   <!-- SECTION 6: ĐÁNH GIÁ KHÁCH HÀNG (SOCIAL PROOF) -->
   <section class="reviews-section" id="reviews">
@@ -953,6 +1020,23 @@
                     <span class="r-gift-note">+ Tặng Băng đô nhung rửa mặt cao cấp</span>
                   </div>
                 </label>
+
+                <label class="radio-card radio-card-digital">
+                  <input type="radio" name="product_package" value="Checklist Da Đẹp 3 Phút (PDF) - 49.000đ" onchange="updateRadioSelection(this)">
+                  <div class="radio-custom"></div>
+                  <div class="radio-content">
+                    <div class="radio-title-row">
+                      <span class="r-title">📄 Checklist Da Đẹp 3 Phút (PDF)</span>
+                      <span class="r-tag" style="background:#C8896A">TẢI NGAY</span>
+                    </div>
+                    <div class="r-price-row">
+                      <span class="r-new-price" style="color:#C8896A">49.000đ</span>
+                      <span class="r-old-price">149.000đ</span>
+                    </div>
+                    <span class="r-gift-note">Nhận file qua Zalo trong 5 phút · Không cần ship</span>
+                  </div>
+                </label>
+
 
               </div>
             </div>

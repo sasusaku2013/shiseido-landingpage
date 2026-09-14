@@ -838,3 +838,52 @@ function goToSurveyForm() {
   }
 }
 
+
+/* ── Digital Product Checkout ─────────────────────────────── */
+function openDigitalCheckout() {
+  document.getElementById('digitalModal').classList.add('active');
+}
+function closeDigitalModal() {
+  document.getElementById('digitalModal').classList.remove('active');
+}
+
+function submitDigitalOrder(event) {
+  event.preventDefault();
+  const contact = document.getElementById('digitalContact').value.trim();
+  const name    = document.getElementById('digitalName').value.trim() || 'bạn';
+  const btn     = event.target.querySelector('button[type=submit]');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang gửi...';
+
+  // Gửi thông báo qua FormSubmit
+  fetch('https://formsubmit.co/ajax/toquynhanh@gmail.com', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      '_subject': `📄 [MUA CHECKLIST PDF] ${name} - ${contact}`,
+      'Tên khách': name,
+      'Zalo nhận file': contact,
+      'Sản phẩm': 'Checklist Da Đẹp 3 Phút - 49.000đ',
+      '_template': 'table',
+      '_captcha': 'false'
+    })
+  })
+  .then(() => {
+    closeDigitalModal();
+    alert(`✅ Mình nhận được rồi ${name}!\n\nQuỳnh Anh sẽ gửi file PDF qua Zalo ${contact} trong 5 phút nhé 🌸`);
+    document.getElementById('digitalForm').reset();
+  })
+  .catch(() => {
+    alert('Mạng có vấn đề — bạn nhắn thẳng Zalo 0977338876 để mình gửi file nhé!');
+  })
+  .finally(() => {
+    btn.disabled = false;
+    btn.textContent = '✅ Đã chuyển khoản — Gửi thông tin nhận file';
+  });
+}
+
+// Đóng digital modal khi click nền
+document.getElementById('digitalModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeDigitalModal();
+});
