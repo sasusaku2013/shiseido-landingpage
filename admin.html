@@ -361,12 +361,21 @@ textarea{resize:vertical;min-height:72px}
 
 <script>
 // ─── Server URL Config ─────────────────────────────────────
-let API_BASE = localStorage.getItem('adminServerUrl') || 'https://dealngon.online';
+// Tự động xoá cache cũ nếu từng lưu dealngon.online vào localStorage
+if (localStorage.getItem('adminServerUrl') && localStorage.getItem('adminServerUrl').includes('dealngon.online')) {
+  localStorage.removeItem('adminServerUrl');
+}
+
+const isStaticHost = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
+// Nếu đang mở từ Railway, Render hay localhost thì gọi trực tiếp host hiện tại
+let API_BASE = isStaticHost ? (localStorage.getItem('adminServerUrl') || '') : '';
+
 function updateServerLabel() {
-  document.getElementById('serverLabel').textContent = '🔗 ' + API_BASE;
+  const current = API_BASE || window.location.origin;
+  document.getElementById('serverLabel').textContent = '🔗 ' + current;
 }
 function openServerConfig() {
-  document.getElementById('serverUrlInput').value = API_BASE;
+  document.getElementById('serverUrlInput').value = API_BASE || window.location.origin;
   document.getElementById('serverConfigModal').style.display = 'flex';
   document.getElementById('serverTestResult').textContent = '';
 }
@@ -418,7 +427,7 @@ const badge=(val,prefix='')=>`<span class="badge badge-${prefix?prefix+'-':''}${
 async function api(method, url, body=null){
   const opts={method, headers:{'Content-Type':'application/json'}};
   if(body) opts.body=JSON.stringify(body);
-  const fullUrl = url.startsWith('http') ? url : API_BASE + url;
+  const fullUrl = (url.startsWith('http') || !API_BASE) ? url : API_BASE + url;
   const res=await fetch(fullUrl,opts);
   if(!res.ok){const e=await res.json().catch(()=>({})); throw new Error(e.error||'Lỗi server');}
   return res.json();
