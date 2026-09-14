@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Panel — Shiseido Brain</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+/* Header */
+.header{background:linear-gradient(135deg,#1a1a2e,#5b2d8e);color:#fff;padding:16px 28px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.header-logo{font-size:1.6rem}
+.header h1{font-size:1.15rem;font-weight:700;letter-spacing:.5px}
+.header small{font-size:.75rem;opacity:.65}
+/* Tabs */
+.tabs{display:flex;gap:4px;padding:20px 28px 0;border-bottom:2px solid #e2e8f0}
+.tab-btn{padding:10px 22px;border:none;background:none;cursor:pointer;font-size:.9rem;font-weight:600;color:#64748b;border-radius:8px 8px 0 0;transition:.2s}
+.tab-btn.active{background:#fff;color:#5b2d8e;border-bottom:3px solid #5b2d8e;margin-bottom:-2px}
+.tab-btn:hover:not(.active){background:#f8fafc;color:#334155}
+/* Content */
+.tab-content{display:none;padding:24px 28px}
+.tab-content.active{display:block}
+/* Toolbar */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.toolbar h2{font-size:1rem;font-weight:700;color:#334155}
+.stat-badge{background:#f1f5f9;padding:4px 12px;border-radius:20px;font-size:.78rem;color:#64748b}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:600;transition:.2s}
+.btn-primary{background:#5b2d8e;color:#fff}.btn-primary:hover{background:#4a2475}
+.btn-success{background:#10b981;color:#fff}.btn-success:hover{background:#059669}
+.btn-warning{background:#f59e0b;color:#fff}.btn-warning:hover{background:#d97706}
+.btn-danger{background:#ef4444;color:#fff}.btn-danger:hover{background:#dc2626}
+.btn-sm{padding:5px 10px;font-size:.78rem;border-radius:6px}
+/* Table */
+.table-wrap{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+th{background:#f8fafc;padding:10px 14px;text-align:left;font-size:.75rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.actions{display:flex;gap:6px}
+/* Badges */
+.badge{padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap}
+.badge-physical{background:#dbeafe;color:#1d4ed8}
+.badge-digital{background:#d1fae5;color:#065f46}
+.badge-service{background:#fef3c7;color:#92400e}
+.badge-pending{background:#fef3c7;color:#92400e}
+.badge-confirmed{background:#dbeafe;color:#1d4ed8}
+.badge-shipping{background:#ede9fe;color:#5b21b6}
+.badge-delivered{background:#d1fae5;color:#065f46}
+.badge-cancelled{background:#fee2e2;color:#b91c1c}
+.badge-refunded{background:#f1f5f9;color:#475569}
+.badge-cod{background:#fef3c7;color:#92400e}
+.badge-bank_transfer{background:#d1fae5;color:#065f46}
+.badge-active{background:#d1fae5;color:#065f46}
+.badge-inactive{background:#fee2e2;color:#b91c1c}
+.stock-low{color:#ef4444;font-weight:700}
+.stock-null{color:#94a3b8;font-style:italic}
+/* Empty state */
+.empty{text-align:center;padding:48px;color:#94a3b8}
+.empty-icon{font-size:2.5rem;margin-bottom:10px}
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:92%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{padding:20px 24px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f1f5f9}
+.modal-header h3{font-size:1rem;font-weight:700;color:#1a1a2e}
+.modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:#94a3b8;line-height:1}.modal-close:hover{color:#334155}
+.modal-body{padding:20px 24px}
+.modal-footer{padding:16px 24px;border-top:1px solid #f1f5f9;display:flex;justify-content:flex-end;gap:10px}
+/* Form */
+.form-group{margin-bottom:16px}
+label{display:block;font-size:.8rem;font-weight:600;color:#475569;margin-bottom:6px}
+input,select,textarea{width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.88rem;color:#1a1a2e;transition:.2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#5b2d8e;box-shadow:0 0 0 3px rgba(91,45,142,.1)}
+textarea{resize:vertical;min-height:72px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-hint{font-size:.73rem;color:#94a3b8;margin-top:4px}
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:#fff;padding:12px 20px;border-radius:10px;font-size:.85rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:.3s;display:flex;align-items:center;gap:8px}
+.toast.show{transform:none;opacity:1}
+.toast.success{background:#10b981}
+.toast.error{background:#ef4444}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">🌸</div>
+  <div>
+    <h1>Shiseido Admin Panel</h1>
+    <small>brain.db · Quản lý sản phẩm · khách hàng · đơn hàng</small>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('products')">🛍️ Sản phẩm</button>
+  <button class="tab-btn" onclick="switchTab('customers')">👥 Khách hàng</button>
+  <button class="tab-btn" onclick="switchTab('orders')">📦 Đơn hàng</button>
+</div>
+
+<!-- ═══ TAB: PRODUCTS ═══════════════════════════════════════ -->
+<div id="tab-products" class="tab-content active">
+  <div class="toolbar">
+    <div>
+      <h2>Danh sách sản phẩm</h2>
+      <span class="stat-badge" id="products-count">—</span>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('product')">＋ Thêm sản phẩm</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Tên sản phẩm</th><th>Loại</th><th>Giá (đ)</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr>
+      </thead>
+      <tbody id="products-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ TAB: CUSTOMERS ══════════════════════════════════════ -->
+<div id="tab-customers" class="tab-content">
+  <div class="toolbar">
+    <div>
+      <h2>Danh sách khách hàng</h2>
+      <span class="stat-badge" id="customers-count">—</span>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('customer')">＋ Thêm khách hàng</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Tên</th><th>Số điện thoại</th><th>Zalo</th><th>Email</th><th>Nguồn</th><th>Ngày đăng ký</th><th>Thao tác</th></tr>
+      </thead>
+      <tbody id="customers-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ TAB: ORDERS ═════════════════════════════════════════ -->
+<div id="tab-orders" class="tab-content">
+  <div class="toolbar">
+    <div>
+      <h2>Danh sách đơn hàng</h2>
+      <span class="stat-badge" id="orders-count">—</span>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('order')">＋ Thêm đơn hàng</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Khách hàng</th><th>Sản phẩm</th><th>Số tiền</th><th>Trạng thái</th><th>Thanh toán</th><th>Mã CK</th><th>Ngày đặt</th><th>Thao tác</th></tr>
+      </thead>
+      <tbody id="orders-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ MODALS ═══════════════════════════════════════════════ -->
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="modal-product">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="product-modal-title">Thêm sản phẩm</h3>
+      <button class="modal-close" onclick="closeModal('product')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="product-id">
+      <div class="form-group">
+        <label>Tên sản phẩm *</label>
+        <input type="text" id="product-name" placeholder="Ví dụ: Shiseido Serum 30ml">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Loại sản phẩm *</label>
+          <select id="product-type" onchange="toggleStockField()">
+            <option value="physical">Vật lý (physical)</option>
+            <option value="digital">Số (digital)</option>
+            <option value="service">Dịch vụ (service)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Giá (VND) *</label>
+          <input type="number" id="product-price" placeholder="2480000">
+        </div>
+      </div>
+      <div class="form-group" id="stock-group">
+        <label>Số lượng tồn kho</label>
+        <input type="number" id="product-stock" placeholder="Để trống = không giới hạn">
+        <div class="form-hint">Chỉ dành cho sản phẩm vật lý. Để trống nếu bạn quản lý tồn kho thủ công.</div>
+      </div>
+      <div class="form-group">
+        <label>Mô tả</label>
+        <textarea id="product-description" placeholder="Mô tả ngắn về sản phẩm..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Trạng thái</label>
+        <select id="product-active">
+          <option value="1">✅ Đang bán</option>
+          <option value="0">⛔ Ngưng bán</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('product')" style="background:#f1f5f9;color:#475569">Huỷ</button>
+      <button class="btn btn-success" onclick="saveProduct()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div class="modal-overlay" id="modal-customer">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="customer-modal-title">Thêm khách hàng</h3>
+      <button class="modal-close" onclick="closeModal('customer')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="customer-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Họ và tên *</label>
+          <input type="text" id="customer-name" placeholder="Nguyễn Thị A">
+        </div>
+        <div class="form-group">
+          <label>Số điện thoại *</label>
+          <input type="text" id="customer-phone" placeholder="0987654321">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Zalo</label>
+          <input type="text" id="customer-zalo" placeholder="SĐT Zalo (nếu khác)">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="customer-email" placeholder="email@example.com">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nguồn</label>
+        <select id="customer-source">
+          <option value="manual">Thêm thủ công</option>
+          <option value="waitlist">Waitlist</option>
+          <option value="order">Từ đơn hàng</option>
+          <option value="referral">Giới thiệu</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ghi chú</label>
+        <textarea id="customer-notes" placeholder="Ghi chú về khách hàng..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('customer')" style="background:#f1f5f9;color:#475569">Huỷ</button>
+      <button class="btn btn-success" onclick="saveCustomer()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Order Modal -->
+<div class="modal-overlay" id="modal-order">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="order-modal-title">Thêm đơn hàng</h3>
+      <button class="modal-close" onclick="closeModal('order')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="order-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Khách hàng</label>
+          <select id="order-customer"></select>
+        </div>
+        <div class="form-group">
+          <label>Sản phẩm</label>
+          <select id="order-product" onchange="fillOrderAmount()"></select>
+        </div>
+      </div>
+      <div class="form-group" id="stock-warning" style="display:none">
+        <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px 14px;font-size:.82rem;color:#856404">
+          ⚠️ <strong>Sản phẩm vật lý có tồn kho giới hạn</strong> — Thêm đơn sẽ tự động trừ 1 đơn vị.
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Số tiền (VND) *</label>
+          <input type="number" id="order-amount" placeholder="2480000">
+        </div>
+        <div class="form-group">
+          <label>Trạng thái</label>
+          <select id="order-status">
+            <option value="pending">⏳ Chờ xác nhận</option>
+            <option value="confirmed">✅ Đã xác nhận</option>
+            <option value="shipping">🚚 Đang giao</option>
+            <option value="delivered">📦 Đã giao</option>
+            <option value="cancelled">❌ Đã huỷ</option>
+            <option value="refunded">↩️ Hoàn tiền</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Thanh toán</label>
+          <select id="order-payment">
+            <option value="cod">COD (tiền mặt)</option>
+            <option value="bank_transfer">Chuyển khoản</option>
+            <option value="other">Khác</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mã chuyển khoản</label>
+          <input type="text" id="order-ref" placeholder="DH12345678">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Địa chỉ giao hàng</label>
+        <input type="text" id="order-address" placeholder="123 Đường ABC, Hà Nội">
+      </div>
+      <div class="form-group">
+        <label>Ghi chú</label>
+        <textarea id="order-notes" placeholder="Ghi chú đơn hàng..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('order')" style="background:#f1f5f9;color:#475569">Huỷ</button>
+      <button class="btn btn-success" onclick="saveOrder()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ─────────────────────────────────────────────────
+let products=[], customers=[], orders=[];
+let editMode = null;
+
+// ─── Tab switching ─────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ─── Toast ─────────────────────────────────────────────────
+function toast(msg, type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=(type==='success'?'✅ ':'❌ ')+msg;
+  t.className='toast '+type+' show';
+  setTimeout(()=>t.className='toast',3000);
+}
+
+// ─── Format helpers ────────────────────────────────────────
+const fmt=(n)=>Number(n).toLocaleString('vi-VN')+'đ';
+const fmtDate=(s)=>s?s.slice(0,10):'—';
+const badge=(val,prefix='')=>`<span class="badge badge-${prefix?prefix+'-':''}${val}">${val}</span>`;
+
+// ─── Fetch helpers ─────────────────────────────────────────
+async function api(method, url, body=null){
+  const opts={method, headers:{'Content-Type':'application/json'}};
+  if(body) opts.body=JSON.stringify(body);
+  const res=await fetch(url,opts);
+  if(!res.ok){const e=await res.json().catch(()=>({})); throw new Error(e.error||'Lỗi server');}
+  return res.json();
+}
+
+// ─── LOAD DATA ─────────────────────────────────────────────
+async function loadAll(){
+  await Promise.all([loadProducts(), loadCustomers(), loadOrders()]);
+}
+
+async function loadProducts(){
+  products = await api('GET','/api/products');
+  const tbody=document.getElementById('products-tbody');
+  document.getElementById('products-count').textContent=products.length+' sản phẩm';
+  if(!products.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="empty-icon">🛍️</div>Chưa có sản phẩm nào</div></td></tr>`;return;}
+  tbody.innerHTML=products.map(p=>`
+    <tr>
+      <td style="color:#94a3b8;font-size:.78rem">#${p.id}</td>
+      <td style="font-weight:600;max-width:220px">${p.name}</td>
+      <td>${badge(p.type)}</td>
+      <td style="font-weight:700;color:#5b2d8e">${fmt(p.price)}</td>
+      <td>${p.stock===null?'<span class="stock-null">∞ Không giới hạn</span>':p.stock<=5?`<span class="stock-low">⚠️ ${p.stock}</span>`:p.stock}</td>
+      <td>${p.is_active?'<span class="badge badge-active">Đang bán</span>':'<span class="badge badge-inactive">Ngưng</span>'}</td>
+      <td><div class="actions">
+        <button class="btn btn-warning btn-sm" onclick="editProduct(${p.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+async function loadCustomers(){
+  customers = await api('GET','/api/customers');
+  const tbody=document.getElementById('customers-tbody');
+  document.getElementById('customers-count').textContent=customers.length+' khách hàng';
+  if(!customers.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">👥</div>Chưa có khách hàng nào</div></td></tr>`;return;}
+  tbody.innerHTML=customers.map(c=>`
+    <tr>
+      <td style="color:#94a3b8;font-size:.78rem">#${c.id}</td>
+      <td style="font-weight:600">${c.name}</td>
+      <td>${c.phone}</td>
+      <td>${c.zalo||'—'}</td>
+      <td style="color:#64748b;font-size:.82rem">${c.email||'—'}</td>
+      <td><span class="badge" style="background:#f1f5f9;color:#475569">${c.source||'—'}</span></td>
+      <td style="color:#94a3b8;font-size:.8rem">${fmtDate(c.registered_at)}</td>
+      <td><div class="actions">
+        <button class="btn btn-warning btn-sm" onclick="editCustomer(${c.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCustomer(${c.id})">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+async function loadOrders(){
+  orders = await api('GET','/api/orders');
+  const tbody=document.getElementById('orders-tbody');
+  document.getElementById('orders-count').textContent=orders.length+' đơn';
+  if(!orders.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="empty-icon">📦</div>Chưa có đơn hàng nào</div></td></tr>`;return;}
+  tbody.innerHTML=orders.map(o=>`
+    <tr>
+      <td style="color:#94a3b8;font-size:.78rem">#${o.id}</td>
+      <td style="font-weight:600">${o.cname||o.customer_name||'—'}<br><small style="color:#94a3b8">${o.cphone||o.customer_phone||''}</small></td>
+      <td style="max-width:160px;font-size:.82rem">${o.pname||o.product_name||'—'}</td>
+      <td style="font-weight:700;color:#5b2d8e">${fmt(o.amount)}</td>
+      <td>${badge(o.status)}</td>
+      <td>${badge(o.payment_method)}</td>
+      <td style="font-size:.78rem;color:#64748b;font-family:monospace">${o.payment_ref||'—'}</td>
+      <td style="color:#94a3b8;font-size:.8rem">${fmtDate(o.ordered_at)}</td>
+      <td><div class="actions">
+        <button class="btn btn-warning btn-sm" onclick="editOrder(${o.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteOrder(${o.id})">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+// ─── MODAL helpers ─────────────────────────────────────────
+function openModal(type, data=null){
+  editMode={type, data};
+  if(type==='product') setupProductModal(data);
+  if(type==='customer') setupCustomerModal(data);
+  if(type==='order') setupOrderModal(data);
+  document.getElementById('modal-'+type).classList.add('open');
+}
+function closeModal(type){
+  document.getElementById('modal-'+type).classList.remove('open');
+  editMode=null;
+}
+
+// ─── PRODUCT modal ─────────────────────────────────────────
+function toggleStockField(){
+  const t=document.getElementById('product-type').value;
+  document.getElementById('stock-group').style.display=t==='physical'?'block':'none';
+}
+function setupProductModal(data){
+  document.getElementById('product-modal-title').textContent=data?'Chỉnh sửa sản phẩm':'Thêm sản phẩm';
+  document.getElementById('product-id').value=data?.id||'';
+  document.getElementById('product-name').value=data?.name||'';
+  document.getElementById('product-type').value=data?.type||'physical';
+  document.getElementById('product-price').value=data?.price||'';
+  document.getElementById('product-stock').value=data?.stock??'';
+  document.getElementById('product-description').value=data?.description||'';
+  document.getElementById('product-active').value=data?.is_active??1;
+  toggleStockField();
+}
+async function saveProduct(){
+  const id=document.getElementById('product-id').value;
+  const ptype=document.getElementById('product-type').value;
+  const stockVal=document.getElementById('product-stock').value;
+  const body={
+    name:document.getElementById('product-name').value,
+    type:ptype,
+    price:document.getElementById('product-price').value,
+    stock:ptype==='physical'&&stockVal!==''?parseInt(stockVal):null,
+    description:document.getElementById('product-description').value,
+    is_active:document.getElementById('product-active').value,
+  };
+  if(!body.name||!body.price){toast('Vui lòng điền đủ thông tin','error');return;}
+  try{
+    if(id) await api('PUT','/api/products/'+id,body);
+    else await api('POST','/api/products',body);
+    closeModal('product'); await loadProducts(); toast('Lưu sản phẩm thành công!');
+  }catch(e){toast(e.message,'error');}
+}
+function editProduct(id){
+  openModal('product', products.find(p=>p.id===id));
+}
+async function deleteProduct(id){
+  if(!confirm('Xoá sản phẩm này?')) return;
+  try{await api('DELETE','/api/products/'+id);await loadProducts();toast('Đã xoá sản phẩm');}
+  catch(e){toast(e.message,'error');}
+}
+
+// ─── CUSTOMER modal ────────────────────────────────────────
+function setupCustomerModal(data){
+  document.getElementById('customer-modal-title').textContent=data?'Chỉnh sửa khách hàng':'Thêm khách hàng';
+  document.getElementById('customer-id').value=data?.id||'';
+  document.getElementById('customer-name').value=data?.name||'';
+  document.getElementById('customer-phone').value=data?.phone||'';
+  document.getElementById('customer-zalo').value=data?.zalo||'';
+  document.getElementById('customer-email').value=data?.email||'';
+  document.getElementById('customer-source').value=data?.source||'manual';
+  document.getElementById('customer-notes').value=data?.notes||'';
+}
+async function saveCustomer(){
+  const id=document.getElementById('customer-id').value;
+  const body={
+    name:document.getElementById('customer-name').value,
+    phone:document.getElementById('customer-phone').value,
+    zalo:document.getElementById('customer-zalo').value,
+    email:document.getElementById('customer-email').value,
+    source:document.getElementById('customer-source').value,
+    notes:document.getElementById('customer-notes').value,
+  };
+  if(!body.name||!body.phone){toast('Họ tên và SĐT là bắt buộc','error');return;}
+  try{
+    if(id) await api('PUT','/api/customers/'+id,body);
+    else await api('POST','/api/customers',body);
+    closeModal('customer');await loadCustomers();toast('Lưu khách hàng thành công!');
+  }catch(e){toast(e.message,'error');}
+}
+function editCustomer(id){openModal('customer',customers.find(c=>c.id===id));}
+async function deleteCustomer(id){
+  if(!confirm('Xoá khách hàng này?')) return;
+  try{await api('DELETE','/api/customers/'+id);await loadCustomers();toast('Đã xoá khách hàng');}
+  catch(e){toast(e.message,'error');}
+}
+
+// ─── ORDER modal ───────────────────────────────────────────
+function setupOrderModal(data){
+  document.getElementById('order-modal-title').textContent=data?'Chỉnh sửa đơn hàng':'Thêm đơn hàng';
+  document.getElementById('order-id').value=data?.id||'';
+  // Populate dropdowns
+  const cSel=document.getElementById('order-customer');
+  cSel.innerHTML='<option value="">— Chọn khách hàng —</option>'+
+    customers.map(c=>`<option value="${c.id}" ${data?.customer_id===c.id?'selected':''}>${c.name} · ${c.phone}</option>`).join('');
+  const pSel=document.getElementById('order-product');
+  pSel.innerHTML='<option value="">— Chọn sản phẩm —</option>'+
+    products.filter(p=>p.is_active).map(p=>`<option value="${p.id}" data-price="${p.price}" data-type="${p.type}" data-stock="${p.stock}" ${data?.product_id===p.id?'selected':''}>${p.name} · ${fmt(p.price)}</option>`).join('');
+  document.getElementById('order-amount').value=data?.amount||'';
+  document.getElementById('order-status').value=data?.status||'pending';
+  document.getElementById('order-payment').value=data?.payment_method||'cod';
+  document.getElementById('order-ref').value=data?.payment_ref||'';
+  document.getElementById('order-address').value=data?.address||'';
+  document.getElementById('order-notes').value=data?.notes||'';
+  if(data?.product_id) fillOrderAmount();
+}
+function fillOrderAmount(){
+  const sel=document.getElementById('order-product');
+  const opt=sel.selectedOptions[0];
+  if(!opt||!opt.value) return;
+  document.getElementById('order-amount').value=opt.dataset.price||'';
+  const isPhysical=opt.dataset.type==='physical';
+  const hasStock=opt.dataset.stock!='null'&&opt.dataset.stock!=='';
+  document.getElementById('stock-warning').style.display=(isPhysical&&hasStock)?'block':'none';
+}
+async function saveOrder(){
+  const id=document.getElementById('order-id').value;
+  const pSel=document.getElementById('order-product').selectedOptions[0];
+  const cSel=document.getElementById('order-customer').selectedOptions[0];
+  const body={
+    customer_id:document.getElementById('order-customer').value||null,
+    customer_name:cSel?.text?.split('·')[0]?.trim()||'',
+    customer_phone:cSel?.text?.split('·')[1]?.trim()||'',
+    product_id:document.getElementById('order-product').value||null,
+    product_name:pSel?.text?.split('·')[0]?.trim()||'',
+    amount:document.getElementById('order-amount').value,
+    status:document.getElementById('order-status').value,
+    payment_method:document.getElementById('order-payment').value,
+    payment_ref:document.getElementById('order-ref').value,
+    address:document.getElementById('order-address').value,
+    notes:document.getElementById('order-notes').value,
+  };
+  if(!body.amount){toast('Vui lòng nhập số tiền','error');return;}
+  try{
+    if(id) await api('PUT','/api/orders/'+id,body);
+    else await api('POST','/api/orders',body);
+    closeModal('order');await loadAll();toast('Lưu đơn hàng thành công!');
+  }catch(e){toast(e.message,'error');}
+}
+function editOrder(id){openModal('order',orders.find(o=>o.id===id));}
+async function deleteOrder(id){
+  if(!confirm('Xoá đơn hàng này?')) return;
+  try{await api('DELETE','/api/orders/'+id);await loadOrders();toast('Đã xoá đơn hàng');}
+  catch(e){toast(e.message,'error');}
+}
+
+// ─── Close modal on overlay click ─────────────────────────
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click', e=>{ if(e.target===el) el.classList.remove('open'); });
+});
+
+// ─── Init ─────────────────────────────────────────────────
+loadAll();
+</script>
+</body>
+</html>
