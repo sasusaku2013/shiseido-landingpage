@@ -1158,39 +1158,52 @@
   </div>
 
   <!-- ORDER SUCCESS MODAL -->
-  <div class="order-modal-overlay" id="orderModal">
-    <div class="order-modal-card">
-      <div class="modal-success-icon">
-        <i class="fa-solid fa-circle-check"></i>
-      </div>
-      <h3>ĐẶT HÀNG THÀNH CÔNG!</h3>
-      <p class="modal-greet">Cảm ơn <strong id="modalCustomerName">chị</strong> đã trao niềm tin cho Shiseido Ginza Tokyo.</p>
-      <div class="modal-summary-box">
-        <p><strong>Gói sản phẩm:</strong> <span id="modalPackage">Combo Trẻ Hóa 50ml</span></p>
-        <p><strong>Số điện thoại:</strong> <span id="modalPhone">0987654321</span></p>
-        <p><strong>Địa chỉ nhận hàng:</strong> <span id="modalAddress">Hà Nội</span></p>
-        <p class="modal-gift-tag">🎁 Đã kèm phần quà trị giá 450.000đ + Miễn phí vận chuyển</p>
-      </div>
+   <div class="order-modal-overlay" id="orderModal">
+    <div class="order-modal-card order-modal-compact">
 
-      <!-- QR Code thanh toán SePay -->
-      <div class="modal-qr-section">
-        <p class="modal-qr-title">💳 Thanh toán chuyển khoản ngay (tuỳ chọn)</p>
-        <p class="modal-qr-desc">Quét mã bằng app ngân hàng — tự điền đúng số tiền &amp; nội dung.</p>
-        <div id="modalQrWrap" style="min-height:210px;display:flex;align-items:center;justify-content:center;">
-          <p id="modalQrLoading" style="color:#aaa;font-size:0.85rem;">⏳ Đang tạo mã QR...</p>
-          <img id="modalQrCode"
-               src=""
-               alt="QR Code thanh toán Techcombank"
-               class="modal-qr-img"
-               style="display:none;"
-               onload="this.style.display='block';document.getElementById('modalQrLoading').style.display='none';"
-               onerror="document.getElementById('modalQrLoading').innerHTML='⚠️ Không tải được QR — <a id=\'qrLink\' href=\'#\' target=\'_blank\'>bấm đây để xem QR</a>';" />
+      <!-- Header -->
+      <div class="modal-header-row">
+        <div class="modal-success-icon modal-icon-sm">
+          <i class="fa-solid fa-circle-check"></i>
         </div>
-        <p class="modal-qr-note">Hoặc chuyển khoản sau khi nhận hàng &amp; kiểm tra — shipper sẽ thu tiền mặt.</p>
+        <div>
+          <h3 class="modal-title-sm">ĐẶT HÀNG THÀNH CÔNG!</h3>
+          <p class="modal-greet-sm">Cảm ơn <strong id="modalCustomerName">chị</strong> đã tin tưởng Shiseido Ginza Tokyo 🌸</p>
+        </div>
       </div>
 
-      <p class="modal-note">Chuyên viên da liễu Shiseido sẽ gọi điện thoại xác nhận đơn hàng và tư vấn chu trình chăm sóc da phù hợp nhất cho bạn trong vòng 15 phút tới.</p>
-      <button class="btn-dark-pill modal-close-btn" onclick="closeModal()">Đã Hiểu &amp; Đóng Lại</button>
+      <!-- 2 cột: Thông tin + QR -->
+      <div class="modal-body-row">
+
+        <!-- Cột trái: thông tin đơn hàng -->
+        <div class="modal-col-info">
+          <div class="modal-summary-box">
+            <p><strong>Gói:</strong> <span id="modalPackage">Combo Trẻ Hóa 50ml</span></p>
+            <p><strong>SĐT:</strong> <span id="modalPhone">0987654321</span></p>
+            <p><strong>Địa chỉ:</strong> <span id="modalAddress">Hà Nội</span></p>
+            <p class="modal-gift-tag">🎁 Quà VIP 450k + Freeship</p>
+          </div>
+          <p class="modal-note-sm">Chuyên viên sẽ gọi xác nhận trong <strong>15 phút</strong> tới.</p>
+          <button class="btn-dark-pill modal-close-btn" onclick="closeModal()">Đóng Lại</button>
+        </div>
+
+        <!-- Cột phải: QR Code -->
+        <div class="modal-col-qr">
+          <p class="modal-qr-title">💳 Chuyển khoản ngay</p>
+          <div id="modalQrWrap" style="min-height:160px;display:flex;align-items:center;justify-content:center;">
+            <p id="modalQrLoading" style="color:#aaa;font-size:0.8rem;text-align:center;">⏳ Đang tạo QR...</p>
+            <img id="modalQrCode"
+                 src=""
+                 alt="QR Techcombank"
+                 class="modal-qr-img"
+                 style="display:none;"
+                 onload="this.style.display='block';document.getElementById('modalQrLoading').style.display='none';"
+                 onerror="document.getElementById('modalQrLoading').innerHTML='<a href=\'#\' id=\'qrLink\' target=\'_blank\' style=\'color:#5b2d8e;font-size:0.82rem;\'>⚠️ Bấm để xem QR</a>';" />
+          </div>
+          <p class="modal-qr-note">Hoặc trả tiền mặt khi nhận hàng.</p>
+        </div>
+
+      </div><!-- end modal-body-row -->
     </div>
   </div>
 
