@@ -88,9 +88,35 @@ textarea{resize:vertical;min-height:72px}
 
 <div class="header">
   <div class="header-logo">🌸</div>
-  <div>
+  <div style="flex:1">
     <h1>Shiseido Admin Panel</h1>
-    <small>brain.db · Quản lý sản phẩm · khách hàng · đơn hàng</small>
+    <small id="serverLabel">brain.db · Quản lý sản phẩm · khách hàng · đơn hàng</small>
+  </div>
+  <button onclick="openServerConfig()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.8rem;white-space:nowrap">
+    ⚙️ Server URL
+  </button>
+</div>
+
+<!-- Server config modal -->
+<div id="serverConfigModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:90%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <h3 style="margin-bottom:8px;font-size:1rem">⚙️ Cấu hình Server URL</h3>
+    <p style="font-size:.82rem;color:#64748b;margin-bottom:16px">
+      Admin panel cần kết nối tới Flask server đang chạy. Nhập URL server của bạn:
+    </p>
+    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;font-size:.8rem;color:#475569">
+      <strong>Local (chạy máy tính của bạn):</strong><br>
+      <code>https://dealngon.online</code><br><br>
+      <strong>Public (đã deploy lên Railway/Render):</strong><br>
+      <code>https://brain-api.railway.app</code> (Railway) hoặc tên miền của bạn
+    </div>
+    <input type="url" id="serverUrlInput" placeholder="https://dealngon.online"
+           style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;margin-bottom:14px">
+    <div style="display:flex;gap:10px">
+      <button onclick="saveServerConfig()" style="flex:1;background:#5b2d8e;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600">Lưu & Kết nối</button>
+      <button onclick="document.getElementById('serverConfigModal').style.display='none'" style="background:#f1f5f9;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;color:#475569">Đóng</button>
+    </div>
+    <div id="serverTestResult" style="margin-top:10px;font-size:.8rem;text-align:center"></div>
   </div>
 </div>
 
@@ -236,7 +262,7 @@ textarea{resize:vertical;min-height:72px}
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" id="customer-email" placeholder="email@example.com">
+          <input type="email" id="customer-email" placeholder="toquynhanh@gmail.com">
         </div>
       </div>
       <div class="form-group">
@@ -334,6 +360,35 @@ textarea{resize:vertical;min-height:72px}
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── Server URL Config ─────────────────────────────────────
+let API_BASE = localStorage.getItem('adminServerUrl') || 'https://dealngon.online';
+function updateServerLabel() {
+  document.getElementById('serverLabel').textContent = '🔗 ' + API_BASE;
+}
+function openServerConfig() {
+  document.getElementById('serverUrlInput').value = API_BASE;
+  document.getElementById('serverConfigModal').style.display = 'flex';
+  document.getElementById('serverTestResult').textContent = '';
+}
+async function saveServerConfig() {
+  const url = document.getElementById('serverUrlInput').value.trim().replace(/\/$/, '');
+  if (!url) return;
+  document.getElementById('serverTestResult').textContent = '⏳ Đang kiểm tra kết nối...';
+  try {
+    const res = await fetch(url + '/health', { signal: AbortSignal.timeout(5000) });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      API_BASE = url;
+      localStorage.setItem('adminServerUrl', url);
+      updateServerLabel();
+      document.getElementById('serverTestResult').innerHTML = '<span style="color:green">✅ Kết nối thành công!</span>';
+      setTimeout(() => { document.getElementById('serverConfigModal').style.display='none'; loadAll(); }, 800);
+    }
+  } catch(e) {
+    document.getElementById('serverTestResult').innerHTML = '<span style="color:red">❌ Không kết nối được. Kiểm tra server đang chạy chưa?</span>';
+  }
+}
+
 // ─── State ─────────────────────────────────────────────────
 let products=[], customers=[], orders=[];
 let editMode = null;
@@ -363,13 +418,15 @@ const badge=(val,prefix='')=>`<span class="badge badge-${prefix?prefix+'-':''}${
 async function api(method, url, body=null){
   const opts={method, headers:{'Content-Type':'application/json'}};
   if(body) opts.body=JSON.stringify(body);
-  const res=await fetch(url,opts);
+  const fullUrl = url.startsWith('http') ? url : API_BASE + url;
+  const res=await fetch(fullUrl,opts);
   if(!res.ok){const e=await res.json().catch(()=>({})); throw new Error(e.error||'Lỗi server');}
   return res.json();
 }
 
 // ─── LOAD DATA ─────────────────────────────────────────────
 async function loadAll(){
+  updateServerLabel();
   await Promise.all([loadProducts(), loadCustomers(), loadOrders()]);
 }
 
