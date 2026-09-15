@@ -345,6 +345,7 @@ def create_order_from_checkout():
     d = request.json
     phone = (d.get("phone") or "").strip()
     name = (d.get("name") or "Khách hàng").strip()
+    email = (d.get("email") or "").strip()
     address = (d.get("address") or "").strip()
     notes = (d.get("notes") or "").strip()
 
@@ -355,14 +356,15 @@ def create_order_from_checkout():
         if not customer:
             try:
                 cid = DB.execute(
-                    "INSERT INTO customers(name,phone,zalo,source,notes) VALUES(?,?,?,'order',?)",
-                    (name, phone, phone, address or notes))
+                    "INSERT INTO customers(name,phone,zalo,email,source,notes) VALUES(?,?,?,?,'order',?)",
+                    (name, phone, phone, email or None, address or notes))
             except Exception:
                 c2 = DB.fetchone("SELECT id FROM customers WHERE phone=?", (phone,))
                 cid = c2["id"] if c2 else None
         else:
             cid = customer["id"]
-            DB.run("UPDATE customers SET name=?, notes=? WHERE id=?", (name, address or notes, cid))
+            DB.run("UPDATE customers SET name=?, email=COALESCE(NULLIF(?,''), email), notes=? WHERE id=?",
+                   (name, email, address or notes, cid))
 
     pkg = d.get("package","")
     is_combo2 = "Combo 2" in pkg or "2.780" in pkg

@@ -879,7 +879,7 @@ function submitDigitalOrder(event) {
       '_subject': `📄 [MUA CHECKLIST PDF] ${name} - ${contact}`,
       'Tên khách': name,
       'Zalo nhận file': contact,
-      'Sản phẩm': 'Checklist Da Đẹp 3 Phút - 49.000đ',
+      'Sản phẩm': 'Checklist Da Đẹp 3 Phút - 2.000đ',
       '_template': 'table',
       '_captcha': 'false'
     })
@@ -901,4 +901,70 @@ function submitDigitalOrder(event) {
 // Đóng digital modal khi click nền
 document.getElementById('digitalModal')?.addEventListener('click', function(e) {
   if (e.target === this) closeDigitalModal();
+});
+
+
+// ── Waitlist Survey Form Submission ───────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const surveyForm = document.getElementById('surveyForm');
+  if (surveyForm) {
+    surveyForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const submitBtn = surveyForm.querySelector('.btn-survey-submit');
+      const originalText = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span><i class="fa-solid fa-spinner fa-spin"></i> Đang gửi khảo sát...</span>';
+      }
+
+      const formData = new FormData(surveyForm);
+      const ten = (formData.get('ten') || '').trim();
+      const sdt = (formData.get('sdt_zalo') || '').trim();
+      const email = (formData.get('email') || '').trim();
+      const kenh = formData.get('kenh_mua_sam') || '';
+      const sp = formData.get('san_pham_quan_tam') || '';
+      const gia = formData.get('muc_gia') || '';
+
+      const notes = `Kênh: ${kenh} · Quan tâm: ${sp} · Giá: ${gia}`;
+
+      // 1. Đồng bộ khách hàng lên Admin (bảng customers, source: waitlist)
+      const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
+      const ADMIN_SERVER = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
+      if (ADMIN_SERVER && sdt) {
+        fetch(ADMIN_SERVER + '/api/customers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: ten || 'Khách waitlist',
+            phone: sdt,
+            zalo: sdt,
+            email: email,
+            source: 'waitlist',
+            notes: notes
+          })
+        }).catch(err => console.warn('Lỗi lưu waitlist admin:', err));
+      }
+
+      // 2. Gửi Formspree
+      try {
+        await fetch(surveyForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+      } catch (err) {}
+
+      // 3. Hiển thị thông báo thành công
+      surveyForm.reset();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+      const successMsg = document.getElementById('surveySuccess');
+      if (successMsg) {
+        successMsg.style.display = 'block';
+        successMsg.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
 });
