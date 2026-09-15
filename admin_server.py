@@ -3,8 +3,8 @@ admin_server.py — Admin Panel + SePay Webhook
 Local:      python3 admin_server.py  →  http://localhost:5001/admin
 Production: set DATABASE_URL env var  →  dùng PostgreSQL tự động
 """
-import os, re, json, sqlite3, hmac, hashlib
-from datetime import datetime
+import os, re, json, sqlite3, hmac, hashlib, threading, time
+from datetime import datetime, timedelta
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
 
@@ -176,6 +176,20 @@ def init_schema():
             ordered_at     {ts},
             updated_at     {ts}
         )""",
+        f"""CREATE TABLE IF NOT EXISTS email_queue (
+            id           {pk},
+            customer_id  INTEGER,
+            email        TEXT NOT NULL,
+            name         TEXT,
+            step         INTEGER NOT NULL,
+            subject      TEXT NOT NULL,
+            scheduled_at TEXT NOT NULL,
+            status       TEXT NOT NULL DEFAULT 'pending'
+                         CHECK(status IN ('pending','sent','failed')),
+            sent_at      TEXT,
+            error        TEXT,
+            created_at   {ts}
+        )""",
     ]
 
     conn = DB._conn()
@@ -248,16 +262,40 @@ def get_customers():
 @app.route("/api/customers", methods=["POST"])
 def create_customer():
     d = request.json
-    try:
-        lid = DB.execute(
-            "INSERT INTO customers(name,phone,zalo,email,source,notes) VALUES(?,?,?,?,?,?)",
-            (d["name"],d["phone"],d.get("zalo",d["phone"]),d.get("email"),d.get("source","manual"),d.get("notes"))
-        )
-        return jsonify(DB.fetchone("SELECT * FROM customers WHERE id=?", (lid,))), 201
-    except Exception as e:
-        if "unique" in str(e).lower() or "duplicate" in str(e).lower():
-            return jsonify({"error": "Số điện thoại đã tồn tại"}), 400
-        raise
+    name = (d.get("name") or "Khách hàng").strip()
+    phone = (d.get("phone") or "").strip()
+    zalo = (d.get("zalo") or phone).strip()
+    email = (d.get("email") or "").strip()
+    source = (d.get("source") or "manual").strip()
+    notes = (d.get("notes") or "").strip()
+
+    cid = None
+    existing = DB.fetchone("SELECT id, email, name FROM customers WHERE phone=?", (phone,)) if phone else None
+    if existing:
+        cid = existing["id"]
+        DB.run("UPDATE customers SET name=?, email=COALESCE(NULLIF(?,''), email), source=?, notes=? WHERE id=?",
+               (name, email or None, source, notes, cid))
+    else:
+        try:
+            cid = DB.execute(
+                "INSERT INTO customers(name,phone,zalo,email,source,notes) VALUES(?,?,?,?,?,?)",
+                (name, phone, zalo, email or None, source, notes)
+            )
+        except Exception as e:
+            if "unique" in str(e).lower() or "duplicate" in str(e).lower():
+                existing2 = DB.fetchone("SELECT id FROM customers WHERE phone=?", (phone,))
+                cid = existing2["id"] if existing2 else None
+            else:
+                raise
+
+    cust_row = DB.fetchone("SELECT * FROM customers WHERE id=?", (cid,)) if cid else None
+    effective_email = email or (cust_row.get("email") if cust_row else None)
+
+    # Kích hoạt chuỗi email tự động nếu khách đến từ waitlist và có email
+    if source == "waitlist" and effective_email:
+        threading.Thread(target=trigger_waitlist_sequence, args=(cid, name, effective_email), daemon=True).start()
+
+    return jsonify(cust_row or {"id": cid, "name": name}), 201
 
 @app.route("/api/customers/<int:cid>", methods=["PUT"])
 def update_customer(cid):
@@ -453,6 +491,292 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
         """
         send_resend_email(customer_email, f"🌸 [Xác nhận đơn hàng] {product_name} - Mã #{ref}", cust_html, attachments)
 
+# ─── WAITLIST EMAIL SEQUENCE (3 EMAILS) ──────────────────────
+def get_email_template(step, name="bạn"):
+    safe_name = name.strip() if name and name.strip() else "bạn"
+    if step == 1:
+        subject = "🌸 Chào bạn, mình là DealNgon đây (và một lời hứa nhỏ)"
+        html = f"""
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #F0EAE1; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; color: #333333; line-height: 1.7;">
+          <div style="background: #FDFBF7; padding: 28px 24px; text-align: center; border-bottom: 1px solid #F0EAE1;">
+            <h1 style="margin: 0; font-size: 22px; color: #9E5C3A; font-weight: 700; letter-spacing: 0.5px;">DealNgon</h1>
+            <p style="margin: 6px 0 0; font-size: 13px; color: #7A6B63;">Đồng hành cùng làn da &amp; sự thảnh thơi của bạn</p>
+          </div>
+          <div style="padding: 28px 24px; font-size: 15px;">
+            <p style="margin-top: 0;"><strong>Chào {safe_name},</strong></p>
+            <p>Cảm ơn bạn đã tin tưởng để lại thông tin tại góc nhỏ của DealNgon.</p>
+            <p>Mình gửi email này trước hết là để nói một lời chào thật ấm áp từ một người phụ nữ cũng ngoài 30, cũng đi làm công sở và mỗi sáng cũng từng quay cuồng với đủ thứ việc như bạn.</p>
+            <p>Thật ra, đã qua rồi cái thời tụi mình có thảnh thơi 45 phút mỗi sáng để ngồi trước gương vỗ 7–8 bước toner, essence, serum, kem dưỡng, kem lót... Nhiều hôm dậy muộn, nhìn cái bàn trang điểm lỉnh kỉnh chai lọ mà thấy áp lực còn hơn cả việc mở hòm thư công việc.</p>
+            <p><strong>Đó là lý do DealNgon làm góc nhỏ này.</strong></p>
+            <p>Mình ở đây <strong>không phải để vẽ thêm cho bạn vài ba món đồ đắt tiền</strong> mua về rồi để bám bụi trên bàn trang điểm. Mình chỉ muốn chia sẻ những thứ bản thân đã tự "trả học phí" suốt nhiều năm qua: Làm sao để tối giản hết mức có thể, chỉ mất đúng <strong>3 phút mỗi sáng</strong> mà bước ra khỏi cửa da dẻ vẫn căng mọng, chỉn chu, ngồi điều hòa cả ngày không bị mốc khóe mũi hay xỉn màu.</p>
+            
+            <div style="background: #FDFBF7; border-left: 4px solid #9E5C3A; padding: 14px 18px; margin: 24px 0; border-radius: 0 8px 8px 0;">
+              <strong style="color: #9E5C3A; display: block; margin-bottom: 6px;">🌸 Một lời hứa nhỏ với bạn:</strong>
+              <p style="margin: 0; font-size: 14px; color: #555555;">Hòm thư này sẽ không bao giờ có những lời quảng cáo đao to búa lớn hay spam bạn mỗi ngày. Thi thoảng, mình sẽ gửi cho bạn những quan sát thực tế nhất về da dẻ, cách chăm sóc nhanh gọn và những món mình đã dùng sướng thật sự.</p>
+            </div>
+
+            <p>Trong lúc chờ đợi, bạn cứ thong thả nhé. <strong>Hai ngày nữa</strong>, mình sẽ gửi cho bạn một phát hiện khá thú vị về lý do vì sao <em>càng bôi nhiều lớp dưỡng buổi sáng, đến 2h chiều da lại càng dễ bị mốc meo ở văn phòng máy lạnh.</em></p>
+            
+            <p style="margin-bottom: 24px;">Chúc bạn một ngày làm việc thật nhẹ nhàng và thảnh thơi! 🌸</p>
+
+            <div style="border-top: 1px solid #F0EAE1; padding-top: 18px; margin-top: 24px;">
+              <strong style="color: #9E5C3A; font-size: 16px;">DealNgon</strong><br>
+              <span style="font-size: 13px; color: #777777;">Người bạn đồng hành cùng làn da của bạn</span><br>
+              <span style="font-size: 13px; color: #777777;">Zalo hỗ trợ: <strong>0977 338 876</strong> · Website: <a href="https://dealngon.online" style="color: #9E5C3A; text-decoration: none;">dealngon.online</a></span>
+            </div>
+          </div>
+        </div>
+        """
+        return subject, html
+
+    elif step == 2:
+        subject = "❄️ Nghịch lý 2h chiều ở văn phòng máy lạnh"
+        html = f"""
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #F0EAE1; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; color: #333333; line-height: 1.7;">
+          <div style="background: #FDFBF7; padding: 28px 24px; text-align: center; border-bottom: 1px solid #F0EAE1;">
+            <h1 style="margin: 0; font-size: 22px; color: #9E5C3A; font-weight: 700; letter-spacing: 0.5px;">DealNgon</h1>
+            <p style="margin: 6px 0 0; font-size: 13px; color: #7A6B63;">Góc chia sẻ thực tế dành cho phụ nữ bận rộn</p>
+          </div>
+          <div style="padding: 28px 24px; font-size: 15px;">
+            <p style="margin-top: 0;"><strong>Chào {safe_name},</strong></p>
+            <p>Có bao giờ bạn rơi vào tình huống này chưa:</p>
+            <p>Buổi sáng thức dậy, bạn rất chăm chỉ. Bạn bôi đủ toner, serum, kem dưỡng ẩm, rồi cẩn thận dặm thêm kem chống nắng hoặc lớp phấn nhẹ. Bạn bước ra khỏi nhà với cảm giác rất yên tâm vì <em>"hôm nay mình chăm da kỹ thế này cơ mà"</em>.</p>
+            <p>Thế nhưng, cứ đến tầm <strong>2h chiều ở văn phòng</strong>, ngẩng mặt soi gương trong nhà vệ sinh thì hỡi ôi: <strong>hai bên cánh mũi với khóe miệng thì mốc trắng (cakey), còn vùng trán với cằm thì lại bóng nhờn loang lổ.</strong></p>
+            <p>Cảm giác lúc đó vừa bực vừa thấy bất lực, đúng không?</p>
+            
+            <div style="background: #FFF8F3; border-radius: 8px; padding: 16px 20px; margin: 20px 0; border: 1px solid #FDE8DB;">
+              <p style="margin: 0; color: #9E5C3A; font-weight: 600; font-size: 16px;">Thật ra, nguyên nhân đơn giản thôi:</p>
+              <p style="margin: 6px 0 0; color: #444;">Da của tụi mình không hề thiếu dưỡng chất, mà nó đang bị <strong>"ngạt thở"</strong>.</p>
+            </div>
+
+            <p>Sau tuổi 30, khả năng tự điều tiết của da bắt đầu chậm lại. Khi bạn đè 3–4 lớp dưỡng dày lên mặt trong lúc sáng đang vội (lớp trước chưa kịp ráo đã chồng tiếp lớp sau), các hoạt chất không thấm sâu được mà chỉ nằm đọng ở tầng biểu bì.</p>
+            
+            <p>Và khi bạn bước vào phòng máy lạnh 8 tiếng:</p>
+            <ol style="padding-left: 20px; margin: 12px 0;">
+              <li style="margin-bottom: 8px;">Không khí lạnh và khô sẽ nhanh chóng <strong>hút cạn lượng nước</strong> trên bề mặt, làm lớp màng kem chưa kịp thấm bị khô cứng lại thành vệt mốc.</li>
+              <li>Bên dưới tầng đáy, các tuyến bã nhờn thấy bề mặt bị khô căng nên phát tín hiệu báo động đỏ: <em>"Khô quá rồi, phải tiết thêm dầu ra để tự vệ thôi!"</em></li>
+            </ol>
+
+            <p>Kết quả là: <strong>Bên ngoài thì mốc khô, bên trong thì đổ dầu.</strong> Vừa tốn tiền mua nhiều lọ kem, vừa tốn thời gian bôi trát mỗi sáng mà da lại không đẹp như ý.</p>
+
+            <p><strong>Vậy giải pháp là gì?</strong><br>
+            Đơn giản thôi bạn ạ: <strong>Buổi sáng, hãy để da được thở.</strong></p>
+
+            <p>Thay vì bôi 4–5 món lỉnh kỉnh, bạn chỉ cần tập trung đúng 2 thứ:</p>
+            <ul style="padding-left: 20px; margin: 12px 0;">
+              <li style="margin-bottom: 8px;"><strong>Cấp ẩm ngậm sâu tầng tế bào</strong> bằng một loại serum thẩm thấu nhanh (dạng lỏng nhẹ, thấm trong 30 giây).</li>
+              <li><strong>Một lớp bảo vệ nhẹ mặt</strong> (chống nắng hoặc kem khóa ẩm tích hợp), không gây bết dính.</li>
+            </ul>
+
+            <div style="background: #FDFBF7; border-left: 4px solid #10B981; padding: 14px 18px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+              <strong style="color: #059669;">💡 Sáng mai thử xem nhé:</strong>
+              <p style="margin: 4px 0 0; font-size: 14px; color: #555;">Thử bớt đi 2 bước dưỡng rườm rà, thay vào đó sau khi rửa mặt, bạn vỗ serum thật đều rồi áp nhẹ hai lòng bàn tay ấm lên má trong 15 giây để dưỡng chất tự rút sâu vào da. Bạn sẽ thấy 2h chiều ngày mai da mặt nhẹ tênh và êm ru hơn hẳn đấy!</p>
+            </div>
+
+            <p>Ngày mai, mình sẽ chia sẻ với bạn công thức 1 bước thay thế cả chu trình mà mình đang dùng mỗi sáng nhé.</p>
+
+            <div style="border-top: 1px solid #F0EAE1; padding-top: 18px; margin-top: 24px;">
+              <p style="margin: 0; color: #777;">Thương mến,</p>
+              <strong style="color: #9E5C3A; font-size: 16px;">DealNgon</strong><br>
+              <span style="font-size: 13px; color: #777777;">Website: <a href="https://dealngon.online" style="color: #9E5C3A; text-decoration: none;">dealngon.online</a></span>
+            </div>
+          </div>
+        </div>
+        """
+        return subject, html
+
+    elif step == 3:
+        subject = "🌸 Bạn có muốn đổi lấy 15 phút ngủ thêm mỗi sáng?"
+        html = f"""
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #F0EAE1; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; color: #333333; line-height: 1.7;">
+          <div style="background: #FDFBF7; padding: 28px 24px; text-align: center; border-bottom: 1px solid #F0EAE1;">
+            <h1 style="margin: 0; font-size: 22px; color: #9E5C3A; font-weight: 700; letter-spacing: 0.5px;">DealNgon</h1>
+            <p style="margin: 6px 0 0; font-size: 13px; color: #7A6B63;">Giải pháp tối giản 1 bước thay 5 bước cho phụ nữ 30–45 tuổi</p>
+          </div>
+          <div style="padding: 28px 24px; font-size: 15px;">
+            <p style="margin-top: 0;"><strong>Chào {safe_name},</strong></p>
+            <p>Hôm trước mình đã chia sẻ về lý do vì sao bôi quá nhiều bước buổi sáng chỉ làm da thêm bí bách và dễ mốc ở văn phòng máy lạnh.</p>
+            <p>Nhiều chị em sau khi đọc xong nhắn tin hỏi mình:<br>
+            <em>"Thế bây giờ bận quá, sáng chỉ có đúng 3–5 phút thì dùng món gì để vừa đủ ẩm, vừa chống lão hóa mà không phải lỉnh kỉnh?"</em></p>
+
+            <p>Thật ra, câu trả lời nằm ở bộ đôi mà bản thân DealNgon đã gắn bó suốt thời gian qua: <strong>Combo 3 Phút Buổi Sáng — Shiseido Ultimune (Serum 50ml + Kem dưỡng Essential Energy).</strong></p>
+            
+            <p>Ở đây, mình không bán những lời quảng cáo hoa mỹ hay hứa hẹn da bạn sẽ "trẻ ra 10 tuổi sau 1 đêm". Mình chỉ chia sẻ một giải pháp thực tế:</p>
+            
+            <ul style="padding-left: 20px; margin: 14px 0;">
+              <li style="margin-bottom: 10px;"><strong>1 bước thay thế cả chu trình:</strong> Tinh chất thẩm thấu cực nhanh sau 30 giây, đưa dưỡng chất ngậm sâu dưới da. Bạn không cần ngồi đợi từng lớp kem khô như trước nữa.</li>
+              <li style="margin-bottom: 10px;"><strong>Êm ru cả ngày trong máy lạnh:</strong> Tối ưu màng ẩm tự nhiên giúp da căng mướt từ 8h sáng tới 6h tối, khóe mũi khóe miệng mịn màng, không lo cakey hay loang lổ.</li>
+              <li><strong>Nhẹ mặt tuyệt đối:</strong> Không bết rít, không nặng mặt — cảm giác nhẹ tênh như da mộc nhưng nhìn vào lại rất sáng khỏe và chỉn chu.</li>
+            </ul>
+
+            <p>Con số thoạt nhìn có thể nhỉnh hơn các dòng kem thông thường một chút, <strong>nhưng thật ra tính ra bạn mua 1 mà được 2</strong>: Thay vì tốn tiền mua 3–4 lọ lỉnh kỉnh rồi sáng nào cũng cuống cuồng bôi trát, món này làm xong hết trong 3 phút. Bạn vừa tiết kiệm được tiền mua các món thừa thãi, vừa mua được <strong>15 phút ngủ nướng thảnh thơi mỗi sáng</strong>.</p>
+
+            <div style="background: #FDFBF7; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #EFE5D8;">
+              <h3 style="margin-top: 0; color: #9E5C3A; font-size: 16px; text-align: center; margin-bottom: 16px;">🎁 CÁC GÓI ƯU ĐÃI ĐẶC QUYỀN HÔM NAY</h3>
+              
+              <!-- Gói 1 -->
+              <div style="background: #ffffff; border: 2px solid #9E5C3A; border-radius: 8px; padding: 14px; margin-bottom: 12px; position: relative;">
+                <span style="background: #9E5C3A; color: #ffffff; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 6px;">✨ GÓI BÁN CHẠY NHẤT</span>
+                <div style="font-weight: bold; font-size: 15px; color: #222;">Combo 3 Phút Buổi Sáng (Serum 50ml + Kem Dưỡng)</div>
+                <div style="color: #9E5C3A; font-size: 18px; font-weight: bold; margin: 4px 0;">2.780.000đ <span style="font-size: 13px; color: #999; text-decoration: line-through; font-weight: normal;">3.280.000đ</span></div>
+                <div style="font-size: 13px; color: #555;">🎁 <strong>Tặng:</strong> Hộp quà 3 Mặt nạ lụa cao cấp + Băng đô nhung (Trị giá 450k) + Freeship toàn quốc.</div>
+              </div>
+
+              <!-- Gói 2 -->
+              <div style="background: #ffffff; border: 1px solid #E0D7CC; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
+                <div style="font-weight: bold; font-size: 15px; color: #222;">Gói Tối Giản: Serum Shiseido Ultimune 30ml</div>
+                <div style="color: #9E5C3A; font-size: 16px; font-weight: bold; margin: 4px 0;">2.480.000đ <span style="font-size: 13px; color: #999; text-decoration: line-through; font-weight: normal;">2.980.000đ</span></div>
+                <div style="font-size: 13px; color: #555;">🎁 <strong>Tặng:</strong> Băng đô nhung cao cấp + Freeship.</div>
+              </div>
+
+              <!-- Gói 3 -->
+              <div style="background: #ffffff; border: 1px solid #E0D7CC; border-radius: 8px; padding: 14px;">
+                <div style="font-weight: bold; font-size: 15px; color: #222;">Gói Trải Nghiệm: Checklist Da Đẹp 3 Phút (PDF)</div>
+                <div style="color: #9E5C3A; font-size: 16px; font-weight: bold; margin: 4px 0;">2.000đ</div>
+                <div style="font-size: 13px; color: #555;">📥 File PDF checklist in ra dán gương hoặc xem trên điện thoại.</div>
+              </div>
+            </div>
+
+            <div style="text-align: center; margin: 28px 0 20px;">
+              <a href="https://dealngon.online/thanh-toan" style="display: inline-block; background: #9E5C3A; color: #ffffff; text-decoration: none; padding: 15px 32px; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 12px rgba(158, 92, 58, 0.3);">👉 BẤM VÀO ĐÂY ĐỂ ĐẶT HÀNG &amp; NHẬN ƯU ĐÃI</a>
+              <p style="margin: 8px 0 0; font-size: 12px; color: #888;">(Hệ thống quét mã VietQR tự động điền sẵn số tiền, quét 3 giây là xong)</p>
+            </div>
+
+            <div style="background: #FFF8F3; border-radius: 8px; padding: 14px 18px; margin: 20px 0; border: 1px solid #FDE8DB;">
+              <strong style="color: #9E5C3A; font-size: 14px;">Cam kết từ DealNgon:</strong>
+              <p style="margin: 4px 0 0; font-size: 13px; color: #555;">Hàng nhập khẩu chính hãng Shiseido Nhật Bản 100%. Mình chỉ có cái mặt và cái uy tín đi làm bao năm nay, xài thấy ưng thật mới dám gom cho chị em bạn bè dùng chung. Bạn cứ thử xem, bôi lên mặt 3 ngày là cảm nhận được liền :)))</p>
+            </div>
+
+            <p style="font-size: 14px; color: #666;">Nếu bạn cần tư vấn kỹ hơn về tình trạng da của mình trước khi chọn gói, cứ bấm trả lời email này hoặc nhắn Zalo cho mình qua số <strong>0977 338 876</strong> nhé!</p>
+
+            <div style="border-top: 1px solid #F0EAE1; padding-top: 18px; margin-top: 24px;">
+              <p style="margin: 0; color: #777;">Chúc bạn luôn rạng rỡ và thảnh thơi mỗi sớm mai! 🌸</p>
+              <strong style="color: #9E5C3A; font-size: 16px;">DealNgon</strong><br>
+              <span style="font-size: 13px; color: #777777;">Website: <a href="https://dealngon.online" style="color: #9E5C3A; text-decoration: none;">dealngon.online</a></span>
+            </div>
+          </div>
+        </div>
+        """
+        return subject, html
+
+    return "", ""
+
+def trigger_waitlist_sequence(customer_id, name, email):
+    """Kích hoạt chuỗi email:
+       - Nếu email có chứa '+test': gửi cả 3 email ngay lập tức.
+       - Ngược lại: gửi Email 1 ngay, lên lịch Email 2 (+2 ngày) và Email 3 (+3 ngày).
+    """
+    if not email or "@" not in email:
+        return
+    email = email.strip()
+    name = (name or "bạn").strip()
+    is_test = "+test" in email.lower()
+    now = datetime.now()
+
+    if is_test:
+        print(f"[Waitlist Test] 🚀 Phát hiện email test '{email}' -> Gửi ngay lập tức cả 3 email...")
+        for step in [1, 2, 3]:
+            subj, html = get_email_template(step, name)
+            res = send_resend_email(email, subj, html)
+            status = "sent" if res else "failed"
+            err_msg = None if res else "Resend send failed"
+            try:
+                DB.execute("""
+                    INSERT INTO email_queue (customer_id, email, name, step, subject, scheduled_at, status, sent_at, error)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+                """, (customer_id, email, name, step, subj, now.strftime("%Y-%m-%d %H:%M:%S"), status, err_msg))
+            except Exception as e_db:
+                print(f"[Waitlist Test DB] Lỗi lưu queue: {e_db}")
+            time.sleep(2)
+        print(f"[Waitlist Test] ✅ Đã gửi xong 3 email test cho {email}")
+    else:
+        # 1. Gửi Email 1 ngay lập tức
+        subj1, html1 = get_email_template(1, name)
+        res1 = send_resend_email(email, subj1, html1)
+        status1 = "sent" if res1 else "failed"
+        err1 = None if res1 else "Resend send failed"
+        try:
+            DB.execute("""
+                INSERT INTO email_queue (customer_id, email, name, step, subject, scheduled_at, status, sent_at, error)
+                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+            """, (customer_id, email, name, 1, subj1, now.strftime("%Y-%m-%d %H:%M:%S"), status1, err1))
+        except Exception as e_db:
+            print(f"[Waitlist DB] Lỗi lưu queue step 1: {e_db}")
+
+        # 2. Lên lịch Email 2 sau 2 ngày
+        time2 = (now + timedelta(days=2)).strftime("%Y-%m-%d %H:%M:%S")
+        subj2, _ = get_email_template(2, name)
+        try:
+            DB.execute("""
+                INSERT INTO email_queue (customer_id, email, name, step, subject, scheduled_at, status)
+                VALUES (?, ?, ?, ?, ?, ?, 'pending')
+            """, (customer_id, email, name, 2, subj2, time2))
+        except Exception as e_db:
+            print(f"[Waitlist DB] Lỗi lưu queue step 2: {e_db}")
+
+        # 3. Lên lịch Email 3 sau 3 ngày
+        time3 = (now + timedelta(days=3)).strftime("%Y-%m-%d %H:%M:%S")
+        subj3, _ = get_email_template(3, name)
+        try:
+            DB.execute("""
+                INSERT INTO email_queue (customer_id, email, name, step, subject, scheduled_at, status)
+                VALUES (?, ?, ?, ?, ?, ?, 'pending')
+            """, (customer_id, email, name, 3, subj3, time3))
+        except Exception as e_db:
+            print(f"[Waitlist DB] Lỗi lưu queue step 3: {e_db}")
+
+        print(f"[Waitlist] ✅ Đã gửi Email 1 và lên lịch Email 2 (+2 ngày), Email 3 (+3 ngày) cho {email}")
+
+def process_email_queue():
+    """Quét và xử lý các email pending đã đến hạn."""
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    pending = DB.fetchall("""
+        SELECT * FROM email_queue
+        WHERE status = 'pending' AND scheduled_at <= ?
+        ORDER BY scheduled_at ASC LIMIT 10
+    """, (now_str,))
+
+    if not pending:
+        return 0
+
+    sent_count = 0
+    for item in pending:
+        qid = item["id"]
+        step = item["step"]
+        email = item["email"]
+        name = item.get("name") or "bạn"
+        subj, html = get_email_template(step, name)
+        res = send_resend_email(email, subj, html)
+        if res:
+            DB.run("UPDATE email_queue SET status='sent', sent_at=CURRENT_TIMESTAMP WHERE id=?", (qid,))
+            sent_count += 1
+            print(f"[Queue Worker] ✅ Đã gửi email step {step} cho {email} (Queue #{qid})")
+        else:
+            DB.run("UPDATE email_queue SET status='failed', error='Resend send failed' WHERE id=?", (qid,))
+            print(f"[Queue Worker] ❌ Gửi thất bại email step {step} cho {email} (Queue #{qid})")
+        time.sleep(1)
+    return sent_count
+
+def email_queue_worker_loop():
+    """Background worker định kỳ mỗi 60 giây."""
+    print("[Queue Worker] ⏰ Background email worker started (polling every 60s)...")
+    while True:
+        try:
+            process_email_queue()
+        except Exception as e:
+            print(f"[Queue Worker] ⚠️ Worker error: {e}")
+        time.sleep(60)
+
+# ─── EMAIL QUEUE ENDPOINTS ────────────────────────────────────
+@app.route("/api/email-queue", methods=["GET"])
+def get_email_queue():
+    return jsonify(DB.fetchall("SELECT * FROM email_queue ORDER BY id DESC LIMIT 100"))
+
+@app.route("/api/email-queue/process", methods=["GET", "POST"])
+def manual_process_email_queue():
+    count = process_email_queue()
+    return jsonify({"ok": True, "processed": count})
+
 @app.route("/api/orders/from-checkout", methods=["POST"])
 def create_order_from_checkout():
     d = request.json
@@ -581,8 +905,24 @@ def health():
     db_type = "postgresql" if IS_PG else "sqlite"
     return jsonify({"status": "ok", "db": db_type, "time": datetime.now().isoformat()})
 
+_worker_started = False
+def ensure_worker_started():
+    global _worker_started
+    if not _worker_started:
+        _worker_started = True
+        try:
+            init_schema()
+        except Exception as e:
+            print(f"[Init] ⚠️ Lỗi init_schema: {e}")
+        t = threading.Thread(target=email_queue_worker_loop, daemon=True)
+        t.start()
+
+@app.before_request
+def startup_hook():
+    ensure_worker_started()
+
 if __name__ == "__main__":
-    init_schema()
+    ensure_worker_started()
     port = int(os.environ.get("PORT", 5001))
     print(f"🚀 Admin: http://localhost:{port}/admin")
     print(f"🔗 Webhook: https://web-production-42cec4.up.railway.app/webhook/sepay")
