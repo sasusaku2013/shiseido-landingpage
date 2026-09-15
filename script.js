@@ -370,7 +370,7 @@ function handleFormSubmit(event) {
 
     // Tạo đơn pending trên Flask (nếu server đang chạy)
     const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
-    const ADMIN_SERVER = isStatic ? (localStorage.getItem('adminServerUrl') || '') : window.location.origin;
+    const ADMIN_SERVER = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
 
     if (ADMIN_SERVER) {
       fetch(ADMIN_SERVER + '/api/orders/from-checkout', {

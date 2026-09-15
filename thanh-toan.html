@@ -569,7 +569,7 @@
       
       // Nếu có sẵn ref từ URL, tự động kích hoạt polling kiểm tra
       const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
-      const serverUrl = isStatic ? (localStorage.getItem('adminServerUrl') || '') : window.location.origin;
+      const serverUrl = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
       if (serverUrl && orderRef) {
         startPaymentPolling(orderRef, serverUrl);
       }
@@ -684,7 +684,7 @@
 
       // 2. Gửi về Backend Python tạo đơn pending
       const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
-      const serverUrl = isStatic ? (localStorage.getItem('adminServerUrl') || '') : window.location.origin;
+      const serverUrl = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
       
       if (serverUrl) {
         fetch(serverUrl + '/api/orders/from-checkout', {
