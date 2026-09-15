@@ -3,7 +3,7 @@ admin_server.py — Admin Panel + SePay Webhook
 Local:      python3 admin_server.py  →  http://localhost:5001/admin
 Production: set DATABASE_URL env var  →  dùng PostgreSQL tự động
 """
-import os, re, json, sqlite3
+import os, re, json, sqlite3, hmac, hashlib
 from datetime import datetime
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
@@ -377,6 +377,15 @@ def create_order_from_checkout():
 # ─── SEPAY WEBHOOK ────────────────────────────────────────────
 @app.route("/webhook/sepay", methods=["POST"])
 def sepay_webhook():
+    # Xác thực chữ ký HMAC-SHA256 nếu có cài đặt Secret Key
+    secret = os.environ.get("SEPAY_WEBHOOK_SECRET", "").strip()
+    if secret:
+        signature = request.headers.get("X-SePay-Signature", "")
+        expected = hmac.new(secret.encode("utf-8"), request.get_data(), hashlib.sha256).hexdigest()
+        if not signature or not hmac.compare_digest(expected, signature):
+            print(f"[SePay] ❌ Chữ ký HMAC không hợp lệ!")
+            return jsonify({"error": "Invalid signature"}), 401
+
     data = request.json or {}
     print(f"[SePay] {json.dumps(data, ensure_ascii=False)}")
     content = str(data.get("content","") or data.get("transferContent","") or "")
@@ -424,5 +433,5 @@ if __name__ == "__main__":
     init_schema()
     port = int(os.environ.get("PORT", 5001))
     print(f"🚀 Admin: http://localhost:{port}/admin")
-    print(f"🔗 Webhook: https://dealngon.online/webhook/sepay")
+    print(f"🔗 Webhook: https://web-production-42cec4.up.railway.app/webhook/sepay")
     app.run(host="0.0.0.0", port=port, debug=not IS_PG)
