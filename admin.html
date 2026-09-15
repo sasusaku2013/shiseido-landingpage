@@ -338,9 +338,13 @@ textarea{resize:vertical;min-height:72px}
           </select>
         </div>
         <div class="form-group">
-          <label>Mã chuyển khoản</label>
-          <input type="text" id="order-ref" placeholder="DH12345678">
+          <label>Mã chuyển khoản / Mã đơn</label>
+          <input type="text" id="order-ref" placeholder="Tự sinh nếu để trống">
         </div>
+      </div>
+      <div class="form-group">
+        <label>Email khách hàng (tự động gửi email xác nhận chuẩn DealNgon qua Resend)</label>
+        <input type="email" id="order-email" placeholder="khachhang@gmail.com">
       </div>
       <div class="form-group">
         <label>Địa chỉ giao hàng</label>
@@ -612,6 +616,14 @@ function setupOrderModal(data){
   document.getElementById('order-ref').value=data?.payment_ref||'';
   document.getElementById('order-address').value=data?.address||'';
   document.getElementById('order-notes').value=data?.notes||'';
+
+  const curCust = customers.find(c=>c.id===(data?.customer_id));
+  document.getElementById('order-email').value=data?.customer_email||curCust?.email||'';
+  cSel.onchange=function(){
+    const chosen=customers.find(c=>c.id==this.value);
+    if(chosen&&chosen.email) document.getElementById('order-email').value=chosen.email;
+  };
+
   if(data?.product_id) fillOrderAmount();
 }
 function fillOrderAmount(){
@@ -631,6 +643,7 @@ async function saveOrder(){
     customer_id:document.getElementById('order-customer').value||null,
     customer_name:cSel?.text?.split('·')[0]?.trim()||'',
     customer_phone:cSel?.text?.split('·')[1]?.trim()||'',
+    customer_email:document.getElementById('order-email').value.trim()||'',
     product_id:document.getElementById('order-product').value||null,
     product_name:pSel?.text?.split('·')[0]?.trim()||'',
     amount:document.getElementById('order-amount').value,
@@ -644,7 +657,7 @@ async function saveOrder(){
   try{
     if(id) await api('PUT','/api/orders/'+id,body);
     else await api('POST','/api/orders',body);
-    closeModal('order');await loadAll();toast('Lưu đơn hàng thành công!');
+    closeModal('order');await loadAll();toast('Lưu đơn hàng thành công! Đang tự động gửi email...');
   }catch(e){toast(e.message,'error');}
 }
 function editOrder(id){openModal('order',orders.find(o=>o.id===id));}
