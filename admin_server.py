@@ -420,12 +420,16 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
         is_pdf = "PDF" in product_name or "Checklist" in product_name
         
         # Nếu mua PDF, đính kèm file Checklist
-        pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Checklist-Da-Dep-3-Phut-QuynhAnh.pdf")
+        pdf_name = "Checklist-Da-Dep-3-Phut-DealNgon.pdf"
+        pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), pdf_name)
+        if not os.path.exists(pdf_path):
+            pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Checklist-Da-Dep-3-Phut-QuynhAnh.pdf")
+
         if is_pdf and os.path.exists(pdf_path):
             try:
                 with open(pdf_path, "rb") as f:
                     attachments.append({
-                        "filename": "Checklist-Da-Dep-3-Phut-QuynhAnh.pdf",
+                        "filename": pdf_name,
                         "content": list(f.read())
                     })
             except Exception as e:
@@ -442,7 +446,7 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
             <p style="margin: 4px 0;"><strong>Tổng thanh toán:</strong> <strong style="color:#9E5C3A;">{fmt_amount}</strong></p>
             <p style="margin: 4px 0;"><strong>Trạng thái:</strong> <span style="color:{status_color}; font-weight:bold;">{status_text}</span></p>
           </div>
-          {'<p style="color:#10B981; font-weight:bold;">🎁 File PDF Checklist đã được đính kèm ngay bên dưới email này để bạn tải về máy dán gương nhé!</p><div style="text-align:center;margin:16px 0;"><a href="https://dealngon.online/Checklist-Da-Dep-3-Phut-QuynhAnh.pdf" style="display:inline-block;background:#9E5C3A;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:bold;font-size:14px;">📥 Bấm vào đây để tải trực tiếp file PDF</a></div>' if is_pdf else '<p>DealNgon sẽ liên hệ qua Zalo / Số điện thoại để xác nhận và đóng gói gửi hàng sớm nhất cho bạn nhé.</p>'}
+          {'<p style="color:#10B981; font-weight:bold;">🎁 File PDF Checklist đã được đính kèm ngay bên dưới email này để bạn tải về máy dán gương nhé!</p><div style="text-align:center;margin:16px 0;"><a href="https://dealngon.online/Checklist-Da-Dep-3-Phut-DealNgon.pdf" style="display:inline-block;background:#9E5C3A;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:bold;font-size:14px;">📥 Bấm vào đây để tải trực tiếp file PDF</a></div>' if is_pdf else '<p>DealNgon sẽ liên hệ qua Zalo / Số điện thoại để xác nhận và đóng gói gửi hàng sớm nhất cho bạn nhé.</p>'}
           <hr style="border:none; border-top: 1px solid #eee; margin: 20px 0;">
           <p style="font-size: 12px; color: #888; text-align: center;">Mọi thắc mắc vui lòng liên hệ Zalo: <strong>0977 338 876 (DealNgon)</strong> · Website: dealngon.online</p>
         </div>
