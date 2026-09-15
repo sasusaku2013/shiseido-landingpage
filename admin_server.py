@@ -343,18 +343,26 @@ def check_payment(ref):
 @app.route("/api/orders/from-checkout", methods=["POST"])
 def create_order_from_checkout():
     d = request.json
-    # Tìm hoặc tạo customer
-    customer = DB.fetchone("SELECT id FROM customers WHERE phone=?", (d.get("phone",""),))
-    if not customer and d.get("phone"):
-        try:
-            cid = DB.execute(
-                "INSERT INTO customers(name,phone,zalo,source) VALUES(?,?,?,'order')",
-                (d.get("name",""),d.get("phone",""),d.get("phone","")))
-        except Exception:
-            c2 = DB.fetchone("SELECT id FROM customers WHERE phone=?", (d.get("phone",""),))
-            cid = c2["id"] if c2 else None
-    else:
-        cid = customer["id"] if customer else None
+    phone = (d.get("phone") or "").strip()
+    name = (d.get("name") or "Khách hàng").strip()
+    address = (d.get("address") or "").strip()
+    notes = (d.get("notes") or "").strip()
+
+    # 1. Thêm hoặc cập nhật Khách hàng vào bảng customers
+    cid = None
+    if phone:
+        customer = DB.fetchone("SELECT id FROM customers WHERE phone=?", (phone,))
+        if not customer:
+            try:
+                cid = DB.execute(
+                    "INSERT INTO customers(name,phone,zalo,source,notes) VALUES(?,?,?,'order',?)",
+                    (name, phone, phone, address or notes))
+            except Exception:
+                c2 = DB.fetchone("SELECT id FROM customers WHERE phone=?", (phone,))
+                cid = c2["id"] if c2 else None
+        else:
+            cid = customer["id"]
+            DB.run("UPDATE customers SET name=?, notes=? WHERE id=?", (name, address or notes, cid))
 
     pkg = d.get("package","")
     is_combo2 = "Combo 2" in pkg or "2.780" in pkg
@@ -365,13 +373,25 @@ def create_order_from_checkout():
     pid  = product["id"]   if product else None
     pnm  = product["name"] if product else pkg
 
-    lid = DB.execute("""
-        INSERT INTO orders(customer_id,customer_name,customer_phone,
-                           product_id,product_name,amount,status,
-                           payment_method,payment_ref,address)
-        VALUES(?,?,?,?,?,?,'pending','bank_transfer',?,?)""",
-        (cid,d.get("name",""),d.get("phone",""),pid,pnm,amount,
-         d.get("payment_ref",""),d.get("address","")))
+    status = d.get("status", "pending")
+    ref = d.get("payment_ref", "").strip()
+
+    existing = DB.fetchone("SELECT id FROM orders WHERE payment_ref=?", (ref,)) if ref else None
+    if existing:
+        DB.run("""
+            UPDATE orders SET customer_id=?, customer_name=?, customer_phone=?,
+                              product_id=?, product_name=?, amount=?, status=?,
+                              address=?, notes=?, updated_at=CURRENT_TIMESTAMP WHERE id=?
+        """, (cid, name, phone, pid, pnm, amount, status, address, notes, existing["id"]))
+        lid = existing["id"]
+    else:
+        lid = DB.execute("""
+            INSERT INTO orders(customer_id,customer_name,customer_phone,
+                               product_id,product_name,amount,status,
+                               payment_method,payment_ref,address,notes)
+            VALUES(?,?,?,?,?,?,?,'bank_transfer',?,?,?)""",
+            (cid, name, phone, pid, pnm, amount, status, ref, address, notes))
+
     return jsonify(DB.fetchone("SELECT * FROM orders WHERE id=?", (lid,))), 201
 
 # ─── SEPAY WEBHOOK ────────────────────────────────────────────

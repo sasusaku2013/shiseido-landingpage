@@ -36,7 +36,7 @@
     .top-header {
       background: #fff;
       border-bottom: 1px solid var(--border-color);
-      padding: 16px 20px;
+      padding: 14px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -44,15 +44,13 @@
     .brand-logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       text-decoration: none;
       color: var(--text-dark);
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
     }
-    .brand-logo span {
-      color: var(--primary);
-    }
+    .brand-logo span { color: var(--primary); }
     .back-home-link {
       font-size: 0.85rem;
       color: var(--text-muted);
@@ -64,39 +62,56 @@
     .back-home-link:hover { color: var(--primary); }
 
     .checkout-wrapper {
-      max-width: 840px;
-      margin: 30px auto;
-      padding: 0 16px 40px;
+      max-width: 680px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
       flex: 1;
       width: 100%;
     }
 
-    .page-title {
-      text-align: center;
+    /* Step Progress Bar */
+    .step-progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 24px;
+      gap: 8px;
     }
-    .page-title h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
-      color: var(--text-dark);
-      margin-bottom: 6px;
-    }
-    .page-title p {
+    .step-node {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
       color: var(--text-muted);
-      font-size: 0.92rem;
     }
-
-    .checkout-layout {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 24px;
-      align-items: start;
+    .step-node.active {
+      color: var(--primary-dark);
     }
-
-    @media (max-width: 768px) {
-      .checkout-layout {
-        grid-template-columns: 1fr;
-      }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #EFE6DF;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .step-node.active .step-num {
+      background: var(--primary);
+      color: #fff;
+    }
+    .step-node.completed .step-num {
+      background: var(--success);
+      color: #fff;
+    }
+    .step-divider {
+      width: 36px;
+      height: 2px;
+      background: var(--border-color);
     }
 
     .card {
@@ -104,21 +119,26 @@
       border-radius: var(--radius);
       border: 1px solid var(--border-color);
       padding: 24px;
-      box-shadow: 0 4px 20px rgba(158, 92, 58, 0.04);
+      box-shadow: 0 4px 20px rgba(158, 92, 58, 0.05);
     }
 
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .card-header {
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #F3EDE7;
+    }
+    .card-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
       color: var(--text-dark);
+      margin-bottom: 4px;
     }
-    .card-title i { color: var(--primary-light); }
+    .card-header p {
+      color: var(--text-muted);
+      font-size: 0.86rem;
+    }
 
-    /* Package selector radio */
+    /* Packages */
     .package-options {
       display: flex;
       flex-direction: column;
@@ -136,22 +156,14 @@
       transition: all 0.2s ease;
       background: #fafafa;
     }
-    .package-item:hover {
-      border-color: var(--primary-light);
-      background: #fff;
-    }
-    .package-item.active {
-      border-color: var(--primary);
-      background: #FEF7F2;
-    }
+    .package-item:hover { border-color: var(--primary-light); background: #fff; }
+    .package-item.active { border-color: var(--primary); background: #FEF7F2; }
     .package-item input[type="radio"] {
       accent-color: var(--primary);
       width: 18px;
       height: 18px;
     }
-    .package-info {
-      flex: 1;
-    }
+    .package-info { flex: 1; }
     .package-name {
       font-weight: 600;
       font-size: 0.92rem;
@@ -168,9 +180,7 @@
       margin-left: 6px;
       display: inline-block;
     }
-    .package-badge-pdf {
-      background: var(--primary);
-    }
+    .package-badge-pdf { background: var(--primary); }
     .package-price {
       font-weight: 700;
       color: var(--primary-dark);
@@ -178,9 +188,7 @@
     }
 
     /* Form Fields */
-    .form-group {
-      margin-bottom: 14px;
-    }
+    .form-group { margin-bottom: 14px; }
     .form-label {
       display: block;
       font-size: 0.83rem;
@@ -191,7 +199,7 @@
     .form-label .req { color: #dc2626; }
     .form-input {
       width: 100%;
-      padding: 10px 14px;
+      padding: 11px 14px;
       border: 1.5px solid var(--border-color);
       border-radius: 10px;
       font-size: 0.9rem;
@@ -199,42 +207,116 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    .form-input:focus {
-      border-color: var(--primary);
+    .form-input:focus { border-color: var(--primary); }
+
+    /* Action buttons */
+    .btn-next {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+      box-shadow: 0 4px 14px rgba(158, 92, 58, 0.25);
+      margin-top: 20px;
+    }
+    .btn-next:hover { opacity: 0.95; }
+    .btn-next:active { transform: scale(0.99); }
+
+    .btn-back {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-back:hover { background: #FAF6F2; color: var(--text-dark); }
+
+    .btn-paid {
+      width: 100%;
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: #fff;
+      border: none;
+      padding: 15px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+      transition: opacity 0.2s;
+      margin-top: 16px;
+    }
+    .btn-paid:hover { opacity: 0.95; }
+
+    /* Summary Box in Step 2 */
+    .order-summary-box {
+      background: #FAF6F2;
+      border: 1px solid #EADAD0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+    }
+    .order-summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .order-summary-row:last-child {
+      margin-bottom: 0;
+      padding-top: 6px;
+      border-top: 1px dashed #E2D3C7;
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 1rem;
     }
 
-    /* QR Panel */
+    /* QR Container */
     .qr-container {
       text-align: center;
-      background: #FAF6F2;
+      background: #fff;
       border-radius: 14px;
       padding: 18px;
-      border: 1px dashed var(--primary-light);
-      margin-bottom: 16px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 18px;
     }
     .qr-img {
-      width: 190px;
-      height: 190px;
+      width: 200px;
+      height: 200px;
       border-radius: 12px;
       margin: 0 auto 10px;
       display: block;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      background: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
     .qr-loading {
-      height: 190px;
+      height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-    .qr-hint {
-      font-size: 0.78rem;
-      color: var(--text-muted);
+      font-size: 0.9rem;
     }
 
-    /* Bank details list */
+    /* Bank info */
     .bank-info-box {
       background: #F8F9FA;
       border-radius: 12px;
@@ -269,65 +351,49 @@
       font-weight: 600;
       transition: all 0.2s;
     }
-    .btn-copy:hover {
-      background: var(--primary-light);
-      color: #fff;
-    }
+    .btn-copy:hover { background: var(--primary-light); color: #fff; }
 
-    /* Action buttons */
-    .btn-submit {
-      width: 100%;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: opacity 0.2s, transform 0.1s;
-      box-shadow: 0 4px 14px rgba(158, 92, 58, 0.25);
-    }
-    .btn-submit:hover { opacity: 0.95; }
-    .btn-submit:active { transform: scale(0.99); }
-
-    /* Success screen */
+    /* Success Panel */
     .success-panel {
       display: none;
       text-align: center;
-      padding: 30px 20px;
+      padding: 32px 20px;
     }
     .success-icon {
-      font-size: 3.5rem;
+      font-size: 3.8rem;
       color: var(--success);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .success-panel h2 {
       font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
+      font-size: 1.65rem;
+      color: var(--text-dark);
       margin-bottom: 8px;
     }
-    .success-panel p {
+    .success-desc {
       color: var(--text-muted);
       font-size: 0.92rem;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
+      line-height: 1.6;
     }
-
-    .support-note {
-      text-align: center;
-      margin-top: 14px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
+    .detail-card {
+      background: #FAF6F2;
+      border-radius: 14px;
+      border: 1px solid #EBDCD0;
+      padding: 18px;
+      max-width: 460px;
+      margin: 0 auto 24px;
+      font-size: 0.88rem;
+      text-align: left;
     }
-    .support-note a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 600;
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
     }
+    .detail-row:last-child { margin-bottom: 0; }
+    .detail-row span:first-child { color: var(--text-muted); }
+    .detail-row span:last-child { font-weight: 600; color: var(--text-dark); text-align: right; }
 
     .footer {
       text-align: center;
@@ -351,163 +417,235 @@
     </a>
   </header>
 
-  <!-- Checkout Container -->
   <main class="checkout-wrapper">
-    <div class="page-title">
-      <h1>Cổng Thanh Toán Đơn Hàng</h1>
-      <p>Quét mã VietQR Techcombank — Hệ thống tự động xác nhận trong 30 giây</p>
+
+    <!-- Progress Indicator -->
+    <div class="step-progress" id="stepIndicator">
+      <div class="step-node active" id="stepNode1">
+        <div class="step-num">1</div>
+        <span>Chọn sản phẩm & Thông tin</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step-node" id="stepNode2">
+        <div class="step-num">2</div>
+        <span>Quét mã QR thanh toán</span>
+      </div>
     </div>
 
-    <!-- MAIN FORM & PAYMENT -->
-    <div class="checkout-layout" id="checkoutLayout">
-      
-      <!-- Cột trái: Thông tin gói & khách hàng -->
-      <div class="card">
-        <div class="card-title">
-          <i class="fa-solid fa-box-open"></i> 1. Chọn sản phẩm / gói dịch vụ
+    <!-- ============================================================
+         BƯỚC 1: CHỌN SẢN PHẨM & THÔNG TIN NHẬN HÀNG
+         ============================================================ -->
+    <div class="card" id="step1Card">
+      <div class="card-header">
+        <h2>Bước 1: Chọn sản phẩm & Thông tin nhận hàng</h2>
+        <p>Vui lòng chọn gói ưu đãi và điền thông tin để chuyển đến bước thanh toán</p>
+      </div>
+
+      <!-- Package Selection -->
+      <div class="package-options" id="packageOptions">
+        <!-- Combo 2 -->
+        <label class="package-item active" onclick="selectPackageItem('combo2', 2780000, 'Combo 3 Phút Buổi Sáng (50ml + Kem dưỡng)')">
+          <input type="radio" name="pkg" value="combo2" checked>
+          <div class="package-info">
+            <span class="package-name">
+              Combo 3 Phút Buổi Sáng (Ultimune 50ml + Kem)
+              <span class="package-badge">BÁN CHẠY ⭐</span>
+            </span>
+          </div>
+          <span class="package-price">2.780.000đ</span>
+        </label>
+
+        <!-- Gói 1 -->
+        <label class="package-item" onclick="selectPackageItem('serum30', 2480000, 'Serum Shiseido Ultimune 30ml')">
+          <input type="radio" name="pkg" value="serum30">
+          <div class="package-info">
+            <span class="package-name">Serum Shiseido Ultimune 30ml</span>
+          </div>
+          <span class="package-price">2.480.000đ</span>
+        </label>
+
+        <!-- Sản phẩm số -->
+        <label class="package-item" onclick="selectPackageItem('pdf', 49000, 'Checklist Da Đẹp 3 Phút (File PDF)')">
+          <input type="radio" name="pkg" value="pdf">
+          <div class="package-info">
+            <span class="package-name">
+              Checklist Da Đẹp 3 Phút (File PDF)
+              <span class="package-badge package-badge-pdf">TẢI NGAY</span>
+            </span>
+          </div>
+          <span class="package-price">49.000đ</span>
+        </label>
+      </div>
+
+      <!-- Customer info form -->
+      <form id="step1Form" onsubmit="goToStep2(event)">
+        <div class="form-group">
+          <label class="form-label" for="custName">Họ và tên của bạn <span class="req">*</span></label>
+          <input type="text" id="custName" class="form-input" required placeholder="Ví dụ: Nguyễn Thị Lan Anh">
         </div>
 
-        <div class="package-options" id="packageOptions">
-          <!-- Combo 2 -->
-          <label class="package-item active" onclick="selectPackageItem('combo2', 2780000, 'Combo 3 Phút Buổi Sáng (50ml + Kem dưỡng)')">
-            <input type="radio" name="pkg" value="combo2" checked>
-            <div class="package-info">
-              <span class="package-name">
-                Combo 3 Phút Buổi Sáng (Ultimune 50ml + Kem)
-                <span class="package-badge">BÁN CHẠY ⭐</span>
-              </span>
-            </div>
-            <span class="package-price">2.780.000đ</span>
-          </label>
-
-          <!-- Gói 1 -->
-          <label class="package-item" onclick="selectPackageItem('serum30', 2480000, 'Serum Shiseido Ultimune 30ml')">
-            <input type="radio" name="pkg" value="serum30">
-            <div class="package-info">
-              <span class="package-name">Serum Shiseido Ultimune 30ml</span>
-            </div>
-            <span class="package-price">2.480.000đ</span>
-          </label>
-
-          <!-- Sản phẩm số -->
-          <label class="package-item" onclick="selectPackageItem('pdf', 49000, 'Checklist Da Đẹp 3 Phút (File PDF)')">
-            <input type="radio" name="pkg" value="pdf">
-            <div class="package-info">
-              <span class="package-name">
-                Checklist Da Đẹp 3 Phút (File PDF)
-                <span class="package-badge package-badge-pdf">TẢI NGAY</span>
-              </span>
-            </div>
-            <span class="package-price">49.000đ</span>
-          </label>
+        <div class="form-group">
+          <label class="form-label" for="custPhone">Số điện thoại / Zalo nhận hàng <span class="req">*</span></label>
+          <input type="tel" id="custPhone" class="form-input" required placeholder="Ví dụ: 0912 345 678" pattern="[0-9]{10,11}">
         </div>
 
-        <div class="card-title" style="margin-top: 18px;">
-          <i class="fa-solid fa-user"></i> 2. Thông tin nhận hàng
+        <div class="form-group" id="addressGroup">
+          <label class="form-label" for="custAddress">Địa chỉ nhận hàng (đối với mỹ phẩm) <span class="req">*</span></label>
+          <input type="text" id="custAddress" class="form-input" placeholder="Số nhà, tên đường, quận/huyện, tỉnh/thành">
         </div>
 
-        <form id="orderForm" onsubmit="handleConfirmPayment(event)">
-          <div class="form-group">
-            <label class="form-label" for="custName">Họ và tên của bạn <span class="req">*</span></label>
-            <input type="text" id="custName" class="form-input" required placeholder="Ví dụ: Nguyễn Lan Anh" oninput="updateQrCode()">
-          </div>
+        <div class="form-group">
+          <label class="form-label" for="custNotes">Ghi chú hoặc tình trạng da (tuỳ chọn)</label>
+          <input type="text" id="custNotes" class="form-input" placeholder="Ví dụ: Giao giờ hành chính, da dầu thiếu ẩm...">
+        </div>
 
-          <div class="form-group">
-            <label class="form-label" for="custPhone">Số điện thoại / Zalo <span class="req">*</span></label>
-            <input type="tel" id="custPhone" class="form-input" required placeholder="0988xxxxxx" oninput="updateQrCode()">
-          </div>
+        <!-- Nút Tiếp theo -->
+        <button type="submit" class="btn-next" id="btnNext">
+          <span>Tiếp theo</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
 
-          <div class="form-group" id="addressGroup">
-            <label class="form-label" for="custAddress">Địa chỉ nhận hàng (đối với mỹ phẩm)</label>
-            <input type="text" id="custAddress" class="form-input" placeholder="Số nhà, tên đường, quận/huyện, tỉnh/thành">
-          </div>
 
-          <div class="form-group">
-            <label class="form-label" for="custNotes">Ghi chú (tuỳ chọn)</label>
-            <input type="text" id="custNotes" class="form-input" placeholder="Giao giờ hành chính, bọc kín...">
-          </div>
+    <!-- ============================================================
+         BƯỚC 2: QUÉT MÃ QR THANH TOÁN
+         ============================================================ -->
+    <div class="card" id="step2Card" style="display: none;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <button type="button" class="btn-back" onclick="goToStep1()">
+          <i class="fa-solid fa-arrow-left"></i> Quay lại
+        </button>
+        <span style="font-size: 0.8rem; font-weight: 700; color: #d97706; background: #FEF3C7; padding: 4px 10px; border-radius: 8px;">
+          ⏳ Chờ thanh toán
+        </span>
+      </div>
 
-          <button type="submit" class="btn-submit" id="submitBtn">
-            <i class="fa-solid fa-check-circle"></i>
-            <span>TÔI ĐÃ CHUYỂN KHOẢN XONG</span>
-          </button>
-        </form>
+      <div class="card-header">
+        <h2>Bước 2: Quét mã QR thanh toán</h2>
+        <p>Mở ứng dụng ngân hàng bất kỳ để quét mã VietQR tự động điền số tiền và nội dung</p>
+      </div>
 
-        <p class="support-note">
-          Cần hỗ trợ thanh toán? Nhắn Zalo: <a href="https://zalo.me/0977338876" target="_blank">0977 338 876 (Quỳnh Anh)</a>
+      <!-- Tóm tắt đơn hàng -->
+      <div class="order-summary-box">
+        <div class="order-summary-row">
+          <span>Khách hàng:</span>
+          <strong id="sumCustName">—</strong>
+        </div>
+        <div class="order-summary-row">
+          <span>Số điện thoại:</span>
+          <span id="sumCustPhone">—</span>
+        </div>
+        <div class="order-summary-row">
+          <span>Sản phẩm:</span>
+          <span id="sumPackageName">—</span>
+        </div>
+        <div class="order-summary-row">
+          <span>Tổng tiền thanh toán:</span>
+          <span id="sumAmount" style="color: var(--primary); font-weight: 800;">—</span>
+        </div>
+      </div>
+
+      <!-- Mã QR VietQR -->
+      <div class="qr-container">
+        <div id="qrLoading" class="qr-loading">⏳ Đang tạo mã VietQR...</div>
+        <img id="qrImg" class="qr-img" style="display: none;" alt="VietQR Techcombank">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Nội dung chuyển khoản: <strong id="txtRefDisplay" style="color: #D32F2F;">DH9999</strong>
         </p>
       </div>
 
-      <!-- Cột phải: Mã QR VietQR Techcombank & Thông tin chuyển khoản -->
-      <div class="card">
-        <div class="card-title">
-          <i class="fa-solid fa-qrcode"></i> 3. Quét mã thanh toán
+      <!-- Thông tin tài khoản -->
+      <div class="bank-info-box">
+        <div class="bank-row">
+          <span class="bank-label">Ngân hàng:</span>
+          <span class="bank-val">Techcombank</span>
         </div>
-
-        <div class="qr-container">
-          <div id="qrLoading" class="qr-loading">⏳ Đang tạo mã VietQR...</div>
-          <img id="qrImg" class="qr-img" style="display:none;" alt="VietQR Techcombank">
-          <p class="qr-hint">Mở app Ngân hàng bất kỳ (Techcombank, Vietcombank, MB, Momo...) quét mã để tự điền số tiền & nội dung</p>
+        <div class="bank-row">
+          <span class="bank-label">Số tài khoản:</span>
+          <span class="bank-val">
+            <span>19025414262027</span>
+            <button type="button" class="btn-copy" onclick="copyText('19025414262027', this)">Copy</button>
+          </span>
         </div>
-
-        <div class="bank-info-box">
-          <div class="bank-row">
-            <span class="bank-label">Ngân hàng:</span>
-            <span class="bank-val">Techcombank</span>
-          </div>
-          <div class="bank-row">
-            <span class="bank-label">Số tài khoản:</span>
-            <span class="bank-val">
-              <span id="txtStk">19025414262027</span>
-              <button type="button" class="btn-copy" onclick="copyText('19025414262027', this)">Copy</button>
-            </span>
-          </div>
-          <div class="bank-row">
-            <span class="bank-label">Chủ tài khoản:</span>
-            <span class="bank-val">TÔ QUỲNH ANH</span>
-          </div>
-          <div class="bank-row">
-            <span class="bank-label">Số tiền:</span>
-            <span class="bank-val" style="color:var(--primary); font-size:1.05rem;">
-              <span id="txtAmount">2.780.000đ</span>
-              <button type="button" class="btn-copy" onclick="copyAmount(this)">Copy</button>
-            </span>
-          </div>
-          <div class="bank-row">
-            <span class="bank-label">Nội dung CK:</span>
-            <span class="bank-val">
-              <span id="txtRef" style="color:#d97706;">DH9999</span>
-              <button type="button" class="btn-copy" onclick="copyRef(this)">Copy</button>
-            </span>
-          </div>
+        <div class="bank-row">
+          <span class="bank-label">Chủ tài khoản:</span>
+          <span class="bank-val">TÔ QUỲNH ANH</span>
         </div>
-
-        <div style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:10px; padding:10px 12px; font-size:0.78rem; color:#92400E;">
-          ⚠️ <strong>Lưu ý:</strong> Vui lòng giữ nguyên nội dung chuyển khoản để hệ thống tự động ghi nhận đơn nhanh nhất.
+        <div class="bank-row">
+          <span class="bank-label">Số tiền:</span>
+          <span class="bank-val" style="color: var(--primary);">
+            <span id="txtAmountVal">—</span>
+            <button type="button" class="btn-copy" onclick="copyAmount(this)">Copy</button>
+          </span>
+        </div>
+        <div class="bank-row">
+          <span class="bank-label">Nội dung CK:</span>
+          <span class="bank-val">
+            <span id="txtRefVal" style="color: #D32F2F;">DH9999</span>
+            <button type="button" class="btn-copy" onclick="copyRef(this)">Copy</button>
+          </span>
         </div>
       </div>
 
+      <!-- Nút xác nhận đã chuyển khoản -->
+      <button type="button" class="btn-paid" id="btnPaid" onclick="handleCustomerCompletedPayment()">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Tôi đã chuyển khoản xong</span>
+      </button>
+
+      <p style="text-align: center; margin-top: 14px; font-size: 0.8rem; color: var(--text-muted);">
+        Hệ thống tự động phát hiện thanh toán trong 30 giây · Hỗ trợ Zalo: <strong>0977 338 876</strong>
+      </p>
     </div>
 
-    <!-- SUCCESS SCREEN (Hiện khi thanh toán hoặc bấm xác nhận) -->
-    <div class="card success-panel" id="successPanel">
-      <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
-      <h2>ĐÃ GHI NHẬN ĐƠN HÀNG!</h2>
-      <p id="successDesc">Cảm ơn bạn! Hệ thống đã ghi nhận thông tin chuyển khoản.</p>
-      
-      <div style="background:#FAF6F2; border-radius:12px; padding:16px; max-width:440px; margin:0 auto 20px; font-size:0.88rem; text-align:left;">
-        <p style="margin-bottom:6px;"><strong>📦 Sản phẩm:</strong> <span id="resPackage">—</span></p>
-        <p style="margin-bottom:6px;"><strong>💰 Số tiền:</strong> <span id="resAmount">—</span></p>
-        <p style="margin-bottom:6px;"><strong>👤 Người nhận:</strong> <span id="resName">—</span></p>
-        <p style="margin-bottom:6px;"><strong>📱 Số điện thoại:</strong> <span id="resPhone">—</span></p>
-        <p><strong>🏷️ Mã đơn hàng:</strong> <span id="resRef" style="color:var(--primary); font-weight:700;">—</span></p>
-      </div>
 
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">
-        Quỳnh Anh sẽ liên hệ qua Zalo / Số điện thoại của bạn trong 15 phút tới để xác nhận và gửi hàng nhé 🌸
+    <!-- ============================================================
+         MÀN THÔNG BÁO ĐÃ ĐẶT HÀNG THÀNH CÔNG
+         ============================================================ -->
+    <div class="card success-panel" id="successCard">
+      <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+      <h2 id="successTitle">ĐÃ ĐẶT HÀNG THÀNH CÔNG! 🎉</h2>
+      <p class="success-desc" id="successDesc">
+        Cảm ơn bạn! Đơn hàng của bạn đã được ghi nhận và đồng bộ vào hệ thống quản lý.
       </p>
 
-      <a href="/landing-page" class="btn-submit" style="display:inline-flex; width:auto; padding:10px 24px; text-decoration:none;">
+      <div class="detail-card">
+        <div class="detail-row">
+          <span>Mã đơn hàng:</span>
+          <span id="resRef" style="color: var(--primary); font-weight: 800;">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Khách hàng:</span>
+          <span id="resName">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Số điện thoại:</span>
+          <span id="resPhone">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Sản phẩm:</span>
+          <span id="resPackage">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Tổng số tiền:</span>
+          <span id="resAmount" style="color: var(--primary); font-weight: 800;">—</span>
+        </div>
+        <div class="detail-row" id="resAddressRow">
+          <span>Địa chỉ giao hàng:</span>
+          <span id="resAddress">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Trạng thái đơn:</span>
+          <span id="resStatus" style="color: #10B981; font-weight: 700;">Đã ghi nhận (Success)</span>
+        </div>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;">
+        Quỳnh Anh sẽ chuẩn bị đơn hàng và gửi cho bạn sớm nhất nhé! 🌸
+      </p>
+
+      <a href="/landing-page" class="btn-next" style="display: inline-flex; width: auto; padding: 12px 28px; text-decoration: none;">
         <i class="fa-solid fa-house"></i> Về trang chủ
       </a>
     </div>
@@ -519,30 +657,41 @@
   </footer>
 
   <script>
+    // ── Backend API Server ─────────────────────────────────────
+    const isStaticHost = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
+    const API_BASE = localStorage.getItem('adminServerUrl') || (isStaticHost ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
+
     // ── State ──────────────────────────────────────────────────
     let currentPackage = {
       id: 'combo2',
       name: 'Combo 3 Phút Buổi Sáng (50ml + Kem dưỡng)',
       price: 2780000
     };
-    let orderRef = generateOrderRef();
+    let orderRef = 'DH' + Math.floor(1000 + Math.random() * 9000);
+    let _pollTimer = null;
+    let isPaymentDone = false;
 
-    function generateOrderRef() {
-      return 'DH' + Math.floor(1000 + Math.random() * 9000);
-    }
-
-    // ── Parse URL params (Hỗ trợ gửi link trực tiếp cho khách) ─
-    function initFromUrlParams() {
+    // ── Init from URL Params ───────────────────────────────────
+    function initFromParams() {
       const params = new URLSearchParams(window.location.search);
-      const pkg = params.get('package') || params.get('goi') || params.get('p');
-      const amountParam = params.get('amount') || params.get('gia');
-      const nameParam = params.get('name') || params.get('ten');
-      const phoneParam = params.get('phone') || params.get('sdt');
-      const refParam = params.get('ref') || params.get('ma');
+      const pkg = params.get('package') || params.get('goi');
+      const name = params.get('name') || params.get('ten');
+      const phone = params.get('phone') || params.get('sdt');
+      const addr = params.get('address') || params.get('diachi');
+      const note = params.get('notes') || params.get('ghichu');
+      const ref = params.get('ref') || params.get('ma');
+      const step = params.get('step');
 
-      if (refParam) {
-        orderRef = refParam.toUpperCase();
+      if (ref) orderRef = ref.toUpperCase();
+      if (name) document.getElementById('custName').value = name;
+      if (phone) {
+        document.getElementById('custPhone').value = phone;
+        if (!ref && phone.length >= 4) {
+          orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
+        }
       }
+      if (addr) document.getElementById('custAddress').value = addr;
+      if (note) document.getElementById('custNotes').value = note;
 
       if (pkg) {
         const pLower = pkg.toLowerCase();
@@ -553,34 +702,17 @@
         } else {
           selectPackageItem('combo2', 2780000, 'Combo 3 Phút Buổi Sáng (50ml + Kem dưỡng)');
         }
-      } else if (amountParam) {
-        const amt = parseInt(amountParam);
-        if (!isNaN(amt)) {
-          currentPackage.price = amt;
-          currentPackage.name = 'Đơn đặt hàng tuỳ chọn (' + amt.toLocaleString('vi-VN') + 'đ)';
-        }
       }
 
-      if (nameParam) document.getElementById('custName').value = nameParam;
-      if (phoneParam) {
-        document.getElementById('custPhone').value = phoneParam;
-        updateOrderRefWithPhone(phoneParam);
+      // Nếu đã có thông tin từ trang chính chuyển sang (step=2), tự động vào luôn Bước 2
+      if (step === '2' && name && phone) {
+        goToStep2Directly();
       }
-      
-      // Nếu có sẵn ref từ URL, tự động kích hoạt polling kiểm tra
-      const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
-      const serverUrl = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
-      if (serverUrl && orderRef) {
-        startPaymentPolling(orderRef, serverUrl);
-      }
-
-      updateUiAndQr();
     }
 
     function selectPackageItem(id, price, name) {
       currentPackage = { id, price, name };
       
-      // Update radio UI
       document.querySelectorAll('.package-item').forEach(el => el.classList.remove('active'));
       const activeItem = document.querySelector(`.package-item input[value="${id}"]`)?.closest('.package-item');
       if (activeItem) {
@@ -588,37 +720,71 @@
         activeItem.querySelector('input').checked = true;
       }
 
-      // Ẩn địa chỉ nếu là PDF
+      // Ẩn/hiện trường địa chỉ
       const addrGroup = document.getElementById('addressGroup');
+      const addrInput = document.getElementById('custAddress');
       if (id === 'pdf') {
         addrGroup.style.display = 'none';
+        addrInput.required = false;
       } else {
         addrGroup.style.display = 'block';
+        addrInput.required = true;
       }
-
-      updateUiAndQr();
     }
 
-    function updateOrderRefWithPhone(phone) {
-      if (phone && phone.length >= 4) {
+    // ── BƯỚC 1: Xử lý khi bấm nút "Tiếp theo" ──────────────────
+    function goToStep2(event) {
+      if (event) event.preventDefault();
+      
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const address = document.getElementById('custAddress').value.trim();
+      const notes = document.getElementById('custNotes').value.trim();
+
+      if (!name || !phone) {
+        alert('Vui lòng nhập Họ tên và Số điện thoại!');
+        return;
+      }
+      if (currentPackage.id !== 'pdf' && !address) {
+        alert('Vui lòng nhập địa chỉ nhận hàng!');
+        return;
+      }
+
+      if (phone.length >= 4 && !orderRef.includes(phone.slice(-4))) {
         orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
       }
+
+      // 1. Tạo Khách hàng & Đơn hàng (Pending) trên Admin
+      syncOrderToAdmin(name, phone, address, notes, 'pending');
+
+      // 2. Gửi email FormSubmit
+      sendFormSubmitEmail(name, phone, address, notes);
+
+      // 3. Chuyển sang Bước 2
+      goToStep2Directly();
     }
 
-    function updateQrCode() {
-      const phone = document.getElementById('custPhone').value.trim();
-      if (phone.length >= 4) {
-        updateOrderRefWithPhone(phone);
-      }
-      updateUiAndQr();
-    }
+    function goToStep2Directly() {
+      const name = document.getElementById('custName').value.trim() || 'Quý khách';
+      const phone = document.getElementById('custPhone').value.trim() || '';
 
-    function updateUiAndQr() {
-      // Cập nhật text số tiền & mã đơn
-      document.getElementById('txtAmount').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
-      document.getElementById('txtRef').textContent = orderRef;
+      // Cập nhật Step indicator
+      document.getElementById('stepNode1').classList.remove('active');
+      document.getElementById('stepNode1').classList.add('completed');
+      document.getElementById('stepNode2').classList.add('active');
 
-      // Sinh URL VietQR
+      // Cập nhật tóm tắt Bước 2
+      document.getElementById('sumCustName').textContent = name;
+      document.getElementById('sumCustPhone').textContent = phone;
+      document.getElementById('sumPackageName').textContent = currentPackage.name;
+      document.getElementById('sumAmount').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
+
+      // Cập nhật thông tin ngân hàng & QR
+      document.getElementById('txtAmountVal').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
+      document.getElementById('txtRefVal').textContent = orderRef;
+      document.getElementById('txtRefDisplay').textContent = orderRef;
+
+      // Sinh mã VietQR Techcombank
       const qrImg = document.getElementById('qrImg');
       const qrLoading = document.getElementById('qrLoading');
       const qrUrl = `https://img.vietqr.io/image/TCB-19025414262027-compact.jpg?amount=${currentPackage.price}&addInfo=${orderRef}&accountName=Quynh%20Anh`;
@@ -630,12 +796,141 @@
         qrLoading.style.display = 'none';
         qrImg.style.display = 'block';
       };
-      qrImg.onerror = () => {
-        qrLoading.innerHTML = `<span style="color:#dc2626">Lỗi tải QR. Vui lòng chuyển khoản theo thông tin bên dưới!</span>`;
-      };
+
+      // Đổi giao diện
+      document.getElementById('step1Card').style.display = 'none';
+      document.getElementById('step2Card').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Kích hoạt theo dõi SePay thanh toán tự động
+      startPaymentPolling(orderRef);
     }
 
-    // Copy helper
+    function goToStep1() {
+      if (_pollTimer) clearInterval(_pollTimer);
+      document.getElementById('stepNode2').classList.remove('active');
+      document.getElementById('stepNode1').classList.remove('completed');
+      document.getElementById('stepNode1').classList.add('active');
+
+      document.getElementById('step2Card').style.display = 'none';
+      document.getElementById('step1Card').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── BƯỚC 2: Xử lý khi bấm nút "Tôi đã chuyển khoản xong" ───
+    function handleCustomerCompletedPayment() {
+      const name = document.getElementById('custName').value.trim() || 'Quý khách';
+      const phone = document.getElementById('custPhone').value.trim() || '';
+      const address = document.getElementById('custAddress').value.trim() || '';
+      const notes = document.getElementById('custNotes').value.trim() || '';
+
+      const btn = document.getElementById('btnPaid');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xác nhận đơn hàng...';
+
+      // Cập nhật hoặc đảm bảo đơn hàng có trên Admin
+      syncOrderToAdmin(name, phone, address, notes, 'success');
+
+      setTimeout(() => {
+        showSuccessScreen(name, phone, address, true);
+      }, 500);
+    }
+
+    // ── Lắng nghe thanh toán SePay tự động ─────────────────────
+    function startPaymentPolling(ref) {
+      if (!API_BASE) return;
+      if (_pollTimer) clearInterval(_pollTimer);
+
+      let attempts = 0;
+      _pollTimer = setInterval(async () => {
+        attempts++;
+        if (attempts > 120 || isPaymentDone) {
+          clearInterval(_pollTimer);
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/api/check-payment/${ref}`, { signal: AbortSignal.timeout(3000) });
+          if (!res.ok) return;
+          const data = await res.json();
+
+          if (data.found && (data.status === 'success' || data.status === 'confirmed')) {
+            clearInterval(_pollTimer);
+            const name = document.getElementById('custName').value.trim() || data.order?.customer_name || 'Quý khách';
+            const phone = document.getElementById('custPhone').value.trim() || '';
+            const address = document.getElementById('custAddress').value.trim() || '';
+            showSuccessScreen(name, phone, address, true);
+          }
+        } catch(e) {}
+      }, 3000);
+    }
+
+    // ── Hiển thị Màn hình Đặt hàng thành công ─────────────────
+    function showSuccessScreen(name, phone, address, isSuccess=true) {
+      isPaymentDone = true;
+      if (_pollTimer) clearInterval(_pollTimer);
+
+      document.getElementById('stepIndicator').style.display = 'none';
+      document.getElementById('step1Card').style.display = 'none';
+      document.getElementById('step2Card').style.display = 'none';
+      const successCard = document.getElementById('successCard');
+      successCard.style.display = 'block';
+
+      document.getElementById('resRef').textContent = orderRef;
+      document.getElementById('resName').textContent = name || 'Quý khách';
+      document.getElementById('resPhone').textContent = phone || '—';
+      document.getElementById('resPackage').textContent = currentPackage.name;
+      document.getElementById('resAmount').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
+
+      const addrRow = document.getElementById('resAddressRow');
+      if (currentPackage.id === 'pdf' || !address) {
+        addrRow.style.display = 'none';
+      } else {
+        addrRow.style.display = 'flex';
+        document.getElementById('resAddress').textContent = address;
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Đồng bộ đơn hàng & khách hàng lên Backend Admin ────────
+    function syncOrderToAdmin(name, phone, address, notes, status='pending') {
+      if (!API_BASE) return;
+      fetch(`${API_BASE}/api/orders/from-checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name,
+          phone: phone,
+          address: address,
+          notes: notes,
+          package: currentPackage.name,
+          payment_ref: orderRef,
+          status: status
+        })
+      }).catch(err => console.warn('Lỗi sync admin:', err));
+    }
+
+    function sendFormSubmitEmail(name, phone, address, notes) {
+      fetch("https://formsubmit.co/ajax/toquynhanh@gmail.com", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          "_subject": `🌸 [ĐƠN HÀNG MỚI] ${name} - ${phone} (${orderRef})`,
+          "Mã đơn hàng": orderRef,
+          "Gói sản phẩm": currentPackage.name,
+          "Số tiền": currentPackage.price.toLocaleString('vi-VN') + 'đ',
+          "Khách hàng": name,
+          "Số điện thoại": phone,
+          "Địa chỉ": address || 'Không có (Sản phẩm số)',
+          "Ghi chú": notes,
+          "_template": "table",
+          "_captcha": "false"
+        })
+      }).catch(() => {});
+    }
+
+    // ── Copy helpers ───────────────────────────────────────────
     function copyText(val, btn) {
       navigator.clipboard.writeText(val).then(() => {
         const old = btn.textContent;
@@ -652,121 +947,8 @@
     function copyAmount(btn) { copyText(currentPackage.price.toString(), btn); }
     function copyRef(btn) { copyText(orderRef, btn); }
 
-    // ── Xử lý khi bấm nút "Tôi đã chuyển khoản" ────────────────
-    function handleConfirmPayment(event) {
-      event.preventDefault();
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const address = document.getElementById('custAddress').value.trim();
-      const notes = document.getElementById('custNotes').value.trim();
-      const submitBtn = document.getElementById('submitBtn');
-
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang ghi nhận đơn...';
-
-      // 1. Gửi thông báo về Gmail qua FormSubmit
-      fetch("https://formsubmit.co/ajax/toquynhanh@gmail.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({
-          "_subject": `🌸 [ĐƠN HÀNG MỚI] ${name} - ${phone} (${orderRef})`,
-          "Mã đơn hàng": orderRef,
-          "Gói sản phẩm": currentPackage.name,
-          "Số tiền": currentPackage.price.toLocaleString('vi-VN') + 'đ',
-          "Khách hàng": name,
-          "Số điện thoại / Zalo": phone,
-          "Địa chỉ": address || 'Không có (Sản phẩm số)',
-          "Ghi chú": notes,
-          "_template": "table",
-          "_captcha": "false"
-        })
-      }).catch(err => console.warn('FormSubmit catch:', err));
-
-      // 2. Gửi về Backend Python tạo đơn pending
-      const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
-      const serverUrl = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
-      
-      if (serverUrl) {
-        fetch(serverUrl + '/api/orders/from-checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name, phone, address,
-            package: currentPackage.name,
-            payment_ref: orderRef
-          })
-        }).catch(() => {});
-      }
-
-      // 3. Bắt đầu theo dõi trạng thái thanh toán từ SePay
-      startPaymentPolling(orderRef, serverUrl);
-
-      // 4. Hiển thị thông báo chờ thanh toán hoặc chuyển khoản
-      setTimeout(() => {
-        showThankYouScreen(name, phone, orderRef, false);
-      }, 600);
-    }
-
-    
-    // ── Payment Polling & Thank You Screen ─────────────────────
-    let _pollTimer = null;
-
-    function startPaymentPolling(ref, serverBase) {
-      if (!serverBase) return;
-      if (_pollTimer) clearInterval(_pollTimer);
-
-      let count = 0;
-      _pollTimer = setInterval(async () => {
-        count++;
-        if (count > 120) { clearInterval(_pollTimer); return; } // Dừng sau 6 phút
-
-        try {
-          const res = await fetch(`${serverBase}/api/check-payment/${ref}`, { signal: AbortSignal.timeout(3000) });
-          if (!res.ok) return;
-          const data = await res.json();
-
-          if (data.found && (data.status === 'success' || data.status === 'confirmed')) {
-            clearInterval(_pollTimer);
-            const name = document.getElementById('custName')?.value || data.order?.customer_name || 'bạn';
-            const phone = document.getElementById('custPhone')?.value || '';
-            showThankYouScreen(name, phone, ref, true);
-          }
-        } catch(e) {}
-      }, 3000);
-    }
-
-    function showThankYouScreen(name, phone, ref, isPaid=false) {
-      document.getElementById('checkoutLayout').style.display = 'none';
-      const sp = document.getElementById('successPanel');
-      sp.style.display = 'block';
-
-      if (isPaid) {
-        sp.querySelector('.success-icon').innerHTML = '<i class="fa-solid fa-circle-check" style="color:#10b981;"></i>';
-        sp.querySelector('h2').textContent = '🎉 THANH TOÁN THÀNH CÔNG!';
-        sp.querySelector('h2').style.color = '#10b981';
-        document.getElementById('successDesc').innerHTML = 
-          `Tuyệt vời! Hệ thống đã nhận được tiền chuyển khoản từ <strong>${name}</strong>.<br>` +
-          `Đơn hàng đã được chuyển sang trạng thái <strong>THÀNH CÔNG (SUCCESS)</strong> trên hệ thống.`;
-      } else {
-        sp.querySelector('h2').textContent = 'ĐÃ GHI NHẬN ĐƠN HÀNG (PENDING)';
-        document.getElementById('successDesc').innerHTML = 
-          `Cảm ơn bạn! Đơn hàng đã được tạo trên hệ thống với trạng thái <strong>PENDING</strong>.<br>` +
-          `Hệ thống đang chờ nhận tiền chuyển khoản để tự động chuyển sang <strong>SUCCESS</strong>.`;
-      }
-
-      document.getElementById('resPackage').textContent = currentPackage.name;
-      document.getElementById('resAmount').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
-      document.getElementById('resName').textContent = name || 'Khách hàng';
-      document.getElementById('resPhone').textContent = phone || '—';
-      document.getElementById('resRef').textContent = ref;
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // ── Khởi động ──────────────────────────────────────────────
-    window.addEventListener('DOMContentLoaded', () => {
-      initFromUrlParams();
-    });
+    // Khởi động
+    window.addEventListener('DOMContentLoaded', initFromParams);
   </script>
 </body>
 </html>

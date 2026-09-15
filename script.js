@@ -276,123 +276,80 @@ function handleFormSubmit(event) {
   const noteInput = document.getElementById('customerNote');
   const submitBtn = document.getElementById('btnSubmitOrder');
 
-  const name = nameInput.value.trim();
-  const phone = phoneInput.value.trim();
-  const address = addressInput.value.trim();
+  const name = nameInput ? nameInput.value.trim() : '';
+  const phone = phoneInput ? phoneInput.value.trim() : '';
+  const address = addressInput ? addressInput.value.trim() : '';
   const note = noteInput ? noteInput.value.trim() : '';
   
   const selectedRadio = document.querySelector('input[name="product_package"]:checked');
-  const packageName = selectedRadio ? selectedRadio.value : 'Combo Shiseido';
+  const packageName = selectedRadio ? selectedRadio.value : 'Combo 2: Trọn Gói 3 Phút 50ml - 2.780.000đ';
+
+  if (!name || !phone) {
+    alert('Vui lòng nhập đầy đủ Họ tên và Số điện thoại!');
+    return;
+  }
 
   // Hiệu ứng Loading cho nút bấm
   const originalBtnContent = submitBtn.innerHTML;
   submitBtn.disabled = true;
   submitBtn.innerHTML = `
-    <span class="btn-text"><i class="fa-solid fa-circle-notch fa-spin"></i> ĐANG XỬ LÝ & GỬI ĐƠN HÀNG...</span>
-    <span class="btn-subtext">Vui lòng chờ vài giây để hệ thống ghi nhận</span>
+    <span class="btn-text"><i class="fa-solid fa-spinner fa-spin"></i> ĐANG CHUYỂN ĐẾN TRANG THANH TOÁN...</span>
+    <span class="btn-subtext">Vui lòng chờ trong giây lát</span>
   `;
 
-  // Kiểm tra môi trường chạy:
-  // Nếu đang mở file trực tiếp trên máy (file:///), trình duyệt chặn gọi ngầm (CORS: Origin null)
-  // Ta sẽ gửi trực tiếp (Native Form Submit) để FormSubmit nhận đơn ngay và gửi email kích hoạt tới toquynhanh@gmail.com!
-  const isLocalFile = window.location.protocol === 'file:';
+  // Xác định mã gói để truyền sang trang thanh toán
+  let pkgParam = 'combo2';
+  if (packageName.includes('30ml') || packageName.includes('Gói 1')) pkgParam = 'serum30';
+  if (packageName.includes('PDF') || packageName.includes('Checklist')) pkgParam = 'pdf';
 
-  if (isLocalFile) {
-    const form = document.getElementById('mainCheckoutForm');
-    // Cập nhật tiêu đề email động
-    const subjectInput = form.querySelector('input[name="_subject"]');
-    if (subjectInput) {
-      subjectInput.value = `🌸 [ĐƠN HÀNG SHISEIDO MỚI] ${name} - ${phone}`;
-    }
-    // Gửi form trực tiếp
-    form.submit();
-    return;
-  }
+  const orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
+  const checkoutUrl = `/thanh-toan?package=${pkgParam}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&notes=${encodeURIComponent(note)}&ref=${encodeURIComponent(orderRef)}&step=2`;
 
-  // Nếu đang chạy trên Website thật (GitHub Pages, tên miền riêng hoặc localhost)
-  // Dùng Fetch gửi ngầm để hiển thị Modal Thành Công mượt mà không cần chuyển trang
-  const orderData = {
-    "Họ và tên khách hàng": name,
-    "Số điện thoại": phone,
-    "Địa chỉ giao hàng": address,
-    "Gói sản phẩm chọn mua": packageName,
-    "Tình trạng da / Ghi chú": note || "Không có",
-    "_subject": `🌸 [ĐƠN HÀNG SHISEIDO MỚI] ${name} - ${phone}`,
-    "_template": "table",
-    "_captcha": "false"
-  };
-
+  // 1. Gửi thông báo về FormSubmit email trong nền
   fetch("https://formsubmit.co/ajax/toquynhanh@gmail.com", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    },
-    body: JSON.stringify(orderData)
-  })
-  .then(response => {
-    if (!response.ok) throw new Error("Gửi không thành công");
-    return response.json();
-  })
-  .then(data => {
-    // Hiển thị thông tin lên Modal thành công
-    document.getElementById('modalCustomerName').textContent = name || 'Chị';
-    document.getElementById('modalPhone').textContent = phone;
-    document.getElementById('modalAddress').textContent = address;
-    document.getElementById('modalPackage').textContent = packageName;
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify({
+      "_subject": `🌸 [ĐƠN HÀNG MỚI] ${name} - ${phone} (${orderRef})`,
+      "Mã đơn hàng": orderRef,
+      "Gói chọn": packageName,
+      "Họ tên": name,
+      "Số điện thoại": phone,
+      "Địa chỉ": address,
+      "Ghi chú": note,
+      "_template": "table",
+      "_captcha": "false"
+    })
+  }).catch(() => {});
 
-    // Cập nhật QR Code động theo gói sản phẩm
-    const isCombo2 = packageName.includes('Combo 2') || packageName.includes('2.780');
-    const amount = isCombo2 ? 2780000 : 2480000;
-    const orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
-    // Dùng img.vietqr.io — API chính thức, không chặn hotlink từ GitHub Pages
-    const qrUrl = `https://img.vietqr.io/image/TCB-19025414262027-compact.jpg?amount=${amount}&addInfo=${orderRef}&accountName=Quynh%20Anh`;
-    const qrImg = document.getElementById('modalQrCode');
-    const qrLoading = document.getElementById('modalQrLoading');
-    // Reset trạng thái loading
-    qrImg.style.display = 'none';
-    qrLoading.style.display = 'block';
-    qrLoading.innerHTML = '⏳ Đang tạo mã QR...';
-    // Set src sau để trigger load event
-    qrImg.src = '';
-    setTimeout(() => { qrImg.src = qrUrl; }, 50);
-    // Fallback link nếu ảnh lỗi
-    qrImg.onerror = function() {
-      qrLoading.innerHTML = `⚠️ Không tải được QR — <a href="${qrUrl}" target="_blank" style="color:#5b2d8e;font-weight:600;">bấm đây để xem QR</a>`;
-    };
+  // 2. Tạo Đơn hàng & Khách hàng trên Backend (Railway hoặc local)
+  const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
+  const ADMIN_SERVER = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
 
-    // Xác định mã gói để truyền qua trang thanh toán
-    let pkgParam = 'combo2';
-    if (packageName.includes('30ml') || packageName.includes('Gói 1')) pkgParam = 'serum30';
-    if (packageName.includes('PDF') || packageName.includes('Checklist')) pkgParam = 'pdf';
-
-    const checkoutUrl = `/thanh-toan?package=${pkgParam}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&ref=${encodeURIComponent(orderRef)}`;
-
-    // Tạo đơn pending trên Flask (nếu server đang chạy)
-    const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
-    const ADMIN_SERVER = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
-
-    if (ADMIN_SERVER) {
-      fetch(ADMIN_SERVER + '/api/orders/from-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, address, package: packageName, payment_ref: orderRef })
-      }).finally(() => {
-        window.location.href = checkoutUrl;
-      });
-    } else {
+  if (ADMIN_SERVER) {
+    fetch(ADMIN_SERVER + '/api/orders/from-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, phone, address,
+        package: packageName,
+        payment_ref: orderRef,
+        notes: note
+      })
+    })
+    .catch(err => console.warn('Lỗi kết nối admin server:', err))
+    .finally(() => {
+      // Chuyển hướng sang trang thanh toán
       window.location.href = checkoutUrl;
-    }
-  })
-  .catch(error => {
-    console.warn("Chuyển sang gửi Form chuẩn:", error);
-    const form = document.getElementById('mainCheckoutForm');
-    form.submit();
-  })
-  .finally(() => {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalBtnContent;
-  });
+    });
+  } else {
+    window.location.href = checkoutUrl;
+  }
+}
+
+function closeModal() {
+  const modal = document.getElementById('orderModal');
+  if (modal) modal.classList.remove('active');
 }
 
 // ── Payment Polling ───────────────────────────────────────────
