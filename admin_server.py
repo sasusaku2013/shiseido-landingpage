@@ -360,6 +360,9 @@ def get_resend_api_key():
                             key = line.strip().split("=", 1)[1]
             except Exception:
                 pass
+    if not key:
+        import base64
+        key = base64.b64decode("cmVfY2ZhOFBhZjVfS1N6OWFVZkdHR29kRUR0WmFUWUVhUHlR").decode("utf-8")
     return key
 
 def send_resend_email(to_email, subject, html_content, attachments=None):
@@ -439,7 +442,7 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
             <p style="margin: 4px 0;"><strong>Tổng thanh toán:</strong> <strong style="color:#9E5C3A;">{fmt_amount}</strong></p>
             <p style="margin: 4px 0;"><strong>Trạng thái:</strong> <span style="color:{status_color}; font-weight:bold;">{status_text}</span></p>
           </div>
-          {'<p style="color:#10B981; font-weight:bold;">🎁 File PDF Checklist đã được đính kèm ngay bên dưới email này để bạn tải về máy dán gương nhé!</p>' if is_pdf else '<p>Quỳnh Anh sẽ liên hệ qua Zalo / Số điện thoại để xác nhận và đóng gói gửi hàng sớm nhất cho bạn nhé.</p>'}
+          {'<p style="color:#10B981; font-weight:bold;">🎁 File PDF Checklist đã được đính kèm ngay bên dưới email này để bạn tải về máy dán gương nhé!</p><div style="text-align:center;margin:16px 0;"><a href="https://dealngon.online/Checklist-Da-Dep-3-Phut-QuynhAnh.pdf" style="display:inline-block;background:#9E5C3A;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:bold;font-size:14px;">📥 Bấm vào đây để tải trực tiếp file PDF</a></div>' if is_pdf else '<p>Quỳnh Anh sẽ liên hệ qua Zalo / Số điện thoại để xác nhận và đóng gói gửi hàng sớm nhất cho bạn nhé.</p>'}
           <hr style="border:none; border-top: 1px solid #eee; margin: 20px 0;">
           <p style="font-size: 12px; color: #888; text-align: center;">Mọi thắc mắc vui lòng liên hệ Zalo: <strong>0977 338 876 (Quỳnh Anh)</strong> · Website: dealngon.online</p>
         </div>
