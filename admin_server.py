@@ -307,6 +307,12 @@ def create_order():
          int(d["amount"]),d.get("status","pending"),
          d.get("payment_method","cod"),d.get("payment_ref",""),
          d.get("address",""),d.get("notes","")))
+    # Gửi email tự động qua Resend
+    try:
+        notify_order_emails(name, phone, pnm, amount, ref, address, status, email)
+    except Exception as em_err:
+        print("[Resend] Error:", em_err)
+
     return jsonify(DB.fetchone("SELECT * FROM orders WHERE id=?", (lid,))), 201
 
 @app.route("/api/orders/<int:oid>", methods=["PUT"])
@@ -340,6 +346,106 @@ def check_payment(ref):
     return jsonify({"found": True, "status": row["status"], "order": row})
 
 # ─── CREATE ORDER FROM CHECKOUT ───────────────────────────────
+
+# ─── RESEND EMAIL INTEGRATION ─────────────────────────────────
+def get_resend_api_key():
+    key = os.environ.get("RESEND_API_KEY", "").strip()
+    if not key:
+        cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resend_config.txt")
+        if os.path.exists(cfg_path):
+            try:
+                with open(cfg_path, encoding="utf-8") as f:
+                    for line in f:
+                        if line.startswith("RESEND_API_KEY="):
+                            key = line.strip().split("=", 1)[1]
+            except Exception:
+                pass
+    return key
+
+def send_resend_email(to_email, subject, html_content, attachments=None):
+    api_key = get_resend_api_key()
+    if not api_key:
+        print("[Resend] ⚠️ Chưa có RESEND_API_KEY, bỏ qua gửi email.")
+        return None
+    try:
+        import resend
+        resend.api_key = api_key
+        payload = {
+            "from": "Quỳnh Anh Beauty <orders@dealngon.online>",
+            "to": to_email,
+            "subject": subject,
+            "html": html_content
+        }
+        if attachments:
+            payload["attachments"] = attachments
+        res = resend.Emails.send(payload)
+        print(f"[Resend] ✅ Gửi email thành công tới {to_email}: {res}")
+        return res
+    except Exception as e:
+        print(f"[Resend] ❌ Lỗi gửi email tới {to_email}: {e}")
+        return None
+
+def notify_order_emails(name, phone, product_name, amount, ref, address, status, customer_email=None):
+    fmt_amount = f"{amount:,}đ"
+    status_text = "ĐÃ THANH TOÁN (SUCCESS)" if status == "success" else "CHỜ THANH TOÁN (PENDING)"
+    status_color = "#10B981" if status == "success" else "#D97706"
+
+    # 1. Gửi email thông báo đơn mới tới Quỳnh Anh (Admin)
+    admin_html = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #EBDCD0; border-radius: 12px; padding: 22px; color: #2C1810; background: #FFF;">
+      <h2 style="color: #9E5C3A; margin-top: 0; font-size: 20px;">🌸 Có đơn hàng mới trên dealngon.online!</h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px;">
+        <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Mã đơn hàng:</td><td style="font-weight: bold; color: #D32F2F;">{ref}</td></tr>
+        <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Khách hàng:</td><td style="font-weight: bold;">{name}</td></tr>
+        <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Số điện thoại:</td><td>{phone}</td></tr>
+        <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Email khách:</td><td>{customer_email or '—'}</td></tr>
+        <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Sản phẩm:</td><td style="font-weight: bold;">{product_name}</td></tr>
+        <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Số tiền:</td><td style="font-weight: bold; color: #9E5C3A;">{fmt_amount}</td></tr>
+        <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Địa chỉ nhận:</td><td>{address or 'Không có (Sản phẩm số)'}</td></tr>
+        <tr><td style="padding: 7px 0; color: #7A6559;">Trạng thái:</td><td><strong style="color: {status_color};">{status_text}</strong></td></tr>
+      </table>
+      <div style="text-align: center; margin-top: 18px;">
+        <a href="https://dealngon.online/admin" style="display: inline-block; background: #9E5C3A; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px;">Xem trong trang Admin →</a>
+      </div>
+    </div>
+    """
+    send_resend_email("toquynhanh@gmail.com", f"🌸 [ĐƠN HÀNG MỚI] {name} - {phone} ({ref})", admin_html)
+
+    # 2. Nếu khách có nhập Email -> Gửi email xác nhận kèm quà tặng / tài liệu
+    if customer_email and "@" in customer_email:
+        attachments = []
+        is_pdf = "PDF" in product_name or "Checklist" in product_name
+        
+        # Nếu mua PDF, đính kèm file Checklist
+        pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Checklist-Da-Dep-3-Phut-QuynhAnh.pdf")
+        if is_pdf and os.path.exists(pdf_path):
+            try:
+                with open(pdf_path, "rb") as f:
+                    attachments.append({
+                        "filename": "Checklist-Da-Dep-3-Phut-QuynhAnh.pdf",
+                        "content": list(f.read())
+                    })
+            except Exception as e:
+                print(f"[Resend] Không đính kèm được PDF: {e}")
+
+        cust_html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #EBDCD0; border-radius: 12px; padding: 24px; color: #2C1810; background: #FFF;">
+          <h2 style="color: #9E5C3A; margin-top: 0;">🌸 Quỳnh Anh Beauty</h2>
+          <p>Chào <strong>{name}</strong>,</p>
+          <p>Cảm ơn bạn đã tin tưởng lựa chọn giải pháp làm đẹp của Quỳnh Anh! Đơn hàng của bạn đã được ghi nhận trên hệ thống:</p>
+          <div style="background: #FAF6F2; border-radius: 10px; padding: 14px; margin: 16px 0; font-size: 14px;">
+            <p style="margin: 4px 0;"><strong>Mã đơn hàng:</strong> <span style="color:#D32F2F;">{ref}</span></p>
+            <p style="margin: 4px 0;"><strong>Sản phẩm:</strong> {product_name}</p>
+            <p style="margin: 4px 0;"><strong>Tổng thanh toán:</strong> <strong style="color:#9E5C3A;">{fmt_amount}</strong></p>
+            <p style="margin: 4px 0;"><strong>Trạng thái:</strong> <span style="color:{status_color}; font-weight:bold;">{status_text}</span></p>
+          </div>
+          {'<p style="color:#10B981; font-weight:bold;">🎁 File PDF Checklist đã được đính kèm ngay bên dưới email này để bạn tải về máy dán gương nhé!</p>' if is_pdf else '<p>Quỳnh Anh sẽ liên hệ qua Zalo / Số điện thoại để xác nhận và đóng gói gửi hàng sớm nhất cho bạn nhé.</p>'}
+          <hr style="border:none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #888; text-align: center;">Mọi thắc mắc vui lòng liên hệ Zalo: <strong>0977 338 876 (Quỳnh Anh)</strong> · Website: dealngon.online</p>
+        </div>
+        """
+        send_resend_email(customer_email, f"🌸 [Xác nhận đơn hàng] {product_name} - Mã #{ref}", cust_html, attachments)
+
 @app.route("/api/orders/from-checkout", methods=["POST"])
 def create_order_from_checkout():
     d = request.json
@@ -394,6 +500,12 @@ def create_order_from_checkout():
             VALUES(?,?,?,?,?,?,?,'bank_transfer',?,?,?)""",
             (cid, name, phone, pid, pnm, amount, status, ref, address, notes))
 
+    # Gửi email tự động qua Resend
+    try:
+        notify_order_emails(name, phone, pnm, amount, ref, address, status, email)
+    except Exception as em_err:
+        print("[Resend] Error:", em_err)
+
     return jsonify(DB.fetchone("SELECT * FROM orders WHERE id=?", (lid,))), 201
 
 # ─── SEPAY WEBHOOK ────────────────────────────────────────────
@@ -420,6 +532,17 @@ def sepay_webhook():
                    (order["id"],))
             matched_id = order["id"]
             print(f"[SePay] ✅ Order #{matched_id} confirmed")
+
+            # Gửi email thông báo thanh toán thành công
+            try:
+                # Tìm email khách hàng nếu có
+                cust = DB.fetchone("SELECT email FROM customers WHERE id=?", (order.get("customer_id"),)) if order.get("customer_id") else None
+                c_email = cust["email"] if cust else None
+                notify_order_emails(order.get("customer_name",""), order.get("customer_phone",""),
+                                    order.get("product_name",""), order.get("amount",0),
+                                    order.get("payment_ref",""), order.get("address",""), "success", c_email)
+            except Exception as e_mail:
+                print(f"[Resend SePay] Error: {e_mail}")
             break
     return jsonify({"success": True, "matched_order": matched_id}), 200
 
