@@ -204,7 +204,7 @@ def init_schema():
         )
         DB.execute(
             f"INSERT INTO products(name,type,price,description) VALUES(?,?,?,?) {conflict}",
-            ("Checklist Da Đẹp 3 Phút (PDF)","digital",49000,"File PDF checklist buổi sáng/tối. Nhận qua Zalo trong 5 phút.")
+            ("Checklist Da Đẹp 3 Phút (PDF)","digital",2000,"File PDF checklist buổi sáng/tối. Nhận qua Zalo trong 5 phút.")
         )
         print("✅ Default products seeded")
 
@@ -367,7 +367,7 @@ def create_order_from_checkout():
     pkg = d.get("package","")
     is_combo2 = "Combo 2" in pkg or "2.780" in pkg
     is_digital = "PDF" in pkg or "49.000" in pkg
-    amount = 49000 if is_digital else (2780000 if is_combo2 else 2480000)
+    amount = 2000 if is_digital else (2780000 if is_combo2 else 2480000)
     keyword = "PDF" if is_digital else ("50ml" if is_combo2 else "30ml")
     product = DB.fetchone("SELECT id,name FROM products WHERE name LIKE ?", (f"%{keyword}%",))
     pid  = product["id"]   if product else None
