@@ -1062,18 +1062,27 @@
               </div>
             </div>
 
-            <!-- Số điện thoại -->
+            <!-- Số điện thoại / Zalo -->
             <div class="form-group">
-              <label class="form-label" for="customerPhone">Số điện thoại nhận hàng: <span class="req">*</span></label>
+              <label class="form-label" for="customerPhone">Số điện thoại / Zalo: <span class="req">*</span></label>
               <div class="input-with-icon">
                 <i class="fa-solid fa-phone"></i>
                 <input type="tel" id="customerPhone" name="so_dien_thoai" placeholder="Ví dụ: 0912 345 678" pattern="[0-9]{10,11}" required>
               </div>
             </div>
 
-            <!-- Địa chỉ giao hàng -->
+            <!-- Email nhận xác nhận & tài liệu -->
             <div class="form-group">
-              <label class="form-label" for="customerAddress">Địa chỉ nhận hàng: <span class="req">*</span></label>
+              <label class="form-label" for="customerEmail">Địa chỉ Email nhận xác nhận &amp; tài liệu: <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-envelope"></i>
+                <input type="email" id="customerEmail" name="email" placeholder="Ví dụ: lananh@gmail.com" required>
+              </div>
+            </div>
+
+            <!-- Địa chỉ giao hàng -->
+            <div class="form-group" id="mainAddressGroup">
+              <label class="form-label" for="customerAddress">Địa chỉ nhận hàng (đối với mỹ phẩm): <span class="req">*</span></label>
               <div class="input-with-icon">
                 <i class="fa-solid fa-location-dot"></i>
                 <input type="text" id="customerAddress" name="dia_chi_giao_hang" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành" required>
@@ -1082,8 +1091,8 @@
 
             <!-- Ghi chú tình trạng da -->
             <div class="form-group">
-              <label class="form-label" for="customerNote">Tình trạng da hiện tại (Không bắt buộc):</label>
-              <input type="text" id="customerNote" name="tinh_trang_da" placeholder="Ví dụ: Da dầu thiếu ẩm, có vài nốt thâm mụn...">
+              <label class="form-label" for="customerNote">Ghi chú hoặc tình trạng da (không bắt buộc):</label>
+              <input type="text" id="customerNote" name="tinh_trang_da" placeholder="Ví dụ: Da dầu thiếu ẩm, giao giờ hành chính...">
             </div>
 
             <!-- Nút gửi đơn hàng -->

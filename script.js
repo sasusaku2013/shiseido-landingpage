@@ -71,11 +71,17 @@ function selectPackage(packageName) {
     } else if (input.value.includes('Gói 1') && packageName.includes('Gói 1')) {
       input.checked = true;
       if (radioCard) radioCard.classList.add('active');
+    } else if ((input.value.includes('PDF') || input.value.includes('Checklist')) && (packageName.includes('PDF') || packageName.includes('Checklist'))) {
+      input.checked = true;
+      if (radioCard) radioCard.classList.add('active');
     } else {
       input.checked = false;
       if (radioCard) radioCard.classList.remove('active');
     }
   });
+
+  const checkedRadio = document.querySelector('input[name="product_package"]:checked');
+  if (checkedRadio) updateRadioSelection(checkedRadio);
 
   // Focus vào ô tên để khách điền ngay
   setTimeout(() => {
@@ -91,6 +97,21 @@ function updateRadioSelection(selectedInput) {
   const currentCard = selectedInput.closest('.radio-card');
   if (currentCard) {
     currentCard.classList.add('active');
+  }
+
+  // Ẩn/hiện trường địa chỉ nếu là sản phẩm số (PDF)
+  const val = selectedInput.value || '';
+  const isPdf = val.includes('PDF') || val.includes('Checklist');
+  const addrGroup = document.getElementById('mainAddressGroup');
+  const addrInput = document.getElementById('customerAddress');
+  if (addrGroup && addrInput) {
+    if (isPdf) {
+      addrGroup.style.display = 'none';
+      addrInput.required = false;
+    } else {
+      addrGroup.style.display = 'block';
+      addrInput.required = true;
+    }
   }
 }
 
@@ -272,20 +293,27 @@ function handleFormSubmit(event) {
 
   const nameInput = document.getElementById('customerName');
   const phoneInput = document.getElementById('customerPhone');
+  const emailInput = document.getElementById('customerEmail');
   const addressInput = document.getElementById('customerAddress');
   const noteInput = document.getElementById('customerNote');
   const submitBtn = document.getElementById('btnSubmitOrder');
 
   const name = nameInput ? nameInput.value.trim() : '';
   const phone = phoneInput ? phoneInput.value.trim() : '';
+  const email = emailInput ? emailInput.value.trim() : '';
   const address = addressInput ? addressInput.value.trim() : '';
   const note = noteInput ? noteInput.value.trim() : '';
   
   const selectedRadio = document.querySelector('input[name="product_package"]:checked');
   const packageName = selectedRadio ? selectedRadio.value : 'Combo 2: Trọn Gói 3 Phút 50ml - 2.780.000đ';
+  const isPdf = packageName.includes('PDF') || packageName.includes('Checklist');
 
-  if (!name || !phone) {
-    alert('Vui lòng nhập đầy đủ Họ tên và Số điện thoại!');
+  if (!name || !phone || !email) {
+    alert('Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Địa chỉ Email!');
+    return;
+  }
+  if (!isPdf && !address) {
+    alert('Vui lòng nhập địa chỉ nhận hàng!');
     return;
   }
 
@@ -300,10 +328,10 @@ function handleFormSubmit(event) {
   // Xác định mã gói để truyền sang trang thanh toán
   let pkgParam = 'combo2';
   if (packageName.includes('30ml') || packageName.includes('Gói 1')) pkgParam = 'serum30';
-  if (packageName.includes('PDF') || packageName.includes('Checklist')) pkgParam = 'pdf';
+  if (isPdf) pkgParam = 'pdf';
 
   const orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
-  const checkoutUrl = `/thanh-toan?package=${pkgParam}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}&notes=${encodeURIComponent(note)}&ref=${encodeURIComponent(orderRef)}&step=2`;
+  const checkoutUrl = `/thanh-toan?package=${pkgParam}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&email=${encodeURIComponent(email)}&address=${encodeURIComponent(address)}&notes=${encodeURIComponent(note)}&ref=${encodeURIComponent(orderRef)}&step=2`;
 
   // 1. Gửi thông báo về FormSubmit email trong nền
   fetch("https://formsubmit.co/ajax/toquynhanh@gmail.com", {
@@ -315,7 +343,8 @@ function handleFormSubmit(event) {
       "Gói chọn": packageName,
       "Họ tên": name,
       "Số điện thoại": phone,
-      "Địa chỉ": address,
+      "Email": email,
+      "Địa chỉ": address || 'Không có (Sản phẩm số)',
       "Ghi chú": note,
       "_template": "table",
       "_captcha": "false"
@@ -331,7 +360,7 @@ function handleFormSubmit(event) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name, phone, address,
+        name, phone, email, address,
         package: packageName,
         payment_ref: orderRef,
         notes: note

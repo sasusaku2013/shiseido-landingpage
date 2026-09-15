@@ -480,23 +480,28 @@
       <!-- Customer info form -->
       <form id="step1Form" onsubmit="goToStep2(event)">
         <div class="form-group">
-          <label class="form-label" for="custName">Họ và tên của bạn <span class="req">*</span></label>
-          <input type="text" id="custName" class="form-input" required placeholder="Ví dụ: Nguyễn Thị Lan Anh">
+          <label class="form-label" for="custName">Họ và tên của bạn: <span class="req">*</span></label>
+          <input type="text" id="custName" class="form-input" required placeholder="Ví dụ: Nguyễn Thị Mai Lan">
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="custPhone">Số điện thoại / Zalo nhận hàng <span class="req">*</span></label>
+          <label class="form-label" for="custPhone">Số điện thoại / Zalo: <span class="req">*</span></label>
           <input type="tel" id="custPhone" class="form-input" required placeholder="Ví dụ: 0912 345 678" pattern="[0-9]{10,11}">
         </div>
 
+        <div class="form-group">
+          <label class="form-label" for="custEmail">Địa chỉ Email nhận xác nhận &amp; tài liệu: <span class="req">*</span></label>
+          <input type="email" id="custEmail" class="form-input" required placeholder="Ví dụ: lananh@gmail.com">
+        </div>
+
         <div class="form-group" id="addressGroup">
-          <label class="form-label" for="custAddress">Địa chỉ nhận hàng (đối với mỹ phẩm) <span class="req">*</span></label>
-          <input type="text" id="custAddress" class="form-input" placeholder="Số nhà, tên đường, quận/huyện, tỉnh/thành">
+          <label class="form-label" for="custAddress">Địa chỉ nhận hàng (đối với mỹ phẩm): <span class="req">*</span></label>
+          <input type="text" id="custAddress" class="form-input" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành">
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="custNotes">Ghi chú hoặc tình trạng da (tuỳ chọn)</label>
-          <input type="text" id="custNotes" class="form-input" placeholder="Ví dụ: Giao giờ hành chính, da dầu thiếu ẩm...">
+          <label class="form-label" for="custNotes">Ghi chú hoặc tình trạng da (không bắt buộc):</label>
+          <input type="text" id="custNotes" class="form-input" placeholder="Ví dụ: Da dầu thiếu ẩm, giao giờ hành chính...">
         </div>
 
         <!-- Nút Tiếp theo -->
@@ -535,6 +540,10 @@
         <div class="order-summary-row">
           <span>Số điện thoại:</span>
           <span id="sumCustPhone">—</span>
+        </div>
+        <div class="order-summary-row">
+          <span>Email:</span>
+          <span id="sumCustEmail">—</span>
         </div>
         <div class="order-summary-row">
           <span>Sản phẩm:</span>
@@ -624,6 +633,10 @@
           <span id="resPhone">—</span>
         </div>
         <div class="detail-row">
+          <span>Email:</span>
+          <span id="resEmail">—</span>
+        </div>
+        <div class="detail-row">
           <span>Sản phẩm:</span>
           <span id="resPackage">—</span>
         </div>
@@ -677,6 +690,7 @@
       const pkg = params.get('package') || params.get('goi');
       const name = params.get('name') || params.get('ten');
       const phone = params.get('phone') || params.get('sdt');
+      const email = params.get('email') || params.get('mail');
       const addr = params.get('address') || params.get('diachi');
       const note = params.get('notes') || params.get('ghichu');
       const ref = params.get('ref') || params.get('ma');
@@ -690,6 +704,7 @@
           orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
         }
       }
+      if (email) document.getElementById('custEmail').value = email;
       if (addr) document.getElementById('custAddress').value = addr;
       if (note) document.getElementById('custNotes').value = note;
 
@@ -738,11 +753,12 @@
       
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
+      const email = document.getElementById('custEmail').value.trim();
       const address = document.getElementById('custAddress').value.trim();
       const notes = document.getElementById('custNotes').value.trim();
 
-      if (!name || !phone) {
-        alert('Vui lòng nhập Họ tên và Số điện thoại!');
+      if (!name || !phone || !email) {
+        alert('Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Địa chỉ Email!');
         return;
       }
       if (currentPackage.id !== 'pdf' && !address) {
@@ -755,10 +771,10 @@
       }
 
       // 1. Tạo Khách hàng & Đơn hàng (Pending) trên Admin
-      syncOrderToAdmin(name, phone, address, notes, 'pending');
+      syncOrderToAdmin(name, phone, email, address, notes, 'pending');
 
       // 2. Gửi email FormSubmit
-      sendFormSubmitEmail(name, phone, address, notes);
+      sendFormSubmitEmail(name, phone, email, address, notes);
 
       // 3. Chuyển sang Bước 2
       goToStep2Directly();
@@ -767,6 +783,7 @@
     function goToStep2Directly() {
       const name = document.getElementById('custName').value.trim() || 'Quý khách';
       const phone = document.getElementById('custPhone').value.trim() || '';
+      const email = document.getElementById('custEmail').value.trim() || '';
 
       // Cập nhật Step indicator
       document.getElementById('stepNode1').classList.remove('active');
@@ -776,6 +793,8 @@
       // Cập nhật tóm tắt Bước 2
       document.getElementById('sumCustName').textContent = name;
       document.getElementById('sumCustPhone').textContent = phone;
+      const sumEmail = document.getElementById('sumCustEmail');
+      if (sumEmail) sumEmail.textContent = email || '—';
       document.getElementById('sumPackageName').textContent = currentPackage.name;
       document.getElementById('sumAmount').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
 
@@ -821,6 +840,7 @@
     function handleCustomerCompletedPayment() {
       const name = document.getElementById('custName').value.trim() || 'Quý khách';
       const phone = document.getElementById('custPhone').value.trim() || '';
+      const email = document.getElementById('custEmail').value.trim() || '';
       const address = document.getElementById('custAddress').value.trim() || '';
       const notes = document.getElementById('custNotes').value.trim() || '';
 
@@ -829,10 +849,10 @@
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xác nhận đơn hàng...';
 
       // Cập nhật hoặc đảm bảo đơn hàng có trên Admin
-      syncOrderToAdmin(name, phone, address, notes, 'success');
+      syncOrderToAdmin(name, phone, email, address, notes, 'success');
 
       setTimeout(() => {
-        showSuccessScreen(name, phone, address, true);
+        showSuccessScreen(name, phone, email, address, true);
       }, 500);
     }
 
@@ -858,15 +878,16 @@
             clearInterval(_pollTimer);
             const name = document.getElementById('custName').value.trim() || data.order?.customer_name || 'Quý khách';
             const phone = document.getElementById('custPhone').value.trim() || '';
+            const email = document.getElementById('custEmail').value.trim() || data.order?.email || '';
             const address = document.getElementById('custAddress').value.trim() || '';
-            showSuccessScreen(name, phone, address, true);
+            showSuccessScreen(name, phone, email, address, true);
           }
         } catch(e) {}
       }, 3000);
     }
 
     // ── Hiển thị Màn hình Đặt hàng thành công ─────────────────
-    function showSuccessScreen(name, phone, address, isSuccess=true) {
+    function showSuccessScreen(name, phone, email, address, isSuccess=true) {
       isPaymentDone = true;
       if (_pollTimer) clearInterval(_pollTimer);
 
@@ -879,6 +900,8 @@
       document.getElementById('resRef').textContent = orderRef;
       document.getElementById('resName').textContent = name || 'Quý khách';
       document.getElementById('resPhone').textContent = phone || '—';
+      const resEmail = document.getElementById('resEmail');
+      if (resEmail) resEmail.textContent = email || '—';
       document.getElementById('resPackage').textContent = currentPackage.name;
       document.getElementById('resAmount').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
 
@@ -894,7 +917,7 @@
     }
 
     // ── Đồng bộ đơn hàng & khách hàng lên Backend Admin ────────
-    function syncOrderToAdmin(name, phone, address, notes, status='pending') {
+    function syncOrderToAdmin(name, phone, email, address, notes, status='pending') {
       if (!API_BASE) return;
       fetch(`${API_BASE}/api/orders/from-checkout`, {
         method: 'POST',
@@ -902,6 +925,7 @@
         body: JSON.stringify({
           name: name,
           phone: phone,
+          email: email,
           address: address,
           notes: notes,
           package: currentPackage.name,
@@ -911,7 +935,7 @@
       }).catch(err => console.warn('Lỗi sync admin:', err));
     }
 
-    function sendFormSubmitEmail(name, phone, address, notes) {
+    function sendFormSubmitEmail(name, phone, email, address, notes) {
       fetch("https://formsubmit.co/ajax/toquynhanh@gmail.com", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -922,6 +946,7 @@
           "Số tiền": currentPackage.price.toLocaleString('vi-VN') + 'đ',
           "Khách hàng": name,
           "Số điện thoại": phone,
+          "Email": email,
           "Địa chỉ": address || 'Không có (Sản phẩm số)',
           "Ghi chú": notes,
           "_template": "table",
