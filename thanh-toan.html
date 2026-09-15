@@ -558,7 +558,7 @@
       <!-- Mã QR VietQR -->
       <div class="qr-container">
         <div id="qrLoading" class="qr-loading">⏳ Đang tạo mã VietQR...</div>
-        <img id="qrImg" class="qr-img" style="display: none;" alt="VietQR Techcombank">
+        <img id="qrImg" class="qr-img" style="display: none;" alt="VietQR TPBank">
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
           Nội dung chuyển khoản: <strong id="txtRefDisplay" style="color: #D32F2F;">DH9999</strong>
         </p>
@@ -568,13 +568,13 @@
       <div class="bank-info-box">
         <div class="bank-row">
           <span class="bank-label">Ngân hàng:</span>
-          <span class="bank-val">Techcombank</span>
+          <span class="bank-val">TPBank (Tiên Phong Bank)</span>
         </div>
         <div class="bank-row">
           <span class="bank-label">Số tài khoản:</span>
           <span class="bank-val">
-            <span>19025414262027</span>
-            <button type="button" class="btn-copy" onclick="copyText('19025414262027', this)">Copy</button>
+            <span>09771622861</span>
+            <button type="button" class="btn-copy" onclick="copyText('09771622861', this)">Copy</button>
           </span>
         </div>
         <div class="bank-row">
@@ -666,7 +666,7 @@
   </main>
 
   <footer class="footer">
-    <p>© 2026 Quỳnh Anh Beauty · Techcombank: 19025414262027 · dealngon.online</p>
+    <p>© 2026 Quỳnh Anh Beauty · TPBank: 09771622861 · dealngon.online</p>
   </footer>
 
   <script>
@@ -803,10 +803,10 @@
       document.getElementById('txtRefVal').textContent = orderRef;
       document.getElementById('txtRefDisplay').textContent = orderRef;
 
-      // Sinh mã VietQR Techcombank
+      // Sinh mã VietQR TPBank qua SePay
       const qrImg = document.getElementById('qrImg');
       const qrLoading = document.getElementById('qrLoading');
-      const qrUrl = `https://img.vietqr.io/image/TCB-19025414262027-compact.jpg?amount=${currentPackage.price}&addInfo=${orderRef}&accountName=Quynh%20Anh`;
+      const qrUrl = `https://vietqr.app/img?bank=TPBank&acc=09771622861&template=compact&amount=${currentPackage.price}&des=${orderRef}&holder=TO%20QUYNH%20ANH`;
 
       qrImg.style.display = 'none';
       qrLoading.style.display = 'flex';
