@@ -374,7 +374,7 @@ def send_resend_email(to_email, subject, html_content, attachments=None):
         import resend
         resend.api_key = api_key
         payload = {
-            "from": "Quỳnh Anh Beauty <orders@dealngon.online>",
+            "from": "DealNgon <orders@dealngon.online>",
             "to": to_email,
             "subject": subject,
             "html": html_content
@@ -393,7 +393,7 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
     status_text = "ĐÃ THANH TOÁN (SUCCESS)" if status == "success" else "CHỜ THANH TOÁN (PENDING)"
     status_color = "#10B981" if status == "success" else "#D97706"
 
-    # 1. Gửi email thông báo đơn mới tới Quỳnh Anh (Admin)
+    # 1. Gửi email thông báo đơn mới tới DealNgon (Admin)
     admin_html = f"""
     <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #EBDCD0; border-radius: 12px; padding: 22px; color: #2C1810; background: #FFF;">
       <h2 style="color: #9E5C3A; margin-top: 0; font-size: 20px;">🌸 Có đơn hàng mới trên dealngon.online!</h2>
@@ -433,18 +433,18 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
 
         cust_html = f"""
         <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #EBDCD0; border-radius: 12px; padding: 24px; color: #2C1810; background: #FFF;">
-          <h2 style="color: #9E5C3A; margin-top: 0;">🌸 Quỳnh Anh Beauty</h2>
+          <h2 style="color: #9E5C3A; margin-top: 0;">🌸 DealNgon</h2>
           <p>Chào <strong>{name}</strong>,</p>
-          <p>Cảm ơn bạn đã tin tưởng lựa chọn giải pháp làm đẹp của Quỳnh Anh! Đơn hàng của bạn đã được ghi nhận trên hệ thống:</p>
+          <p>Cảm ơn bạn đã tin tưởng lựa chọn giải pháp làm đẹp của DealNgon! Đơn hàng của bạn đã được ghi nhận trên hệ thống:</p>
           <div style="background: #FAF6F2; border-radius: 10px; padding: 14px; margin: 16px 0; font-size: 14px;">
             <p style="margin: 4px 0;"><strong>Mã đơn hàng:</strong> <span style="color:#D32F2F;">{ref}</span></p>
             <p style="margin: 4px 0;"><strong>Sản phẩm:</strong> {product_name}</p>
             <p style="margin: 4px 0;"><strong>Tổng thanh toán:</strong> <strong style="color:#9E5C3A;">{fmt_amount}</strong></p>
             <p style="margin: 4px 0;"><strong>Trạng thái:</strong> <span style="color:{status_color}; font-weight:bold;">{status_text}</span></p>
           </div>
-          {'<p style="color:#10B981; font-weight:bold;">🎁 File PDF Checklist đã được đính kèm ngay bên dưới email này để bạn tải về máy dán gương nhé!</p><div style="text-align:center;margin:16px 0;"><a href="https://dealngon.online/Checklist-Da-Dep-3-Phut-QuynhAnh.pdf" style="display:inline-block;background:#9E5C3A;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:bold;font-size:14px;">📥 Bấm vào đây để tải trực tiếp file PDF</a></div>' if is_pdf else '<p>Quỳnh Anh sẽ liên hệ qua Zalo / Số điện thoại để xác nhận và đóng gói gửi hàng sớm nhất cho bạn nhé.</p>'}
+          {'<p style="color:#10B981; font-weight:bold;">🎁 File PDF Checklist đã được đính kèm ngay bên dưới email này để bạn tải về máy dán gương nhé!</p><div style="text-align:center;margin:16px 0;"><a href="https://dealngon.online/Checklist-Da-Dep-3-Phut-QuynhAnh.pdf" style="display:inline-block;background:#9E5C3A;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:bold;font-size:14px;">📥 Bấm vào đây để tải trực tiếp file PDF</a></div>' if is_pdf else '<p>DealNgon sẽ liên hệ qua Zalo / Số điện thoại để xác nhận và đóng gói gửi hàng sớm nhất cho bạn nhé.</p>'}
           <hr style="border:none; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="font-size: 12px; color: #888; text-align: center;">Mọi thắc mắc vui lòng liên hệ Zalo: <strong>0977 338 876 (Quỳnh Anh)</strong> · Website: dealngon.online</p>
+          <p style="font-size: 12px; color: #888; text-align: center;">Mọi thắc mắc vui lòng liên hệ Zalo: <strong>0977 338 876 (DealNgon)</strong> · Website: dealngon.online</p>
         </div>
         """
         send_resend_email(customer_email, f"🌸 [Xác nhận đơn hàng] {product_name} - Mã #{ref}", cust_html, attachments)

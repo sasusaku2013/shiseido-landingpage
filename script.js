@@ -412,7 +412,7 @@ function showPaymentSuccess(orderRef) {
         <div style="font-size:2.5rem;margin-bottom:6px">✅</div>
         <p style="font-weight:700;color:#10b981;font-size:.95rem;margin-bottom:4px">Thanh toán thành công!</p>
         <p style="font-size:.78rem;color:#555">Mã đơn: <strong>${orderRef}</strong></p>
-        <p style="font-size:.75rem;color:#888;margin-top:6px">Quỳnh Anh sẽ gọi xác nhận trong 15 phút tới 🌸</p>
+        <p style="font-size:.75rem;color:#888;margin-top:6px">DealNgon sẽ gọi xác nhận trong 15 phút tới 🌸</p>
       </div>`;
   }
   // Cũng hiển thị banner nhỏ ở đầu modal
@@ -440,7 +440,7 @@ let chatHasGreeted = false;
 // Kịch bản bán hàng & tư vấn chi tiết từ sales_script.md
 const CHATBOT_KB = {
   greeting: {
-    text: `<p><strong>Chào chị ạ! Em là Quỳnh Anh đây.</strong></p>
+    text: `<p><strong>Chào chị ạ! Em là DealNgon đây.</strong></p>
            <p>Thấy chị đang ghé thăm trang, không biết da chị đợt này ngồi điều hòa có đang bị khô mốc hay đổ dầu khó chịu không, chị nhắn em tư vấn thật lòng nha :)))</p>
            <p style="font-size:0.8rem; color:#8E8D95; margin-top:6px;"><em>(Chị có thể bấm chọn nhanh các chủ đề bên dưới hoặc gõ tin nhắn trực tiếp cho em nhé!)</em></p>`
   },
@@ -798,9 +798,9 @@ function processUserQuery(text) {
     return;
   }
 
-  // Fallback mặc định: Giọng tư vấn thân mật của Quỳnh Anh
+  // Fallback mặc định: Giọng tư vấn thân mật của DealNgon
   const fallbackText = `
-    <p>Dạ em Quỳnh Anh đây ạ! Chị muốn em tư vấn kỹ hơn về tình trạng da (khô mốc, đổ dầu, lão hóa...) hay chị đang muốn nhận <strong>Gói ưu đãi gom chung kèm Hộp quà VIP 450k</strong> đợt này thế chị?</p>
+    <p>Dạ em DealNgon đây ạ! Chị muốn em tư vấn kỹ hơn về tình trạng da (khô mốc, đổ dầu, lão hóa...) hay chị đang muốn nhận <strong>Gói ưu đãi gom chung kèm Hộp quà VIP 450k</strong> đợt này thế chị?</p>
     <p>Chị có thể bấm nhanh vào các nút gợi ý câu hỏi ở thanh trượt bên dưới hoặc nhắn trực tiếp cho em nha :)))</p>
   `;
   triggerBotReply(fallbackText, true, false, 600);
@@ -915,7 +915,7 @@ function submitDigitalOrder(event) {
   })
   .then(() => {
     closeDigitalModal();
-    alert(`✅ Mình nhận được rồi ${name}!\n\nQuỳnh Anh sẽ gửi file PDF qua Zalo ${contact} trong 5 phút nhé 🌸`);
+    alert(`✅ Mình nhận được rồi ${name}!\n\nDealNgon sẽ gửi file PDF qua Zalo ${contact} trong 5 phút nhé 🌸`);
     document.getElementById('digitalForm').reset();
   })
   .catch(() => {
