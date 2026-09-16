@@ -395,7 +395,7 @@ function startPaymentPolling(orderRef, serverBase) {
       const res = await fetch(`${serverBase}/api/check-payment/${orderRef}`, { signal: AbortSignal.timeout(4000) });
       if (!res.ok) return;
       const data = await res.json();
-      if (data.found && (data.status === 'confirmed' || data.status === 'delivered')) {
+      if (data.found && (data.status === 'success' || data.status === 'confirmed' || data.status === 'delivered')) {
         clearInterval(_pollInterval);
         showPaymentSuccess(orderRef);
       }
@@ -1025,11 +1025,42 @@ function closeDigitalModal() {
   document.getElementById('digitalModal').classList.remove('active');
 }
 
+// ── Helper validate SĐT & Email chuẩn Việt Nam ───────────────
+function normalizeVNPhone(phone) {
+  if (!phone) return '';
+  let clean = phone.replace(/[^\d+]/g, '');
+  if (clean.startsWith('+84')) clean = '0' + clean.slice(3);
+  else if (clean.startsWith('84') && clean.length >= 11) clean = '0' + clean.slice(2);
+  return clean;
+}
+
+function isValidVNPhone(phone) {
+  const clean = normalizeVNPhone(phone);
+  return /^(0)(3|5|7|8|9)[0-9]{8}$/.test(clean) || /^(02)[0-9]{9}$/.test(clean);
+}
+
+function isValidEmail(email) {
+  if (!email) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+}
+
 function submitDigitalOrder(event) {
   event.preventDefault();
-  const contact = document.getElementById('digitalContact').value.trim();
-  const name    = document.getElementById('digitalName').value.trim() || 'bạn';
+  const contactInput = document.getElementById('digitalContact');
+  const contact = (contactInput?.value || '').trim();
+  const name    = document.getElementById('digitalName')?.value.trim() || 'bạn';
   const btn     = event.target.querySelector('button[type=submit]');
+
+  // Validate SĐT/Zalo
+  if (!isValidVNPhone(contact) && !isValidEmail(contact)) {
+    alert('⚠️ Số điện thoại hoặc Zalo nhận file không hợp lệ!\nVui lòng nhập đúng số điện thoại di động Việt Nam (10 số, ví dụ: 0977 338 876) để DealNgon gửi file PDF qua Zalo nhé.');
+    if (contactInput) {
+      contactInput.style.borderColor = '#ef4444';
+      contactInput.focus();
+    }
+    return;
+  }
+  if (contactInput) contactInput.style.borderColor = '';
 
   btn.disabled = true;
   btn.textContent = '⏳ Đang gửi...';
@@ -1071,14 +1102,17 @@ document.getElementById('digitalModal')?.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', () => {
   const surveyForm = document.getElementById('surveyForm');
   if (surveyForm) {
+    const phoneInput = surveyForm.querySelector('#surveyPhone') || surveyForm.querySelector('input[name="sdt_zalo"]');
+    const emailInput = surveyForm.querySelector('#surveyEmail') || surveyForm.querySelector('input[name="email"]');
+
+    // Lắng nghe sự kiện người dùng gõ để tự xóa viền đỏ lỗi
+    phoneInput?.addEventListener('input', () => { phoneInput.style.borderColor = ''; });
+    emailInput?.addEventListener('input', () => { emailInput.style.borderColor = ''; });
+
     surveyForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       const submitBtn = surveyForm.querySelector('.btn-survey-submit');
       const originalText = submitBtn ? submitBtn.innerHTML : '';
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span><i class="fa-solid fa-spinner fa-spin"></i> Đang gửi khảo sát...</span>';
-      }
 
       const formData = new FormData(surveyForm);
       const ten = (formData.get('ten') || '').trim();
@@ -1088,19 +1122,49 @@ document.addEventListener('DOMContentLoaded', () => {
       const sp = formData.get('san_pham_quan_tam') || '';
       const gia = formData.get('muc_gia') || '';
 
+      // Reset viền lỗi
+      if (phoneInput) phoneInput.style.borderColor = '';
+      if (emailInput) emailInput.style.borderColor = '';
+
+      // ── VALIDATION: Kiểm tra Số điện thoại ──
+      if (!isValidVNPhone(sdt)) {
+        alert('⚠️ Số điện thoại không hợp lệ!\n\nVui lòng nhập đúng số điện thoại di động Việt Nam (gồm 10 chữ số, ví dụ: 0912 345 678 hoặc 0977 338 876) để DealNgon gửi quà tặng và liên hệ.');
+        if (phoneInput) {
+          phoneInput.style.borderColor = '#ef4444';
+          phoneInput.focus();
+        }
+        return;
+      }
+
+      // ── VALIDATION: Kiểm tra Email ──
+      if (!isValidEmail(email)) {
+        alert('⚠️ Địa chỉ Email không hợp lệ!\n\nVui lòng kiểm tra lại hòm thư (ví dụ: lananh@gmail.com) để nhận file Checklist Da Đẹp 3 Phút.');
+        if (emailInput) {
+          emailInput.style.borderColor = '#ef4444';
+          emailInput.focus();
+        }
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span><i class="fa-solid fa-spinner fa-spin"></i> Đang gửi khảo sát...</span>';
+      }
+
+      const cleanPhone = normalizeVNPhone(sdt);
       const notes = `Kênh: ${kenh} · Quan tâm: ${sp} · Giá: ${gia}`;
 
       // 1. Đồng bộ khách hàng lên Admin (bảng customers, source: waitlist)
       const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
       const ADMIN_SERVER = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
-      if (ADMIN_SERVER && (sdt || email)) {
+      if (ADMIN_SERVER && (cleanPhone || email)) {
         fetch(ADMIN_SERVER + '/api/customers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: ten || 'Khách waitlist',
-            phone: sdt,
-            zalo: sdt,
+            phone: cleanPhone,
+            zalo: cleanPhone,
             email: email,
             source: 'waitlist',
             notes: notes

@@ -763,34 +763,100 @@
       }
     }
 
+    // ── Helper validate SĐT & Email chuẩn Việt Nam ───────────
+    function normalizeVNPhone(phone) {
+      if (!phone) return '';
+      let clean = phone.replace(/[^\d+]/g, '');
+      if (clean.startsWith('+84')) clean = '0' + clean.slice(3);
+      else if (clean.startsWith('84') && clean.length >= 11) clean = '0' + clean.slice(2);
+      return clean;
+    }
+
+    function isValidVNPhone(phone) {
+      const clean = normalizeVNPhone(phone);
+      return /^(0)(3|5|7|8|9)[0-9]{8}$/.test(clean) || /^(02)[0-9]{9}$/.test(clean);
+    }
+
+    function isValidEmail(email) {
+      if (!email) return false;
+      return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+    }
+
+    // Tự động gỡ viền đỏ khi người dùng gõ
+    document.addEventListener('DOMContentLoaded', () => {
+      ['custName', 'custPhone', 'custEmail', 'custAddress'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', function() {
+          this.style.borderColor = '';
+        });
+      });
+    });
+
     // ── BƯỚC 1: Xử lý khi bấm nút "Tiếp theo" ──────────────────
     function goToStep2(event) {
       if (event) event.preventDefault();
       
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const email = document.getElementById('custEmail').value.trim();
-      const address = document.getElementById('custAddress').value.trim();
-      const notes = document.getElementById('custNotes').value.trim();
+      const nameInput = document.getElementById('custName');
+      const phoneInput = document.getElementById('custPhone');
+      const emailInput = document.getElementById('custEmail');
+      const addressInput = document.getElementById('custAddress');
 
-      if (!name || !phone || !email) {
-        alert('Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Địa chỉ Email!');
+      const name = (nameInput?.value || '').trim();
+      const phone = (phoneInput?.value || '').trim();
+      const email = (emailInput?.value || '').trim();
+      const address = (addressInput?.value || '').trim();
+      const notes = (document.getElementById('custNotes')?.value || '').trim();
+
+      // Reset viền
+      if (nameInput) nameInput.style.borderColor = '';
+      if (phoneInput) phoneInput.style.borderColor = '';
+      if (emailInput) emailInput.style.borderColor = '';
+      if (addressInput) addressInput.style.borderColor = '';
+
+      if (!name) {
+        alert('⚠️ Vui lòng nhập Họ và tên của bạn!');
+        nameInput?.focus();
         return;
       }
+
+      // Validate SĐT
+      if (!isValidVNPhone(phone)) {
+        alert('⚠️ Số điện thoại không hợp lệ!\n\nVui lòng nhập đúng số điện thoại di động Việt Nam (gồm 10 số, ví dụ: 0912 345 678) để DealNgon liên hệ giao hàng.');
+        if (phoneInput) {
+          phoneInput.style.borderColor = '#ef4444';
+          phoneInput.focus();
+        }
+        return;
+      }
+
+      // Validate Email
+      if (!isValidEmail(email)) {
+        alert('⚠️ Địa chỉ Email không hợp lệ!\n\nVui lòng nhập đúng định dạng email (ví dụ: lananh@gmail.com) để nhận email xác nhận đơn hàng và tài liệu.');
+        if (emailInput) {
+          emailInput.style.borderColor = '#ef4444';
+          emailInput.focus();
+        }
+        return;
+      }
+
       if (currentPackage.id !== 'pdf' && !address) {
-        alert('Vui lòng nhập địa chỉ nhận hàng!');
+        alert('⚠️ Vui lòng nhập địa chỉ nhận hàng!');
+        if (addressInput) {
+          addressInput.style.borderColor = '#ef4444';
+          addressInput.focus();
+        }
         return;
       }
 
-      if (phone.length >= 4 && !orderRef.includes(phone.slice(-4))) {
-        orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
+      const cleanPhone = normalizeVNPhone(phone);
+      if (cleanPhone.length >= 4 && !orderRef.includes(cleanPhone.slice(-4))) {
+        orderRef = 'DH' + cleanPhone.slice(-4) + Date.now().toString().slice(-4);
       }
 
       // 1. Tạo Khách hàng & Đơn hàng (Pending) trên Admin
-      syncOrderToAdmin(name, phone, email, address, notes, 'pending');
+      syncOrderToAdmin(name, cleanPhone, email, address, notes, 'pending');
 
       // 2. Gửi email FormSubmit
-      sendFormSubmitEmail(name, phone, email, address, notes);
+      sendFormSubmitEmail(name, cleanPhone, email, address, notes);
 
       // 3. Chuyển sang Bước 2
       goToStep2Directly();
@@ -931,14 +997,14 @@
           resIcon.style.color = '#059669';
         }
         if (resTitle) {
-          resTitle.textContent = 'ĐÃ XÁC NHẬN THANH TOÁN THÀNH CÔNG! 🎉';
+          resTitle.textContent = 'THANH TOÁN THÀNH CÔNG! 🎉';
           resTitle.style.color = '#065F46';
         }
         if (resDesc) {
-          resDesc.textContent = 'Cảm ơn bạn! Đơn hàng đã được Admin đối soát và xác nhận thanh toán thành công.';
+          resDesc.textContent = 'Cảm ơn bạn! Hệ thống SePay đã tự động xác thực giao dịch chuyển khoản thành công.';
         }
         if (resStatus) {
-          resStatus.innerHTML = '<span style="color:#10B981; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Đã thanh toán (Confirmed)</span>';
+          resStatus.innerHTML = '<span style="color:#10B981; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Đã thanh toán thành công (Tự động)</span>';
         }
         if (resPendingNotice) resPendingNotice.style.display = 'none';
         if (currentPackage.id === 'pdf' && resDownloadBox) {
