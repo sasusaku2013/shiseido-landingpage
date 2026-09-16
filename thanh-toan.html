@@ -267,6 +267,21 @@
     }
     .btn-paid:hover { opacity: 0.95; }
 
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      background-color: #10B981;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse-dot-anim 1.6s infinite;
+    }
+    @keyframes pulse-dot-anim {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
     /* Summary Box in Step 2 */
     .order-summary-box {
       background: #FAF6F2;
@@ -597,14 +612,25 @@
         </div>
       </div>
 
-      <!-- Nút xác nhận đã chuyển khoản -->
-      <button type="button" class="btn-paid" id="btnPaid" onclick="handleCustomerCompletedPayment()">
-        <i class="fa-solid fa-circle-check"></i>
-        <span>Tôi đã chuyển khoản xong</span>
+      <!-- Khung hiển thị trạng thái phát hiện tự động -->
+      <div class="auto-detect-box" style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 12px; padding: 14px 16px; margin: 18px 0; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #166534; font-weight: 700; font-size: 0.95rem;">
+          <span class="pulse-dot"></span>
+          <span>⚡ Đang tự động nhận diện thanh toán từ ngân hàng...</span>
+        </div>
+        <p style="margin: 6px 0 0; font-size: 0.82rem; color: #15803D; line-height: 1.5;">
+          Sau khi chuyển tiền xong trên App ngân hàng, màn hình sẽ <strong>tự động chuyển sang trang nhận hàng trong 3–5 giây</strong>. Bạn không cần thao tác gì thêm!
+        </p>
+      </div>
+
+      <!-- Nút kiểm tra ngay (nếu khách muốn kiểm tra lập tức) -->
+      <button type="button" class="btn-paid" id="btnPaid" onclick="checkPaymentNow()" style="background: #FAF5F0; color: #9E5C3A; border: 1.5px solid #E8D5C4; font-weight: 600; font-size: 0.9rem; padding: 12px 20px;">
+        <i class="fa-solid fa-arrows-rotate" id="checkSpinIcon"></i>
+        <span id="btnPaidText">Tôi đã chuyển tiền rồi (Kiểm tra ngay)</span>
       </button>
 
-      <p style="text-align: center; margin-top: 14px; font-size: 0.8rem; color: var(--text-muted);">
-        Hệ thống tự động phát hiện thanh toán trong 30 giây · Hỗ trợ Zalo: <strong>0977 338 876</strong>
+      <p style="text-align: center; margin-top: 12px; font-size: 0.8rem; color: var(--text-muted);">
+        Hệ thống SePay tự động kết nối TPBank 24/7 · Hotline / Zalo hỗ trợ: <strong>0977 338 876</strong>
       </p>
     </div>
 
@@ -918,29 +944,42 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ── BƯỚC 2: Xử lý khi bấm nút "Tôi đã chuyển khoản xong" ───
-    function handleCustomerCompletedPayment() {
-      const name = document.getElementById('custName').value.trim() || 'Quý khách';
-      const phone = document.getElementById('custPhone').value.trim() || '';
-      const email = document.getElementById('custEmail').value.trim() || '';
-      const address = document.getElementById('custAddress').value.trim() || '';
-      const notes = document.getElementById('custNotes').value.trim() || '';
-
+    // ── BƯỚC 2: Kiểm tra thanh toán tức thì ──────────────────
+    async function checkPaymentNow() {
       const btn = document.getElementById('btnPaid');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi thông tin...';
+      const icon = document.getElementById('checkSpinIcon');
+      const text = document.getElementById('btnPaidText');
+      if (btn) btn.disabled = true;
+      if (icon) icon.className = 'fa-solid fa-spinner fa-spin';
+      if (text) text.textContent = 'Đang kiểm tra biến động số dư TPBank...';
 
-      // Ghi nhận đơn hàng với trạng thái PENDING (chờ Admin đối soát ngân hàng)
-      syncOrderToAdmin(name, phone, email, address, notes, 'pending');
+      try {
+        const res = await fetch(`${API_BASE}/api/check-payment/${orderRef}`, { signal: AbortSignal.timeout(4000) });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.found && (data.status === 'success' || data.status === 'confirmed' || data.status === 'delivered')) {
+            const name = document.getElementById('custName').value.trim() || data.order?.customer_name || 'Quý khách';
+            const phone = document.getElementById('custPhone').value.trim() || '';
+            const email = document.getElementById('custEmail').value.trim() || data.order?.email || '';
+            const address = document.getElementById('custAddress').value.trim() || '';
+            showSuccessScreen(name, phone, email, address, true);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Check payment error:', e);
+      }
 
+      // Nếu ngân hàng chưa chuyển tín hiệu tới SePay
       setTimeout(() => {
-        showSuccessScreen(name, phone, email, address, false);
-        // Bắt đầu lắng nghe khi nào Admin duyệt đơn trên admin.html
-        startPaymentPolling(orderRef);
-      }, 500);
+        if (btn) btn.disabled = false;
+        if (icon) icon.className = 'fa-solid fa-arrows-rotate';
+        if (text) text.textContent = 'Tôi đã chuyển tiền rồi (Kiểm tra lại)';
+        alert('⚡ Hệ thống đang đợi thông báo biến động số dư từ TPBank.\n\nThông thường sau khi bạn hoàn tất lệnh chuyển trên App ngân hàng, SePay sẽ nhận diện trong 3–5 giây. Bạn chỉ cần giữ nguyên màn hình, trang sẽ tự động chuyển sang nhận hàng ngay lập tức!');
+      }, 700);
     }
 
-    // ── Lắng nghe thanh toán & duyệt đơn từ Admin ─────────────
+    // ── Lắng nghe thanh toán tự động qua SePay (polling 2.5s) ──
     function startPaymentPolling(ref) {
       if (!API_BASE) return;
       if (_pollTimer) clearInterval(_pollTimer);
@@ -948,7 +987,7 @@
       let attempts = 0;
       _pollTimer = setInterval(async () => {
         attempts++;
-        if (attempts > 180 || isPaymentDone) {
+        if (attempts > 240 || isPaymentDone) {
           clearInterval(_pollTimer);
           return;
         }
@@ -958,7 +997,7 @@
           if (!res.ok) return;
           const data = await res.json();
 
-          if (data.found && (data.status === 'success' || data.status === 'confirmed')) {
+          if (data.found && (data.status === 'success' || data.status === 'confirmed' || data.status === 'delivered')) {
             clearInterval(_pollTimer);
             const name = document.getElementById('custName').value.trim() || data.order?.customer_name || 'Quý khách';
             const phone = document.getElementById('custPhone').value.trim() || '';
@@ -967,7 +1006,7 @@
             showSuccessScreen(name, phone, email, address, true);
           }
         } catch(e) {}
-      }, 3500);
+      }, 2500);
     }
 
     // ── Hiển thị Màn hình Đặt hàng / Chờ duyệt / Thành công ─────
@@ -990,6 +1029,8 @@
       const resPendingNotice = document.getElementById('resPendingNotice');
       const resDownloadBox = document.getElementById('resDownloadBox');
 
+      const isDigital = currentPackage.id === 'pdf' || (currentPackage.name && currentPackage.name.includes('PDF'));
+
       if (isConfirmed) {
         if (resIcon) {
           resIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
@@ -997,18 +1038,27 @@
           resIcon.style.color = '#059669';
         }
         if (resTitle) {
-          resTitle.textContent = 'THANH TOÁN THÀNH CÔNG! 🎉';
+          resTitle.textContent = isDigital ? 'THANH TOÁN THÀNH CÔNG! 🎉' : 'ĐẶT HÀNG & THANH TOÁN THÀNH CÔNG! 🎉';
           resTitle.style.color = '#065F46';
         }
         if (resDesc) {
-          resDesc.textContent = 'Cảm ơn bạn! Hệ thống SePay đã tự động xác thực giao dịch chuyển khoản thành công.';
+          resDesc.innerHTML = isDigital
+            ? `Cảm ơn bạn! Hệ thống SePay đã tự động xác thực thanh toán thành công.<br>Bản <strong>Checklist Da Đẹp 3 Phút (PDF)</strong> đã được gửi tới email <strong>${email || 'của bạn'}</strong> và bạn có thể bấm nút tải về ngay bên dưới!`
+            : `Cảm ơn bạn! Hệ thống SePay đã tự động xác thực giao dịch chuyển khoản thành công.<br>DealNgon đã tiếp nhận đơn hàng và đang chuẩn bị đóng gói cẩn thận để gửi tới bạn sớm nhất!`;
         }
         if (resStatus) {
           resStatus.innerHTML = '<span style="color:#10B981; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Đã thanh toán thành công (Tự động)</span>';
         }
         if (resPendingNotice) resPendingNotice.style.display = 'none';
-        if (currentPackage.id === 'pdf' && resDownloadBox) {
+        if (isDigital && resDownloadBox) {
           resDownloadBox.style.display = 'block';
+          // Tự động kích hoạt tải file sau 1.2 giây
+          setTimeout(() => {
+            const dlLink = resDownloadBox.querySelector('a');
+            if (dlLink) dlLink.click();
+          }, 1200);
+        } else if (resDownloadBox) {
+          resDownloadBox.style.display = 'none';
         }
       } else {
         if (resIcon) {
@@ -1017,14 +1067,14 @@
           resIcon.style.color = '#D97706';
         }
         if (resTitle) {
-          resTitle.textContent = 'ĐÃ GHI NHẬN THÔNG TIN CHUYỂN KHOẢN! ⏳';
+          resTitle.textContent = 'ĐANG ĐỐI SOÁT THANH TOÁN... ⏳';
           resTitle.style.color = '#92400E';
         }
         if (resDesc) {
-          resDesc.textContent = 'Cảm ơn bạn! DealNgon đã ghi nhận thông báo chuyển khoản và đang đối soát với tài khoản ngân hàng.';
+          resDesc.textContent = 'Hệ thống SePay đang kết nối ngân hàng TPBank để kiểm tra biến động số dư. Màn hình sẽ tự động cập nhật ngay khi nhận được tiền.';
         }
         if (resStatus) {
-          resStatus.innerHTML = '<span style="color:#D97706; font-weight:700;"><i class="fa-solid fa-clock"></i> Đang chờ Admin xác nhận thanh toán</span>';
+          resStatus.innerHTML = '<span style="color:#D97706; font-weight:700;"><i class="fa-solid fa-clock"></i> Đang chờ xác nhận từ ngân hàng</span>';
         }
         if (resPendingNotice) resPendingNotice.style.display = 'block';
         if (resDownloadBox) resDownloadBox.style.display = 'none';

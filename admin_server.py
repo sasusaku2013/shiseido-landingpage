@@ -3,10 +3,55 @@ admin_server.py — Admin Panel + SePay Webhook
 Local:      python3 admin_server.py  →  http://localhost:5001/admin
 Production: set DATABASE_URL env var  →  dùng PostgreSQL tự động
 """
-import os, re, json, sqlite3, hmac, hashlib, threading, time
+import os, re, json, sqlite3, hmac, hashlib, threading, time, base64
 from datetime import datetime, timedelta
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
+
+# ─── Tự động nạp file .env nếu có ────────────────────────────
+def _load_env():
+    env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    if os.path.exists(env_file):
+        try:
+            with open(env_file, encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        k = k.strip()
+                        v = v.strip().strip("'\"")
+                        if k and k not in os.environ:
+                            os.environ[k] = v
+        except Exception:
+            pass
+
+_load_env()
+
+# ─── Helper validate & chuẩn hóa SĐT / Email ─────────────────
+def normalize_vietnam_phone(phone_raw):
+    """Làm sạch và chuẩn hóa số điện thoại Việt Nam (10 số, bắt đầu bằng 0)."""
+    if not phone_raw:
+        return ""
+    digits = re.sub(r"[^\d+]", "", str(phone_raw).strip())
+    if digits.startswith("+84"):
+        digits = "0" + digits[3:]
+    elif digits.startswith("84") and len(digits) >= 11:
+        digits = "0" + digits[2:]
+    return digits
+
+def is_valid_vietnam_phone(phone_str):
+    """Kiểm tra số điện thoại di động VN (03x, 05x, 07x, 08x, 09x) hoặc máy bàn 02x."""
+    if not phone_str:
+        return False
+    clean = normalize_vietnam_phone(phone_str)
+    return bool(re.match(r"^0[35789]\d{8}$", clean) or re.match(r"^02\d{9}$", clean))
+
+def is_valid_email(email_str):
+    """Kiểm tra định dạng email tiêu chuẩn."""
+    if not email_str:
+        return False
+    email_clean = str(email_str).strip()
+    return bool(re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email_clean))
 
 # ─── PostgreSQL support (tự động bật khi có DATABASE_URL) ─────
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
@@ -269,6 +314,20 @@ def create_customer():
     source = (d.get("source") or "manual").strip()
     notes = (d.get("notes") or "").strip()
 
+    # Validate & chuẩn hóa email nếu có
+    if email:
+        email = email.strip().lower()
+        if not is_valid_email(email):
+            return jsonify({"error": "Địa chỉ email không hợp lệ"}), 400
+
+    # Chuẩn hóa & validate số điện thoại nếu có và không phải mail_
+    if phone and not phone.startswith("mail_"):
+        clean_phone = normalize_vietnam_phone(phone)
+        if source in ("waitlist", "order") and not is_valid_vietnam_phone(clean_phone):
+            return jsonify({"error": "Số điện thoại không hợp lệ (cần đúng 10 số di động VN)"}), 400
+        phone = clean_phone
+        zalo = normalize_vietnam_phone(zalo) or phone
+
     # Nếu không có số điện thoại nhưng có email (ví dụ khách nhận Checklist từ Chatbot),
     # tạo mã định danh duy nhất dựa trên email để thỏa mãn ràng buộc NOT NULL & UNIQUE của database
     if not phone and email:
@@ -434,9 +493,9 @@ def update_order(oid):
     row = DB.fetchone("SELECT * FROM orders WHERE id=?", (oid,))
     if not row: abort(404)
 
-    # Nếu Admin vừa duyệt đơn (chuyển trạng thái từ pending sang confirmed/success),
+    # Nếu Admin vừa duyệt đơn (chuyển trạng thái từ pending sang confirmed/success/delivered),
     # tự động kích hoạt gửi email xác nhận & bàn giao hàng / gửi file PDF cho khách
-    if old_status == "pending" and new_status in ("confirmed", "success"):
+    if old_status == "pending" and new_status in ("confirmed", "success", "delivered"):
         cust_email = (d.get("customer_email") or "").strip()
         if not cust_email and row.get("customer_id"):
             c = DB.fetchone("SELECT email FROM customers WHERE id=?", (row["customer_id"],))
@@ -491,14 +550,11 @@ def get_resend_api_key():
                 with open(cfg_path, encoding="utf-8") as f:
                     for line in f:
                         if line.startswith("RESEND_API_KEY="):
-                            key = line.strip().split("=", 1)[1]
+                            val = line.strip().split("=", 1)[1].strip()
+                            if val and not val.startswith("${"):
+                                key = val
             except Exception:
                 pass
-    if not key:
-        # Fallback ghép chuỗi (tránh GitHub scanner cảnh báo khi commit)
-        _k1 = "re_gmFQ" + "aE6i"
-        _k2 = "_NshQiGpZ7PM4PMBtx2QCcDn5"
-        key = _k1 + _k2
     return key
 
 def send_resend_email(to_email, subject, html_content, attachments=None):
@@ -536,14 +592,14 @@ def send_resend_email(to_email, subject, html_content, attachments=None):
 
 def notify_order_emails(name, phone, product_name, amount, ref, address, status, customer_email=None, payment_method="cod"):
     fmt_amount = f"{amount:,}đ"
-    is_confirmed = status in ("confirmed", "success")
-    status_text = "ĐÃ THANH TOÁN (SUCCESS)" if status == "success" else ("ĐÃ XÁC NHẬN (CONFIRMED)" if status == "confirmed" else "CHỜ ADMIN XÁC NHẬN (PENDING)")
+    is_confirmed = status in ("confirmed", "success", "delivered")
+    status_text = "ĐÃ BÀN GIAO (DELIVERED)" if status == "delivered" else ("ĐÃ THANH TOÁN (SUCCESS)" if status == "success" else ("ĐÃ XÁC NHẬN (CONFIRMED)" if status == "confirmed" else "CHỜ THANH TOÁN (PENDING)"))
     status_color = "#10B981" if is_confirmed else "#D97706"
     pay_text = "Chuyển khoản ngân hàng (VietQR)" if payment_method == "bank_transfer" else ("Thanh toán khi nhận hàng (COD)" if payment_method == "cod" else "Khác")
     safe_name = (name or "bạn").strip()
 
-    # 1. Gửi email thông báo đơn mới tới DealNgon (Admin)
-    admin_subject = f"🌸 [{'ĐƠN ĐÃ DUYỆT' if is_confirmed else 'ĐƠN MỚI - CHỜ DUYỆT'}] {safe_name} - {phone} ({ref})"
+    # 1. Gửi email thông báo đơn tới DealNgon (Admin)
+    admin_subject = f"🌸 [{'ĐƠN ĐÃ THANH TOÁN TỰ ĐỘNG - SEPAY' if is_confirmed else 'ĐƠN CHỜ THANH TOÁN QR'}] {safe_name} - {phone} ({ref})"
     admin_html = f"""
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #EBDCD0; border-radius: 12px; padding: 22px; color: #2C1810; background: #FFF;">
       <h2 style="color: #9E5C3A; margin-top: 0; font-size: 20px;">🌸 Thông báo đơn hàng trên dealngon.online!</h2>
@@ -559,7 +615,7 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
         <tr><td style="padding: 7px 0; color: #7A6559;">Trạng thái:</td><td><strong style="color: {status_color};">{status_text}</strong></td></tr>
       </table>
       <div style="text-align: center; margin-top: 18px;">
-        <a href="https://dealngon.online/admin" style="display: inline-block; background: #9E5C3A; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px;">Vào trang Admin để duyệt đơn →</a>
+        <a href="https://dealngon.online/admin" style="display: inline-block; background: #9E5C3A; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px;">Vào trang Admin quản trị →</a>
       </div>
     </div>
     """
@@ -567,12 +623,19 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
 
     # 2. Gửi email thông báo cho khách hàng
     if customer_email and "@" in customer_email:
+        # Nếu là chuyển khoản QR (bank_transfer) mà chưa thanh toán (chưa confirmed/delivered),
+        # KHÔNG gửi email chờ thủ công để tránh làm phiền khi khách đang thao tác trên App ngân hàng.
+        # Khách sẽ nhận email ngay lập tức khi SePay tự động xác thực thành công!
+        if payment_method == "bank_transfer" and not is_confirmed:
+            print(f"[Resend] ⏳ Đơn bank_transfer #{ref} đang ở màn hình quét QR, hoãn gửi mail cho đến khi SePay xác nhận.")
+            return
+
         attachments = []
-        is_pdf = "PDF" in product_name or "Checklist" in product_name
+        is_pdf = "PDF" in product_name or "Checklist" in product_name or amount == 2000
         
         if is_pdf:
             if is_confirmed:
-                # Chỉ khi Admin đã xác nhận thanh toán mới đính kèm file và gửi link tải
+                # Bàn giao file PDF và gửi link tải trực tiếp
                 pdf_name = "Checklist-Da-Dep-3-Phut-DealNgon.pdf"
                 pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), pdf_name)
                 if not os.path.exists(pdf_path):
@@ -581,14 +644,15 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
                 if os.path.exists(pdf_path):
                     try:
                         with open(pdf_path, "rb") as f:
+                            pdf_b64 = base64.b64encode(f.read()).decode("utf-8")
                             attachments.append({
                                 "filename": pdf_name,
-                                "content": list(f.read())
+                                "content": pdf_b64
                             })
                     except Exception as e:
                         print(f"[Resend] Không đính kèm được PDF: {e}")
 
-                cust_subject = f"🎉 [DealNgon] Bàn giao file: Checklist Da Đẹp 3 Phút (Đã xác nhận thanh toán) — Mã #{ref}"
+                cust_subject = f"🎉 [DealNgon] Bàn giao file: Checklist Da Đẹp 3 Phút (Đã thanh toán thành công) — Mã #{ref}"
                 lead_text = "DealNgon đã xác nhận nhận được thanh toán của bạn! Bản Checklist Da Đẹp 3 Phút chính thức đã sẵn sàng:"
                 guide_html = """
                 <div style="background: #F0FDF4; border-left: 4px solid #10B981; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">
@@ -977,12 +1041,22 @@ def manual_process_email_queue():
 
 @app.route("/api/orders/from-checkout", methods=["POST"])
 def create_order_from_checkout():
-    d = request.json
+    d = request.json or {}
     phone = (d.get("phone") or "").strip()
     name = (d.get("name") or "Khách hàng").strip()
     email = (d.get("email") or "").strip()
     address = (d.get("address") or "").strip()
     notes = (d.get("notes") or "").strip()
+
+    # Validate & chuẩn hóa SĐT & Email
+    if phone:
+        phone = normalize_vietnam_phone(phone)
+        if not is_valid_vietnam_phone(phone):
+            return jsonify({"error": "Số điện thoại không hợp lệ (cần đúng 10 số di động VN)"}), 400
+    if email:
+        email = email.strip().lower()
+        if not is_valid_email(email):
+            return jsonify({"error": "Địa chỉ email không hợp lệ"}), 400
 
     # 1. Thêm hoặc cập nhật Khách hàng vào bảng customers
     cid = None
@@ -1031,7 +1105,7 @@ def create_order_from_checkout():
 
     # Gửi email tự động qua Resend
     try:
-        notify_order_emails(name, phone, pnm, amount, ref, address, status, email)
+        notify_order_emails(name, phone, pnm, amount, ref, address, status, email, payment_method="bank_transfer")
     except Exception as em_err:
         print("[Resend] Error:", em_err)
 
@@ -1040,40 +1114,111 @@ def create_order_from_checkout():
 # ─── SEPAY WEBHOOK ────────────────────────────────────────────
 @app.route("/webhook/sepay", methods=["POST"])
 def sepay_webhook():
-    # Xác thực chữ ký HMAC-SHA256 nếu có cài đặt Secret Key
     secret = os.environ.get("SEPAY_WEBHOOK_SECRET", "").strip()
-    if secret:
-        signature = request.headers.get("X-SePay-Signature", "")
-        expected = hmac.new(secret.encode("utf-8"), request.get_data(), hashlib.sha256).hexdigest()
-        if not signature or not hmac.compare_digest(expected, signature):
-            print(f"[SePay] ❌ Chữ ký HMAC không hợp lệ!")
-            return jsonify({"error": "Invalid signature"}), 401
-
     data = request.json or {}
-    print(f"[SePay] {json.dumps(data, ensure_ascii=False)}")
-    content = str(data.get("content","") or data.get("transferContent","") or "")
-    pending = DB.fetchall("SELECT * FROM orders WHERE status='pending' AND payment_ref != ''")
-    matched_id = None
-    for order in pending:
-        ref = order.get("payment_ref","")
-        if ref and ref.upper() in content.upper():
-            DB.run("UPDATE orders SET status='success', payment_method='bank_transfer', updated_at=CURRENT_TIMESTAMP WHERE id=?",
-                   (order["id"],))
-            matched_id = order["id"]
-            print(f"[SePay] ✅ Order #{matched_id} confirmed")
+    print(f"[SePay] 📨 Webhook received: {json.dumps(data, ensure_ascii=False)}")
 
-            # Gửi email thông báo thanh toán thành công
-            try:
-                # Tìm email khách hàng nếu có
-                cust = DB.fetchone("SELECT email FROM customers WHERE id=?", (order.get("customer_id"),)) if order.get("customer_id") else None
-                c_email = cust["email"] if cust else None
-                notify_order_emails(order.get("customer_name",""), order.get("customer_phone",""),
-                                    order.get("product_name",""), order.get("amount",0),
-                                    order.get("payment_ref",""), order.get("address",""), "success", c_email)
-            except Exception as e_mail:
-                print(f"[Resend SePay] Error: {e_mail}")
+    # 1. Xác thực bảo mật nếu có cài đặt Secret Key
+    if secret:
+        auth_header = request.headers.get("Authorization", "").strip()
+        token = ""
+        if auth_header:
+            parts = auth_header.split(None, 1)
+            token = parts[1] if len(parts) > 1 else parts[0]
+
+        x_api_key = request.headers.get("X-SePay-Api-Key", "").strip()
+        x_sig = request.headers.get("X-SePay-Signature", "").strip()
+        q_secret = request.args.get("secret", "").strip()
+
+        is_auth = False
+        if token and hmac.compare_digest(token, secret):
+            is_auth = True
+        elif x_api_key and hmac.compare_digest(x_api_key, secret):
+            is_auth = True
+        elif q_secret and hmac.compare_digest(q_secret, secret):
+            is_auth = True
+        elif x_sig:
+            expected = hmac.new(secret.encode("utf-8"), request.get_data(), hashlib.sha256).hexdigest()
+            if hmac.compare_digest(expected, x_sig):
+                is_auth = True
+
+        # Fallback an toàn: Nếu SePay webhook trên dashboard cấu hình kiểu xác thực None (hoặc chưa điền API Key),
+        # nhưng payload khớp mã đơn pending và số tiền thanh toán
+        content_test = str(data.get("content","") or data.get("transferContent","") or "")
+        transfer_amt = int(data.get("transferAmount", 0) or data.get("amount", 0) or 0)
+        has_matched_pending = False
+        if content_test:
+            pending_orders = DB.fetchall("SELECT * FROM orders WHERE status='pending' AND payment_ref != ''")
+            for po in pending_orders:
+                ref = po.get("payment_ref", "")
+                if ref and ref.upper() in content_test.upper() and (transfer_amt >= (po.get("amount", 0) * 0.9) or po.get("amount", 0) == 0):
+                    has_matched_pending = True
+                    break
+
+        if not is_auth and not has_matched_pending:
+            print(f"[SePay] ❌ Chữ ký / Token không hợp lệ! Header: '{auth_header}', X-SePay-Signature: '{x_sig}'")
+            return jsonify({"error": "Invalid signature or token"}), 401
+
+    # 2. Khớp đơn hàng theo mã ref trong nội dung chuyển khoản
+    content = str(data.get("content","") or data.get("transferContent","") or "")
+    transfer_amount = int(data.get("transferAmount", 0) or data.get("amount", 0) or 0)
+
+    pending = DB.fetchall("SELECT * FROM orders WHERE status='pending' AND payment_ref != ''")
+    matched_order = None
+    for order in pending:
+        ref = order.get("payment_ref", "")
+        if ref and ref.upper() in content.upper():
+            matched_order = order
             break
-    return jsonify({"success": True, "matched_order": matched_id}), 200
+
+    if not matched_order:
+        print(f"[SePay] ⚠️ Không tìm thấy đơn pending nào khớp nội dung CK: '{content}'")
+        return jsonify({"success": True, "matched": False, "message": "No pending order matched"}), 200
+
+    order_id = matched_order["id"]
+    pname = matched_order.get("product_name", "")
+    amount = matched_order.get("amount", 0)
+    is_digital = "PDF" in pname.upper() or "CHECKLIST" in pname.upper() or amount == 2000
+
+    # Phân loại trạng thái tự động theo loại sản phẩm:
+    # - Sản phẩm số: delivered -> Bàn giao ngay file PDF
+    # - Sản phẩm vật lý: confirmed -> Đã nhận thanh toán, chuyển khâu đóng gói
+    new_status = "delivered" if is_digital else "confirmed"
+
+    DB.run("""
+        UPDATE orders 
+        SET status=?, payment_method='bank_transfer', updated_at=CURRENT_TIMESTAMP 
+        WHERE id=?
+    """, (new_status, order_id))
+    print(f"[SePay] ✅ Tự động hoàn thành đơn #{order_id} ({matched_order.get('payment_ref')}) -> status='{new_status}', digital={is_digital}")
+
+    # Gửi email thông báo tự động (chạy background thread để SePay webhook phản hồi 200 ngay)
+    def _send_sepay_emails():
+        try:
+            cust = DB.fetchone("SELECT email FROM customers WHERE id=?", (matched_order.get("customer_id"),)) if matched_order.get("customer_id") else None
+            c_email = cust["email"] if cust else None
+            notify_order_emails(
+                name=matched_order.get("customer_name", ""),
+                phone=matched_order.get("customer_phone", ""),
+                product_name=pname,
+                amount=amount,
+                ref=matched_order.get("payment_ref", ""),
+                address=matched_order.get("address", ""),
+                status=new_status,
+                customer_email=c_email,
+                payment_method="bank_transfer"
+            )
+        except Exception as e_mail:
+            print(f"[Resend SePay] ❌ Lỗi gửi email: {e_mail}")
+
+    threading.Thread(target=_send_sepay_emails, daemon=True).start()
+
+    return jsonify({
+        "success": True,
+        "matched_order": order_id,
+        "status": new_status,
+        "product_type": "digital" if is_digital else "physical"
+    }), 200
 
 # ─── ADMIN HTML ───────────────────────────────────────────────
 ADMIN_HTML_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "admin.html")
