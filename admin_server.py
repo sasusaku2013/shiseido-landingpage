@@ -261,20 +261,33 @@ def get_customers():
 
 @app.route("/api/customers", methods=["POST"])
 def create_customer():
-    d = request.json
+    d = request.json or {}
     name = (d.get("name") or "Khách hàng").strip()
     phone = (d.get("phone") or "").strip()
-    zalo = (d.get("zalo") or phone).strip()
     email = (d.get("email") or "").strip()
+    zalo = (d.get("zalo") or phone).strip()
     source = (d.get("source") or "manual").strip()
     notes = (d.get("notes") or "").strip()
 
+    # Nếu không có số điện thoại nhưng có email (ví dụ khách nhận Checklist từ Chatbot),
+    # tạo mã định danh duy nhất dựa trên email để thỏa mãn ràng buộc NOT NULL & UNIQUE của database
+    if not phone and email:
+        phone = f"mail_{email.lower()}"
+        zalo = zalo or phone
+
     cid = None
-    existing = DB.fetchone("SELECT id, email, name FROM customers WHERE phone=?", (phone,)) if phone else None
+    existing = None
+    if phone and not phone.startswith("mail_"):
+        existing = DB.fetchone("SELECT id, email, name FROM customers WHERE phone=?", (phone,))
+    if not existing and email:
+        existing = DB.fetchone("SELECT id, email, name FROM customers WHERE LOWER(email)=LOWER(?)", (email,))
+    if not existing and phone.startswith("mail_"):
+        existing = DB.fetchone("SELECT id, email, name FROM customers WHERE phone=?", (phone,))
+
     if existing:
         cid = existing["id"]
-        DB.run("UPDATE customers SET name=?, email=COALESCE(NULLIF(?,''), email), source=?, notes=? WHERE id=?",
-               (name, email or None, source, notes, cid))
+        DB.run("UPDATE customers SET name=CASE WHEN ? != 'Khách hàng' AND ? != 'Khách Chatbot' THEN ? ELSE name END, email=COALESCE(NULLIF(?,''), email), source=?, notes=COALESCE(NULLIF(?,''), notes) WHERE id=?",
+               (name, name, name, email or None, source, notes or None, cid))
     else:
         try:
             cid = DB.execute(
@@ -283,7 +296,7 @@ def create_customer():
             )
         except Exception as e:
             if "unique" in str(e).lower() or "duplicate" in str(e).lower():
-                existing2 = DB.fetchone("SELECT id FROM customers WHERE phone=?", (phone,))
+                existing2 = DB.fetchone("SELECT id FROM customers WHERE phone=? OR LOWER(email)=LOWER(?)", (phone, email))
                 cid = existing2["id"] if existing2 else None
             else:
                 raise
@@ -379,17 +392,50 @@ def create_order():
 
 @app.route("/api/orders/<int:oid>", methods=["PUT"])
 def update_order(oid):
-    d = request.json
+    d = request.json or {}
+    old_order = DB.fetchone("SELECT * FROM orders WHERE id=?", (oid,))
+    old_status = old_order["status"] if old_order else None
+
+    new_status = d.get("status", "pending")
     DB.run("""UPDATE orders SET customer_id=?,customer_name=?,customer_phone=?,
                                 product_id=?,product_name=?,amount=?,status=?,
                                 payment_method=?,payment_ref=?,address=?,notes=?,
                                 updated_at=CURRENT_TIMESTAMP WHERE id=?""",
            (d.get("customer_id"),d.get("customer_name",""),d.get("customer_phone",""),
             d.get("product_id"),d.get("product_name",""),int(d["amount"]),
-            d.get("status","pending"),d.get("payment_method","cod"),
+            new_status,d.get("payment_method","cod"),
             d.get("payment_ref",""),d.get("address",""),d.get("notes",""),oid))
     row = DB.fetchone("SELECT * FROM orders WHERE id=?", (oid,))
     if not row: abort(404)
+
+    # Nếu Admin vừa duyệt đơn (chuyển trạng thái từ pending sang confirmed/success),
+    # tự động kích hoạt gửi email xác nhận & bàn giao hàng / gửi file PDF cho khách
+    if old_status == "pending" and new_status in ("confirmed", "success"):
+        cust_email = (d.get("customer_email") or "").strip()
+        if not cust_email and row.get("customer_id"):
+            c = DB.fetchone("SELECT email FROM customers WHERE id=?", (row["customer_id"],))
+            if c: cust_email = (c.get("email") or "").strip()
+        if not cust_email and row.get("customer_phone"):
+            c = DB.fetchone("SELECT email FROM customers WHERE phone=?", (row["customer_phone"],))
+            if c: cust_email = (c.get("email") or "").strip()
+
+        def _send_approval_email():
+            try:
+                notify_order_emails(
+                    row.get("customer_name") or "",
+                    row.get("customer_phone") or "",
+                    row.get("product_name") or "",
+                    row.get("amount") or 0,
+                    row.get("payment_ref") or "",
+                    row.get("address") or "",
+                    new_status,
+                    cust_email,
+                    row.get("payment_method") or "bank_transfer"
+                )
+            except Exception as e:
+                print(f"[Resend Approval Error]: {e}")
+        threading.Thread(target=_send_approval_email, daemon=True).start()
+
     return jsonify(row)
 
 @app.route("/api/orders/<int:oid>", methods=["DELETE"])
@@ -452,18 +498,19 @@ def send_resend_email(to_email, subject, html_content, attachments=None):
 
 def notify_order_emails(name, phone, product_name, amount, ref, address, status, customer_email=None, payment_method="cod"):
     fmt_amount = f"{amount:,}đ"
-    is_success = status == "success"
-    status_text = "ĐÃ THANH TOÁN (SUCCESS)" if is_success else ("ĐÃ XÁC NHẬN (CONFIRMED)" if status == "confirmed" else "CHỜ XÁC NHẬN (PENDING)")
-    status_color = "#10B981" if is_success or status == "confirmed" else "#D97706"
+    is_confirmed = status in ("confirmed", "success")
+    status_text = "ĐÃ THANH TOÁN (SUCCESS)" if status == "success" else ("ĐÃ XÁC NHẬN (CONFIRMED)" if status == "confirmed" else "CHỜ ADMIN XÁC NHẬN (PENDING)")
+    status_color = "#10B981" if is_confirmed else "#D97706"
     pay_text = "Chuyển khoản ngân hàng (VietQR)" if payment_method == "bank_transfer" else ("Thanh toán khi nhận hàng (COD)" if payment_method == "cod" else "Khác")
     safe_name = (name or "bạn").strip()
 
     # 1. Gửi email thông báo đơn mới tới DealNgon (Admin)
+    admin_subject = f"🌸 [{'ĐƠN ĐÃ DUYỆT' if is_confirmed else 'ĐƠN MỚI - CHỜ DUYỆT'}] {safe_name} - {phone} ({ref})"
     admin_html = f"""
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; border: 1px solid #EBDCD0; border-radius: 12px; padding: 22px; color: #2C1810; background: #FFF;">
-      <h2 style="color: #9E5C3A; margin-top: 0; font-size: 20px;">🌸 Có đơn hàng mới trên dealngon.online!</h2>
+      <h2 style="color: #9E5C3A; margin-top: 0; font-size: 20px;">🌸 Thông báo đơn hàng trên dealngon.online!</h2>
       <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px;">
-        <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Mã đơn hàng:</td><td style="font-weight: bold; color: #D32F2F;">{ref}</td></tr>
+        <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Mã đơn hàng:</td><td style="font-weight: bold; color: #D32F2F;">#{ref}</td></tr>
         <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Khách hàng:</td><td style="font-weight: bold;">{safe_name}</td></tr>
         <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Số điện thoại:</td><td>{phone}</td></tr>
         <tr style="border-bottom: 1px solid #F3EDE7;"><td style="padding: 7px 0; color: #7A6559;">Email khách:</td><td>{customer_email or '—'}</td></tr>
@@ -474,58 +521,86 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
         <tr><td style="padding: 7px 0; color: #7A6559;">Trạng thái:</td><td><strong style="color: {status_color};">{status_text}</strong></td></tr>
       </table>
       <div style="text-align: center; margin-top: 18px;">
-        <a href="https://dealngon.online/admin" style="display: inline-block; background: #9E5C3A; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px;">Xem trong trang Admin →</a>
+        <a href="https://dealngon.online/admin" style="display: inline-block; background: #9E5C3A; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px;">Vào trang Admin để duyệt đơn →</a>
       </div>
     </div>
     """
-    send_resend_email("toquynhanh@gmail.com", f"🌸 [ĐƠN HÀNG MỚI] {safe_name} - {phone} ({ref})", admin_html)
+    send_resend_email("toquynhanh@gmail.com", admin_subject, admin_html)
 
-    # 2. Gửi email xác nhận đơn hàng chuẩn brand voice tới khách hàng
+    # 2. Gửi email thông báo cho khách hàng
     if customer_email and "@" in customer_email:
         attachments = []
         is_pdf = "PDF" in product_name or "Checklist" in product_name
         
-        # Nếu mua PDF, đính kèm file Checklist
-        pdf_name = "Checklist-Da-Dep-3-Phut-DealNgon.pdf"
-        pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), pdf_name)
-        if not os.path.exists(pdf_path):
-            pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Checklist-Da-Dep-3-Phut-QuynhAnh.pdf")
-
-        if is_pdf and os.path.exists(pdf_path):
-            try:
-                with open(pdf_path, "rb") as f:
-                    attachments.append({
-                        "filename": pdf_name,
-                        "content": list(f.read())
-                    })
-            except Exception as e:
-                print(f"[Resend] Không đính kèm được PDF: {e}")
-
-        # Hướng dẫn nhận hàng theo loại sản phẩm
         if is_pdf:
-            shipping_guide_html = """
-            <div style="background: #FDFBF7; border-left: 4px solid #10B981; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">
-              <strong style="color: #059669; font-size: 15px; display: block; margin-bottom: 8px;">📥 HƯỚNG DẪN TẢI &amp; SỬ DỤNG CHECKLIST:</strong>
-              <p style="margin: 0 0 12px; font-size: 14px; color: #444; line-height: 1.6;">
-                File PDF đã được đính kèm trực tiếp ngay bên dưới email này để bạn tải về máy. Bạn có thể in ra dán ngay ở góc gương phòng tắm hoặc lưu ảnh vào điện thoại để liếc 30 giây mỗi sáng là nhớ ngay chu trình 3 phút tối giản nhé!
-              </p>
-              <div style="text-align: center; margin: 12px 0;">
-                <a href="https://dealngon.online/Checklist-Da-Dep-3-Phut-DealNgon.pdf" style="display:inline-block; background:#9E5C3A; color:#ffffff; text-decoration:none; padding:12px 24px; border-radius:8px; font-weight:bold; font-size:14px; box-shadow: 0 3px 8px rgba(158,92,58,0.25);">📥 BẤM VÀO ĐÂY ĐỂ TẢI TRỰC TIẾP FILE PDF</a>
-              </div>
-            </div>
-            """
+            if is_confirmed:
+                # Chỉ khi Admin đã xác nhận thanh toán mới đính kèm file và gửi link tải
+                pdf_name = "Checklist-Da-Dep-3-Phut-DealNgon.pdf"
+                pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), pdf_name)
+                if not os.path.exists(pdf_path):
+                    pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Checklist-Da-Dep-3-Phut-QuynhAnh.pdf")
+
+                if os.path.exists(pdf_path):
+                    try:
+                        with open(pdf_path, "rb") as f:
+                            attachments.append({
+                                "filename": pdf_name,
+                                "content": list(f.read())
+                            })
+                    except Exception as e:
+                        print(f"[Resend] Không đính kèm được PDF: {e}")
+
+                cust_subject = f"🎉 [DealNgon] Bàn giao file: Checklist Da Đẹp 3 Phút (Đã xác nhận thanh toán) — Mã #{ref}"
+                lead_text = "DealNgon đã xác nhận nhận được thanh toán của bạn! Bản Checklist Da Đẹp 3 Phút chính thức đã sẵn sàng:"
+                guide_html = """
+                <div style="background: #F0FDF4; border-left: 4px solid #10B981; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">
+                  <strong style="color: #059669; font-size: 15px; display: block; margin-bottom: 8px;">📥 HƯỚNG DẪN TẢI &amp; SỬ DỤNG CHECKLIST:</strong>
+                  <p style="margin: 0 0 12px; font-size: 14px; color: #444; line-height: 1.6;">
+                    File PDF đã được đính kèm trực tiếp ngay bên dưới email này để bạn tải về máy. Bạn có thể in ra dán ngay ở góc gương phòng tắm hoặc lưu ảnh vào điện thoại để liếc 30 giây mỗi sáng là nhớ ngay chu trình 3 phút tối giản nhé!
+                  </p>
+                  <div style="text-align: center; margin: 12px 0;">
+                    <a href="https://dealngon.online/Checklist-Da-Dep-3-Phut-DealNgon.pdf" style="display:inline-block; background:#10B981; color:#ffffff; text-decoration:none; padding:12px 24px; border-radius:8px; font-weight:bold; font-size:14px; box-shadow: 0 3px 8px rgba(16,185,129,0.3);">📥 BẤM VÀO ĐÂY ĐỂ TẢI TRỰC TIẾP FILE PDF</a>
+                  </div>
+                </div>
+                """
+            else:
+                cust_subject = f"⏳ [DealNgon] Đã ghi nhận đơn mua Checklist Da Đẹp 3 Phút — Mã #{ref} (Chờ xác nhận)"
+                lead_text = "DealNgon đã ghi nhận thông tin đăng ký của bạn và đang đối soát chuyển khoản ngân hàng:"
+                guide_html = """
+                <div style="background: #FFFBEB; border-left: 4px solid #F59E0B; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">
+                  <strong style="color: #B45309; font-size: 15px; display: block; margin-bottom: 8px;">⏳ ĐƠN HÀNG ĐANG CHỜ ADMIN XÁC NHẬN THANH TOÁN:</strong>
+                  <p style="margin: 0; font-size: 14px; color: #78350F; line-height: 1.6;">
+                    Admin đang kiểm tra thông tin biến động số dư tài khoản ngân hàng (thường trong vòng <strong>5–15 phút</strong>).<br>
+                    Ngay sau khi xác nhận nhận được <strong>2.000đ</strong>, hệ thống sẽ tự động gửi email bàn giao file PDF hoàn chỉnh kèm file đính kèm tới hòm thư này của bạn ngay nhé!
+                  </p>
+                </div>
+                """
         else:
-            shipping_guide_html = f"""
-            <div style="background: #FDFBF7; border-left: 4px solid #9E5C3A; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">
-              <strong style="color: #9E5C3A; font-size: 15px; display: block; margin-bottom: 8px;">📦 HƯỚNG DẪN NHẬN HÀNG &amp; SỬ DỤNG:</strong>
-              <ul style="margin: 0; padding-left: 18px; font-size: 14px; color: #444; line-height: 1.7;">
-                <li><strong>Đóng gói bảo quản kỹ càng:</strong> Đơn hàng sẽ được DealNgon bọc 2 lớp xốp chống sốc dày dặn, bảo quản nhiệt độ mát để tinh chất luôn đạt độ tươi mới nhất khi đến tay bạn.</li>
-                <li><strong>Thời gian giao hàng dự kiến:</strong> Khu vực Hà Nội &amp; TP.HCM nhận trong 24 giờ. Các tỉnh thành khác nhận trong 1 - 2 ngày làm việc.</li>
-                <li><strong>Đồng kiểm an tâm tuyệt đối:</strong> Khi shipper giao đến, bạn hoàn toàn được mở hộp kiểm tra đúng tem niêm phong chính hãng Shiseido Nhật Bản và quà tặng đi kèm trước khi thanh toán / nhận hàng.</li>
-                <li><strong>Mẹo nhỏ ngày đầu tiên:</strong> Tối nhận hàng về, sau khi làm sạch da, bạn hãy thử ngay 2 lần nhấn (pump) serum rồi áp nhẹ hai lòng bàn tay ấm lên má trong 15 giây. Sáng hôm sau thức dậy bạn sẽ thấy bề mặt da mềm mướt, "uống no nước" và êm ru cả ngày trong phòng điều hòa!</li>
-              </ul>
-            </div>
-            """
+            if is_confirmed:
+                cust_subject = f"🎉 [DealNgon] Xác nhận thanh toán & Đang chuẩn bị gửi hàng — Mã #{ref}"
+                lead_text = "DealNgon đã xác nhận nhận được thanh toán và đang chuẩn bị đóng gói cẩn thận để gửi đến bạn:"
+                guide_html = """
+                <div style="background: #FDFBF7; border-left: 4px solid #10B981; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">
+                  <strong style="color: #059669; font-size: 15px; display: block; margin-bottom: 8px;">📦 ĐÃ XÁC NHẬN — LỊCH GIAO HÀNG DỰ KIẾN:</strong>
+                  <ul style="margin: 0; padding-left: 18px; font-size: 14px; color: #444; line-height: 1.7;">
+                    <li><strong>Đóng gói bảo quản kỹ càng:</strong> Đơn hàng sẽ được bọc 2 lớp xốp chống sốc, bảo quản nhiệt độ mát để tinh chất luôn đạt độ tươi mới nhất.</li>
+                    <li><strong>Thời gian giao hàng:</strong> Khu vực Hà Nội &amp; TP.HCM nhận trong 24 giờ. Các tỉnh thành khác nhận trong 1 - 2 ngày làm việc.</li>
+                    <li><strong>Đồng kiểm an tâm tuyệt đối:</strong> Được mở hộp kiểm tra đúng tem niêm phong Shiseido Nhật Bản và hộp quà VIP 450k đi kèm trước khi nhận.</li>
+                  </ul>
+                </div>
+                """
+            else:
+                cust_subject = f"⏳ [DealNgon] Đã ghi nhận đơn hàng: {product_name} — Mã #{ref} (Chờ xác nhận)"
+                lead_text = "Cảm ơn bạn đã đặt hàng tại DealNgon. Đơn hàng của bạn đã được ghi nhận trên hệ thống và đang chờ Admin đối soát thanh toán:"
+                guide_html = """
+                <div style="background: #FFFBEB; border-left: 4px solid #F59E0B; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">
+                  <strong style="color: #B45309; font-size: 15px; display: block; margin-bottom: 8px;">⏳ ĐƠN HÀNG ĐANG CHỜ ADMIN XÁC NHẬN:</strong>
+                  <p style="margin: 0; font-size: 14px; color: #78350F; line-height: 1.6;">
+                    Nếu bạn đã chuyển khoản ngân hàng qua VietQR, Admin sẽ kiểm tra tài khoản và xác nhận trong 5–15 phút.<br>
+                    Nếu bạn chọn hình thức thanh toán khi nhận hàng (COD), nhân viên tư vấn sẽ liên hệ với bạn để xác nhận địa chỉ trước khi gửi hàng nhé!
+                  </p>
+                </div>
+                """
 
         cust_html = f"""
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #F0EAE1; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; color: #333333; line-height: 1.7;">
@@ -536,8 +611,7 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
           <div style="padding: 28px 24px; font-size: 15px;">
             <p style="margin-top: 0;"><strong>Chào {safe_name},</strong></p>
             <p>Cảm ơn bạn thật nhiều vì giữa vô vàn lựa chọn ngoài kia, bạn đã tin tưởng dừng chân ở góc nhỏ của DealNgon và trao cho mình cơ hội đồng hành cùng làn da của bạn.</p>
-            <p>Là một người phụ nữ ngoài 30, mỗi sáng cũng từng quay cuồng với đủ thứ việc con cái rồi vội vã đến văn phòng ngồi máy lạnh 8 tiếng, mình hiểu rõ cảm giác tìm được một món dưỡng da ưng ý, vừa nhẹ đầu vừa đỡ tốn thời gian quý giá đến nhường nào.</p>
-            <p>Đơn hàng của bạn đã được ghi nhận trên hệ thống và DealNgon đang chuẩn bị đóng gói cẩn thận để gửi đến bạn:</p>
+            <p>{lead_text}</p>
 
             <div style="background: #FAF6F2; border-radius: 10px; padding: 16px 20px; margin: 20px 0; font-size: 14px; border: 1px solid #EFE5D8;">
               <p style="margin: 4px 0;"><strong>Mã đơn hàng:</strong> <span style="color:#D32F2F; font-weight: bold;">#{ref}</span></p>
@@ -548,7 +622,7 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
               {f'<p style="margin: 4px 0;"><strong>Địa chỉ nhận:</strong> {address}</p>' if address else ''}
             </div>
 
-            {shipping_guide_html}
+            {guide_html}
 
             <div style="background: #FFF8F3; border-radius: 8px; padding: 14px 18px; margin: 20px 0; border: 1px solid #FDE8DB;">
               <strong style="color: #9E5C3A; font-size: 14px;">🌸 Lời nhắn từ DealNgon:</strong>
@@ -562,18 +636,16 @@ def notify_order_emails(name, phone, product_name, amount, ref, address, status,
               <strong style="color: #9E5C3A; font-size: 16px;">DealNgon</strong><br>
               <span style="font-size: 13px; color: #777777;">Người bạn đồng hành cùng làn da của bạn</span><br>
               <span style="font-size: 13px; color: #777777;">Zalo hỗ trợ: <strong>0977 338 876</strong> · Website: <a href="https://dealngon.online" style="color: #9E5C3A; text-decoration: none;">dealngon.online</a></span>
-            </div>
           </div>
         </div>
         """
-        cust_subject = f"🌸 [DealNgon] Xác nhận đơn hàng: {product_name} — Mã #{ref}"
         send_resend_email(customer_email, cust_subject, cust_html, attachments)
 
 # ─── WAITLIST EMAIL SEQUENCE (3 EMAILS) ──────────────────────
 def get_email_template(step, name="bạn"):
     safe_name = name.strip() if name and name.strip() else "bạn"
     if step == 1:
-        subject = "🌸 Chào bạn, mình là DealNgon đây (và một lời hứa nhỏ)"
+        subject = "🌸 [Quà Tặng] Gửi bạn bản Checklist Da Đẹp 3 Phút & Lời chào từ DealNgon"
         html = f"""
         <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #F0EAE1; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; color: #333333; line-height: 1.7;">
           <div style="background: #FDFBF7; padding: 28px 24px; text-align: center; border-bottom: 1px solid #F0EAE1;">
@@ -582,8 +654,21 @@ def get_email_template(step, name="bạn"):
           </div>
           <div style="padding: 28px 24px; font-size: 15px;">
             <p style="margin-top: 0;"><strong>Chào {safe_name},</strong></p>
-            <p>Cảm ơn bạn đã tin tưởng để lại thông tin tại góc nhỏ của DealNgon.</p>
-            <p>Mình gửi email này trước hết là để nói một lời chào thật ấm áp từ một người phụ nữ cũng ngoài 30, cũng đi làm công sở và mỗi sáng cũng từng quay cuồng với đủ thứ việc như bạn.</p>
+            <p>Cảm ơn bạn đã tin tưởng kết nối cùng DealNgon.</p>
+            <p>Như đã hẹn, DealNgon xin phép gửi tặng bạn bản <strong>Checklist Da Đẹp 3 Phút (File PDF in dán gương)</strong> để bạn tải về xem ngay nhé:</p>
+            
+            <div style="background: #F0FDF4; border: 1.5px dashed #10B981; border-radius: 12px; padding: 20px; margin: 22px 0; text-align: center;">
+              <span style="font-size: 12px; font-weight: 800; color: #16A34A; text-transform: uppercase; letter-spacing: 0.8px;">🎁 QUÀ TẶNG DÀNH RIÊNG CHO BẠN</span>
+              <h3 style="margin: 8px 0 10px; font-size: 17px; color: #065F46;">Bản Checklist Da Đẹp 3 Phút (File PDF in dán gương)</h3>
+              <p style="margin: 0 0 16px; font-size: 14px; color: #047857; line-height: 1.5;">
+                • Bí quyết 1 bước thay 5 bước mỗi sáng<br>
+                • Mẹo 15 giây áp tay ấm chống khô mốc cánh mũi suốt 8 tiếng ngồi máy lạnh
+              </p>
+              <a href="https://dealngon.online/Checklist-Da-Dep-3-Phut-DealNgon.pdf" target="_blank" style="display: inline-block; background: #16A34A; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 14px; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);">
+                📥 BẤM VÀO ĐÂY ĐỂ TẢI FILE PDF VỀ MÁY
+              </a>
+            </div>
+
             <p>Thật ra, đã qua rồi cái thời tụi mình có thảnh thơi 45 phút mỗi sáng để ngồi trước gương vỗ 7–8 bước toner, essence, serum, kem dưỡng, kem lót... Nhiều hôm dậy muộn, nhìn cái bàn trang điểm lỉnh kỉnh chai lọ mà thấy áp lực còn hơn cả việc mở hòm thư công việc.</p>
             <p><strong>Đó là lý do DealNgon làm góc nhỏ này.</strong></p>
             <p>Mình ở đây <strong>không phải để vẽ thêm cho bạn vài ba món đồ đắt tiền</strong> mua về rồi để bám bụi trên bàn trang điểm. Mình chỉ muốn chia sẻ những thứ bản thân đã tự "trả học phí" suốt nhiều năm qua: Làm sao để tối giản hết mức có thể, chỉ mất đúng <strong>3 phút mỗi sáng</strong> mà bước ra khỏi cửa da dẻ vẫn căng mọng, chỉn chu, ngồi điều hòa cả ngày không bị mốc khóe mũi hay xỉn màu.</p>
@@ -768,9 +853,23 @@ def trigger_waitlist_sequence(customer_id, name, email):
             time.sleep(2)
         print(f"[Waitlist Test] ✅ Đã gửi xong 3 email test cho {email}")
     else:
-        # 1. Gửi Email 1 ngay lập tức
+        # 1. Gửi Email 1 ngay lập tức kèm file PDF đính kèm
         subj1, html1 = get_email_template(1, name)
-        res1 = send_resend_email(email, subj1, html1)
+        pdf_name = "Checklist-Da-Dep-3-Phut-DealNgon.pdf"
+        pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), pdf_name)
+        if not os.path.exists(pdf_path):
+            pdf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Checklist-Da-Dep-3-Phut-QuynhAnh.pdf")
+        pdf_attachments = []
+        if os.path.exists(pdf_path):
+            try:
+                with open(pdf_path, "rb") as f:
+                    pdf_attachments.append({
+                        "filename": pdf_name,
+                        "content": list(f.read())
+                    })
+            except Exception as e_pdf:
+                print(f"[Waitlist Sequence] Không thể đính kèm PDF: {e_pdf}")
+        res1 = send_resend_email(email, subj1, html1, attachments=pdf_attachments if pdf_attachments else None)
         status1 = "sent" if res1 else "failed"
         err1 = None if res1 else "Resend send failed"
         try:

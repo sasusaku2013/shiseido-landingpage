@@ -610,14 +610,30 @@
 
 
     <!-- ============================================================
-         MÀN THÔNG BÁO ĐÃ ĐẶT HÀNG THÀNH CÔNG
+         MÀN THÔNG BÁO ĐÃ ĐẶT HÀNG / CHỜ ADMIN DUYỆT
          ============================================================ -->
     <div class="card success-panel" id="successCard">
-      <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
-      <h2 id="successTitle">ĐÃ ĐẶT HÀNG THÀNH CÔNG! 🎉</h2>
+      <div class="success-icon" id="resIcon" style="background:#FEF3C7; color:#D97706;"><i class="fa-solid fa-hourglass-half"></i></div>
+      <h2 id="successTitle" style="color:#92400E;">ĐÃ GHI NHẬN THÔNG TIN CHUYỂN KHOẢN! ⏳</h2>
       <p class="success-desc" id="successDesc">
-        Cảm ơn bạn! Đơn hàng của bạn đã được ghi nhận và đồng bộ vào hệ thống quản lý.
+        Cảm ơn bạn! DealNgon đã ghi nhận thông báo chuyển khoản và đang đối soát với tài khoản ngân hàng.
       </p>
+
+      <div id="resPendingNotice" style="background: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 12px; padding: 14px 16px; margin: 16px 0; text-align: left;">
+        <div style="font-weight: 700; color: #92400E; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-shield-halved"></i> Đơn hàng đang chờ Admin kiểm tra số dư (5–15 phút):
+        </div>
+        <div style="font-size: 0.82rem; color: #78350F; margin-top: 6px; line-height: 1.5;" id="resPendingDetail">
+          • <strong>Đối với Combo mỹ phẩm:</strong> Admin kiểm tra tiền vào tài khoản sẽ tiến hành đóng gói và giao hàng ngay.<br>
+          • <strong>Đối với File PDF (2.000đ):</strong> Sau khi Admin duyệt thanh toán thành công, hệ thống sẽ tự động gửi file PDF qua Email của bạn và mở nút tải trực tiếp ngay tại đây.
+        </div>
+      </div>
+
+      <div id="resDownloadBox" style="display: none; margin: 16px 0;">
+        <a href="/Checklist-Da-Dep-3-Phut-DealNgon.pdf" download="Checklist-Da-Dep-3-Phut-DealNgon.pdf" class="btn-paid" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35); text-decoration: none; display: inline-flex;">
+          <i class="fa-solid fa-file-pdf"></i> TẢI NGAY BẢN CHECKLIST PDF (ĐÃ DUYỆT)
+        </a>
+      </div>
 
       <div class="detail-card">
         <div class="detail-row">
@@ -650,12 +666,12 @@
         </div>
         <div class="detail-row">
           <span>Trạng thái đơn:</span>
-          <span id="resStatus" style="color: #10B981; font-weight: 700;">Đã ghi nhận (Success)</span>
+          <span id="resStatus" style="color: #D97706; font-weight: 700;"><i class="fa-solid fa-clock"></i> Đang chờ Admin xác nhận thanh toán</span>
         </div>
       </div>
 
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;">
-        DealNgon sẽ chuẩn bị đơn hàng và gửi cho bạn sớm nhất nhé! 🌸
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;" id="resFooterNote">
+        Mọi thắc mắc cần hỗ trợ duyệt nhanh, bạn có thể nhắn Zalo: <strong>0977 338 876</strong> nhé! 🌸
       </p>
 
       <a href="/" class="btn-next" style="display: inline-flex; width: auto; padding: 12px 28px; text-decoration: none;">
@@ -846,17 +862,19 @@
 
       const btn = document.getElementById('btnPaid');
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xác nhận đơn hàng...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi thông tin...';
 
-      // Cập nhật hoặc đảm bảo đơn hàng có trên Admin
-      syncOrderToAdmin(name, phone, email, address, notes, 'success');
+      // Ghi nhận đơn hàng với trạng thái PENDING (chờ Admin đối soát ngân hàng)
+      syncOrderToAdmin(name, phone, email, address, notes, 'pending');
 
       setTimeout(() => {
-        showSuccessScreen(name, phone, email, address, true);
+        showSuccessScreen(name, phone, email, address, false);
+        // Bắt đầu lắng nghe khi nào Admin duyệt đơn trên admin.html
+        startPaymentPolling(orderRef);
       }, 500);
     }
 
-    // ── Lắng nghe thanh toán SePay tự động ─────────────────────
+    // ── Lắng nghe thanh toán & duyệt đơn từ Admin ─────────────
     function startPaymentPolling(ref) {
       if (!API_BASE) return;
       if (_pollTimer) clearInterval(_pollTimer);
@@ -864,7 +882,7 @@
       let attempts = 0;
       _pollTimer = setInterval(async () => {
         attempts++;
-        if (attempts > 120 || isPaymentDone) {
+        if (attempts > 180 || isPaymentDone) {
           clearInterval(_pollTimer);
           return;
         }
@@ -883,19 +901,68 @@
             showSuccessScreen(name, phone, email, address, true);
           }
         } catch(e) {}
-      }, 3000);
+      }, 3500);
     }
 
-    // ── Hiển thị Màn hình Đặt hàng thành công ─────────────────
-    function showSuccessScreen(name, phone, email, address, isSuccess=true) {
-      isPaymentDone = true;
-      if (_pollTimer) clearInterval(_pollTimer);
+    // ── Hiển thị Màn hình Đặt hàng / Chờ duyệt / Thành công ─────
+    function showSuccessScreen(name, phone, email, address, isConfirmed=false) {
+      if (isConfirmed) {
+        isPaymentDone = true;
+        if (_pollTimer) clearInterval(_pollTimer);
+      }
 
       document.getElementById('stepIndicator').style.display = 'none';
       document.getElementById('step1Card').style.display = 'none';
       document.getElementById('step2Card').style.display = 'none';
       const successCard = document.getElementById('successCard');
       successCard.style.display = 'block';
+
+      const resIcon = document.getElementById('resIcon');
+      const resTitle = document.getElementById('successTitle');
+      const resDesc = document.getElementById('successDesc');
+      const resStatus = document.getElementById('resStatus');
+      const resPendingNotice = document.getElementById('resPendingNotice');
+      const resDownloadBox = document.getElementById('resDownloadBox');
+
+      if (isConfirmed) {
+        if (resIcon) {
+          resIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+          resIcon.style.background = '#D1FAE5';
+          resIcon.style.color = '#059669';
+        }
+        if (resTitle) {
+          resTitle.textContent = 'ĐÃ XÁC NHẬN THANH TOÁN THÀNH CÔNG! 🎉';
+          resTitle.style.color = '#065F46';
+        }
+        if (resDesc) {
+          resDesc.textContent = 'Cảm ơn bạn! Đơn hàng đã được Admin đối soát và xác nhận thanh toán thành công.';
+        }
+        if (resStatus) {
+          resStatus.innerHTML = '<span style="color:#10B981; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Đã thanh toán (Confirmed)</span>';
+        }
+        if (resPendingNotice) resPendingNotice.style.display = 'none';
+        if (currentPackage.id === 'pdf' && resDownloadBox) {
+          resDownloadBox.style.display = 'block';
+        }
+      } else {
+        if (resIcon) {
+          resIcon.innerHTML = '<i class="fa-solid fa-hourglass-half"></i>';
+          resIcon.style.background = '#FEF3C7';
+          resIcon.style.color = '#D97706';
+        }
+        if (resTitle) {
+          resTitle.textContent = 'ĐÃ GHI NHẬN THÔNG TIN CHUYỂN KHOẢN! ⏳';
+          resTitle.style.color = '#92400E';
+        }
+        if (resDesc) {
+          resDesc.textContent = 'Cảm ơn bạn! DealNgon đã ghi nhận thông báo chuyển khoản và đang đối soát với tài khoản ngân hàng.';
+        }
+        if (resStatus) {
+          resStatus.innerHTML = '<span style="color:#D97706; font-weight:700;"><i class="fa-solid fa-clock"></i> Đang chờ Admin xác nhận thanh toán</span>';
+        }
+        if (resPendingNotice) resPendingNotice.style.display = 'block';
+        if (resDownloadBox) resDownloadBox.style.display = 'none';
+      }
 
       document.getElementById('resRef').textContent = orderRef;
       document.getElementById('resName').textContent = name || 'Quý khách';

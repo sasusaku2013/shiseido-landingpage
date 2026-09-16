@@ -1,0 +1,6 @@
+# Cấu hình Resend.com
+RESEND_API_KEY=re_cfa8Paf5_KSz9aUfGGGodEDtZaTYEaPyQ
+DOMAIN=dealngon.online
+FROM_EMAIL=onboarding@resend.dev
+# Sau khi verify domain dealngon.online, FROM_EMAIL sẽ đổi thành:
+# FROM_EMAIL=Quỳnh Anh Beauty <support@dealngon.online>

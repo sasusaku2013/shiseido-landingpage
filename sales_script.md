@@ -7,7 +7,7 @@
 ## 🌸 PHẦN 1: CÂU CHÀO KHÁCH HÀNG (GẦN GŨI, TỰ NHIÊN, KHÔNG MÙI ROBOT)
 
 ### Tình huống 1: Khách vừa vào web hoặc bấm nút "Nhắn tin tư vấn"
-> *"Chào chị ạ! Em là Quỳnh Anh đây. Thấy chị đang ghé thăm trang, không biết da chị đợt này ngồi điều hòa có đang bị khô mốc hay đổ dầu khó chịu không, chị nhắn em tư vấn thật lòng nha :)))"*
+> *"Chào chị ạ! Em là DealNgon đây. Thấy chị đang ghé thăm trang, không biết da chị đợt này ngồi điều hòa có đang bị khô mốc hay đổ dầu khó chịu không, chị nhắn em tư vấn thật lòng nha :)))"*
 
 ### Tình huống 2: Khách bấm vào từ bài viết Facebook / Quảng cáo về "Làm đẹp lười 3 phút"
 > *"Dạ chào chị! Chắc chị cũng thuộc 'team bận rộn' giống em đúng không ạ? Sáng ra cuống cuồng lo con cái đi làm nên muốn tìm cách chăm da nào đúng 3 phút là xong. Chị đang nghía tuýp lẻ dùng thử hay trọn bộ Combo 3 phút thế chị?"*
@@ -109,13 +109,16 @@
 ## 🎁 PHẦN 4: CÂU HƯỚNG KHÁCH ĐIỀN FORM KHI CHƯA SẴN SÀNG MUA NGAY
 *(Không chèo kéo, không nài nỉ — Giữ quan hệ và lấy thông tin tự nhiên)*
 
-### Kịch bản 1: Khách bảo "Để chị suy nghĩ thêm / Để chị hỏi ý kiến chồng..."
-> *"Dạ vâng không sao chị ơi! Mua đồ dưỡng da cho mình thì cứ thong thả tìm hiểu cho ưng bụng và thoải mái nhất mới mua chị ạ!
+### Kịch bản 1: Khách bảo "Để chị suy nghĩ thêm / Để chị hỏi ý kiến chồng / Chưa vội mua..."
+> *"Dạ vâng hoàn toàn không sao chị ơi! Mua đồ chăm sóc da cho mình thì chị cứ thong thả tìm hiểu kỹ, khi nào thấy thật sự cần và ưng bụng nhất thì hãy mua, không việc gì phải vội chị nha 😊
 > 
-> Nếu chị chưa vội mua ngay, chị lướt xuống cuối trang điền vào cái **Form khảo sát nhanh 1 phút** giúp em nhé:
-> 👉 https://dealngon.online/landing-page#khao-sat
+> Thật ra em hiểu mà, sản phẩm tiền triệu ai cũng cần đắn đo, nhất là nỗi sợ mua về lại không hợp da hoặc bận quá rồi lười bôi bỏ xó.
 > 
-> Điền xong em gửi tặng chị cẩm nang **'3 Mẹo giữ ẩm cho da dân văn phòng ngồi điều hòa'** qua Zalo đọc tham khảo chơi. Đồng thời em xin phép giữ suất giá ưu đãi gom chung kèm Hộp quà VIP 450k này cho chị đến cuối tuần, lúc nào chị muốn dùng thì cứ nhắn em vẫn áp dụng giá này cho chị nha!"*
+> Dù chị chưa mua ngay, DealNgon xin phép gửi tặng chị bản **Checklist Da Đẹp 3 Phút (File PDF in dán gương)** hoàn toàn miễn phí nhé! Trong này có mẹo '15 giây áp tay ấm' độc quyền cho dân văn phòng ngồi điều hòa — không cần mua thêm mỹ phẩm đắt tiền mà da vẫn đủ ẩm êm ru suốt 8 tiếng.
+> 
+> *(Chatbot hiện ô nhập email trực tiếp ngay trong khung chat: Khách nhập email -> Hệ thống tự động gửi Email 1 kèm link tải PDF vào hòm thư sau 10 giây qua Resend -> Chatbot xác nhận & hiện nút tải trực tiếp file PDF dự phòng)*
+> 
+> Em đã ghi chú giữ nguyên suất Hộp quà VIP 450.000đ và giá ưu đãi này cho chị đến hết tuần. Lúc nào thảnh thơi muốn dùng, chị chỉ cần nhắn em là được nha!"*
 
 ### Kịch bản 2: Khách bảo "Chị chưa có lương / Dạo này đang kẹt tiền..."
-> *"Dạ em hiểu mà chị! Nhiều chị em văn phòng tầm này cũng đang đợi lương. Chị cứ để lại tên với SĐT vào form trên web đi, em ghi chú giữ nguyên suất giảm 40% với quà tặng VIP cho chị. Đầu tháng lãnh lương xong chị ới em gửi hàng sau cũng hoàn toàn được chị nha :)))"*
+> *"Dạ em hiểu mà chị! Nhiều chị em văn phòng tầm này cũng đang đợi lương. Chị cứ để lại tên với SĐT nhận bản Checklist Da Đẹp 3 Phút trước đi, em ghi chú giữ nguyên suất ưu đãi kèm Hộp quà tặng VIP 450k cho chị. Đầu tháng lãnh lương xong chị ới em gửi hàng sau cũng hoàn toàn được chị nha :)))"*

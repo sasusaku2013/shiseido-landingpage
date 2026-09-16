@@ -3,1315 +3,1044 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Làm Đẹp Lười 3 Phút Cho Phụ Nữ 35+ | Tối Giản, Không Cần 10 Bước Phức Tạp</title>
-  <meta name="description" content="Dành riêng cho phụ nữ 35+ bận rộn: Không cần 10 bước phức tạp — 3 phút mỗi sáng là đủ đẹp chỉn chu để đi làm. Vừa chống nắng vừa dưỡng ẩm sâu không dính bết.">
-  
-  <!-- Google Fonts: Playfair Display (Serif sang trọng theo phong cách ảnh mẫu) & Plus Jakarta Sans (Hiện đại, dễ đọc) -->
+  <title>Thanh Toán Đơn Hàng · DealNgon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
-  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --primary: #9E5C3A;
+      --primary-light: #C8896A;
+      --primary-dark: #6B3B22;
+      --bg-warm: #FDF9F5;
+      --card-bg: #FFFFFF;
+      --border-color: #EBDCD0;
+      --text-dark: #2C1810;
+      --text-muted: #7A6559;
+      --success: #10B981;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-warm);
+      color: var(--text-dark);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-header {
+      background: #fff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-dark);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .brand-logo span { color: var(--primary); }
+    .back-home-link {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-home-link:hover { color: var(--primary); }
+
+    .checkout-wrapper {
+      max-width: 680px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Step Progress Bar */
+    .step-progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      gap: 8px;
+    }
+    .step-node {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .step-node.active {
+      color: var(--primary-dark);
+    }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #EFE6DF;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .step-node.active .step-num {
+      background: var(--primary);
+      color: #fff;
+    }
+    .step-node.completed .step-num {
+      background: var(--success);
+      color: #fff;
+    }
+    .step-divider {
+      width: 36px;
+      height: 2px;
+      background: var(--border-color);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(158, 92, 58, 0.05);
+    }
+
+    .card-header {
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #F3EDE7;
+    }
+    .card-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+    .card-header p {
+      color: var(--text-muted);
+      font-size: 0.86rem;
+    }
+
+    /* Packages */
+    .package-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .package-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fafafa;
+    }
+    .package-item:hover { border-color: var(--primary-light); background: #fff; }
+    .package-item.active { border-color: var(--primary); background: #FEF7F2; }
+    .package-item input[type="radio"] {
+      accent-color: var(--primary);
+      width: 18px;
+      height: 18px;
+    }
+    .package-info { flex: 1; }
+    .package-name {
+      font-weight: 600;
+      font-size: 0.92rem;
+      display: block;
+      color: var(--text-dark);
+    }
+    .package-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: #D32F2F;
+      color: #fff;
+      padding: 2px 7px;
+      border-radius: 6px;
+      margin-left: 6px;
+      display: inline-block;
+    }
+    .package-badge-pdf { background: var(--primary); }
+    .package-price {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 0.95rem;
+    }
+
+    /* Form Fields */
+    .form-group { margin-bottom: 14px; }
+    .form-label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+    .form-label .req { color: #dc2626; }
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: var(--primary); }
+
+    /* Action buttons */
+    .btn-next {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+      box-shadow: 0 4px 14px rgba(158, 92, 58, 0.25);
+      margin-top: 20px;
+    }
+    .btn-next:hover { opacity: 0.95; }
+    .btn-next:active { transform: scale(0.99); }
+
+    .btn-back {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-back:hover { background: #FAF6F2; color: var(--text-dark); }
+
+    .btn-paid {
+      width: 100%;
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: #fff;
+      border: none;
+      padding: 15px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+      transition: opacity 0.2s;
+      margin-top: 16px;
+    }
+    .btn-paid:hover { opacity: 0.95; }
+
+    /* Summary Box in Step 2 */
+    .order-summary-box {
+      background: #FAF6F2;
+      border: 1px solid #EADAD0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+    }
+    .order-summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .order-summary-row:last-child {
+      margin-bottom: 0;
+      padding-top: 6px;
+      border-top: 1px dashed #E2D3C7;
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 1rem;
+    }
+
+    /* QR Container */
+    .qr-container {
+      text-align: center;
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 18px;
+    }
+    .qr-img {
+      width: 200px;
+      height: 200px;
+      border-radius: 12px;
+      margin: 0 auto 10px;
+      display: block;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .qr-loading {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Bank info */
+    .bank-info-box {
+      background: #F8F9FA;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      font-size: 0.86rem;
+    }
+    .bank-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px dashed #E2E8F0;
+    }
+    .bank-row:last-child { border-bottom: none; }
+    .bank-label { color: var(--text-muted); }
+    .bank-val {
+      font-weight: 700;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-copy {
+      background: #EFE6DF;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      color: var(--primary-dark);
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover { background: var(--primary-light); color: #fff; }
+
+    /* Success Panel */
+    .success-panel {
+      display: none;
+      text-align: center;
+      padding: 32px 20px;
+    }
+    .success-icon {
+      font-size: 3.8rem;
+      color: var(--success);
+      margin-bottom: 14px;
+    }
+    .success-panel h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .success-desc {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+    .detail-card {
+      background: #FAF6F2;
+      border-radius: 14px;
+      border: 1px solid #EBDCD0;
+      padding: 18px;
+      max-width: 460px;
+      margin: 0 auto 24px;
+      font-size: 0.88rem;
+      text-align: left;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .detail-row:last-child { margin-bottom: 0; }
+    .detail-row span:first-child { color: var(--text-muted); }
+    .detail-row span:last-child { font-weight: 600; color: var(--text-dark); text-align: right; }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      background: #fff;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Top Announcement Bar (Phong cách Unimart) -->
-  <div class="top-announcement-bar">
-    <div class="container announcement-inner">
-      <span class="announcement-tag">⏰ BÍ QUYẾT TƯƠM TẤT 3 PHÚT</span>
-      <p class="announcement-text">
-        Dành riêng cho phụ nữ 35+ bận rộn: Không cần 10 bước phức tạp — Tặng kèm hộp quà VIP <strong>450.000đ</strong> cho <strong>50 chị em đầu tiên</strong>!
-      </p>
-      <div class="top-timer" id="topTimer">
-        <i class="fa-regular fa-clock"></i> Còn lại: <span class="timer-digits">04:25:12</span>
+  <!-- Top bar -->
+  <header class="top-header">
+    <a href="/" class="brand-logo">
+      🌸 <span>DealNgon</span>
+    </a>
+    <a href="/" class="back-home-link">
+      <i class="fa-solid fa-arrow-left"></i> Về trang chủ
+    </a>
+  </header>
+
+  <main class="checkout-wrapper">
+
+    <!-- Progress Indicator -->
+    <div class="step-progress" id="stepIndicator">
+      <div class="step-node active" id="stepNode1">
+        <div class="step-num">1</div>
+        <span>Chọn sản phẩm & Thông tin</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step-node" id="stepNode2">
+        <div class="step-num">2</div>
+        <span>Quét mã QR thanh toán</span>
       </div>
     </div>
-  </div>
 
-  <!-- Header Navigation (Thanh Menu Hiện Đại & Tinh Tế) -->
-  <header class="site-header" id="siteHeader">
-    <div class="container header-container">
-      <a href="#" class="brand-logo">
-        <span class="logo-kanji">資生堂</span>
-        <span class="logo-text">SHISEIDO</span>
-        <span class="logo-sub">GINZA TOKYO</span>
-      </a>
+    <!-- ============================================================
+         BƯỚC 1: CHỌN SẢN PHẨM & THÔNG TIN NHẬN HÀNG
+         ============================================================ -->
+    <div class="card" id="step1Card">
+      <div class="card-header">
+        <h2>Bước 1: Chọn sản phẩm & Thông tin nhận hàng</h2>
+        <p>Vui lòng chọn gói ưu đãi và điền thông tin để chuyển đến bước thanh toán</p>
+      </div>
 
-      <nav class="nav-menu" id="navMenu">
-        <a href="#hero" class="nav-link active">Trang chủ</a>
-        <a href="#problem" class="nav-link">Tình trạng da</a>
-        <a href="#solution" class="nav-link">Giải pháp</a>
-        <a href="#benefits" class="nav-link">Lợi ích vượt trội</a>
-        <a href="#pricing" class="nav-link">Bảng giá ưu đãi</a>
-        <a href="#reviews" class="nav-link">Khách hàng nói gì</a>
-        <a href="#faq" class="nav-link">Giải đáp</a>
-      </nav>
+      <!-- Package Selection -->
+      <div class="package-options" id="packageOptions">
+        <!-- Combo 2 -->
+        <label class="package-item active" onclick="selectPackageItem('combo2', 2780000, 'Combo 3 Phút Buổi Sáng (50ml + Kem dưỡng)')">
+          <input type="radio" name="pkg" value="combo2" checked>
+          <div class="package-info">
+            <span class="package-name">
+              Combo 3 Phút Buổi Sáng (Ultimune 50ml + Kem)
+              <span class="package-badge">BÁN CHẠY ⭐</span>
+            </span>
+          </div>
+          <span class="package-price">2.780.000đ</span>
+        </label>
 
-      <div class="header-actions">
-        <a href="#order-form" class="btn-primary-pill header-cta-btn">
-          <span>Đặt mua ngay</span>
+        <!-- Gói 1 -->
+        <label class="package-item" onclick="selectPackageItem('serum30', 2480000, 'Serum Shiseido Ultimune 30ml')">
+          <input type="radio" name="pkg" value="serum30">
+          <div class="package-info">
+            <span class="package-name">Serum Shiseido Ultimune 30ml</span>
+          </div>
+          <span class="package-price">2.480.000đ</span>
+        </label>
+
+        <!-- Sản phẩm số -->
+        <label class="package-item" onclick="selectPackageItem('pdf', 2000, 'Checklist Da Đẹp 3 Phút (File PDF)')">
+          <input type="radio" name="pkg" value="pdf">
+          <div class="package-info">
+            <span class="package-name">
+              Checklist Da Đẹp 3 Phút (File PDF)
+              <span class="package-badge package-badge-pdf">TẢI NGAY</span>
+            </span>
+          </div>
+          <span class="package-price">2.000đ</span>
+        </label>
+      </div>
+
+      <!-- Customer info form -->
+      <form id="step1Form" onsubmit="goToStep2(event)">
+        <div class="form-group">
+          <label class="form-label" for="custName">Họ và tên của bạn: <span class="req">*</span></label>
+          <input type="text" id="custName" class="form-input" required placeholder="Ví dụ: Nguyễn Thị Mai Lan">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="custPhone">Số điện thoại / Zalo: <span class="req">*</span></label>
+          <input type="tel" id="custPhone" class="form-input" required placeholder="Ví dụ: 0912 345 678" pattern="[0-9]{10,11}">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="custEmail">Địa chỉ Email nhận xác nhận &amp; tài liệu: <span class="req">*</span></label>
+          <input type="email" id="custEmail" class="form-input" required placeholder="Ví dụ: lananh@gmail.com">
+        </div>
+
+        <div class="form-group" id="addressGroup">
+          <label class="form-label" for="custAddress">Địa chỉ nhận hàng (đối với mỹ phẩm): <span class="req">*</span></label>
+          <input type="text" id="custAddress" class="form-input" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="custNotes">Ghi chú hoặc tình trạng da (không bắt buộc):</label>
+          <input type="text" id="custNotes" class="form-input" placeholder="Ví dụ: Da dầu thiếu ẩm, giao giờ hành chính...">
+        </div>
+
+        <!-- Nút Tiếp theo -->
+        <button type="submit" class="btn-next" id="btnNext">
+          <span>Tiếp theo</span>
           <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+
+
+    <!-- ============================================================
+         BƯỚC 2: QUÉT MÃ QR THANH TOÁN
+         ============================================================ -->
+    <div class="card" id="step2Card" style="display: none;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <button type="button" class="btn-back" onclick="goToStep1()">
+          <i class="fa-solid fa-arrow-left"></i> Quay lại
+        </button>
+        <span style="font-size: 0.8rem; font-weight: 700; color: #d97706; background: #FEF3C7; padding: 4px 10px; border-radius: 8px;">
+          ⏳ Chờ thanh toán
+        </span>
+      </div>
+
+      <div class="card-header">
+        <h2>Bước 2: Quét mã QR thanh toán</h2>
+        <p>Mở ứng dụng ngân hàng bất kỳ để quét mã VietQR tự động điền số tiền và nội dung</p>
+      </div>
+
+      <!-- Tóm tắt đơn hàng -->
+      <div class="order-summary-box">
+        <div class="order-summary-row">
+          <span>Khách hàng:</span>
+          <strong id="sumCustName">—</strong>
+        </div>
+        <div class="order-summary-row">
+          <span>Số điện thoại:</span>
+          <span id="sumCustPhone">—</span>
+        </div>
+        <div class="order-summary-row">
+          <span>Email:</span>
+          <span id="sumCustEmail">—</span>
+        </div>
+        <div class="order-summary-row">
+          <span>Sản phẩm:</span>
+          <span id="sumPackageName">—</span>
+        </div>
+        <div class="order-summary-row">
+          <span>Tổng tiền thanh toán:</span>
+          <span id="sumAmount" style="color: var(--primary); font-weight: 800;">—</span>
+        </div>
+      </div>
+
+      <!-- Mã QR VietQR -->
+      <div class="qr-container">
+        <div id="qrLoading" class="qr-loading">⏳ Đang tạo mã VietQR...</div>
+        <img id="qrImg" class="qr-img" style="display: none;" alt="VietQR TPBank">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Nội dung chuyển khoản: <strong id="txtRefDisplay" style="color: #D32F2F;">DH9999</strong>
+        </p>
+      </div>
+
+      <!-- Thông tin tài khoản -->
+      <div class="bank-info-box">
+        <div class="bank-row">
+          <span class="bank-label">Ngân hàng:</span>
+          <span class="bank-val">TPBank (Tiên Phong Bank)</span>
+        </div>
+        <div class="bank-row">
+          <span class="bank-label">Số tài khoản:</span>
+          <span class="bank-val">
+            <span>09771622861</span>
+            <button type="button" class="btn-copy" onclick="copyText('09771622861', this)">Copy</button>
+          </span>
+        </div>
+        <div class="bank-row">
+          <span class="bank-label">Chủ tài khoản:</span>
+          <span class="bank-val">TÔ QUỲNH ANH</span>
+        </div>
+        <div class="bank-row">
+          <span class="bank-label">Số tiền:</span>
+          <span class="bank-val" style="color: var(--primary);">
+            <span id="txtAmountVal">—</span>
+            <button type="button" class="btn-copy" onclick="copyAmount(this)">Copy</button>
+          </span>
+        </div>
+        <div class="bank-row">
+          <span class="bank-label">Nội dung CK:</span>
+          <span class="bank-val">
+            <span id="txtRefVal" style="color: #D32F2F;">DH9999</span>
+            <button type="button" class="btn-copy" onclick="copyRef(this)">Copy</button>
+          </span>
+        </div>
+      </div>
+
+      <!-- Nút xác nhận đã chuyển khoản -->
+      <button type="button" class="btn-paid" id="btnPaid" onclick="handleCustomerCompletedPayment()">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Tôi đã chuyển khoản xong</span>
+      </button>
+
+      <p style="text-align: center; margin-top: 14px; font-size: 0.8rem; color: var(--text-muted);">
+        Hệ thống tự động phát hiện thanh toán trong 30 giây · Hỗ trợ Zalo: <strong>0977 338 876</strong>
+      </p>
+    </div>
+
+
+    <!-- ============================================================
+         MÀN THÔNG BÁO ĐÃ ĐẶT HÀNG / CHỜ ADMIN DUYỆT
+         ============================================================ -->
+    <div class="card success-panel" id="successCard">
+      <div class="success-icon" id="resIcon" style="background:#FEF3C7; color:#D97706;"><i class="fa-solid fa-hourglass-half"></i></div>
+      <h2 id="successTitle" style="color:#92400E;">ĐÃ GHI NHẬN THÔNG TIN CHUYỂN KHOẢN! ⏳</h2>
+      <p class="success-desc" id="successDesc">
+        Cảm ơn bạn! DealNgon đã ghi nhận thông báo chuyển khoản và đang đối soát với tài khoản ngân hàng.
+      </p>
+
+      <div id="resPendingNotice" style="background: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 12px; padding: 14px 16px; margin: 16px 0; text-align: left;">
+        <div style="font-weight: 700; color: #92400E; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-shield-halved"></i> Đơn hàng đang chờ Admin kiểm tra số dư (5–15 phút):
+        </div>
+        <div style="font-size: 0.82rem; color: #78350F; margin-top: 6px; line-height: 1.5;" id="resPendingDetail">
+          • <strong>Đối với Combo mỹ phẩm:</strong> Admin kiểm tra tiền vào tài khoản sẽ tiến hành đóng gói và giao hàng ngay.<br>
+          • <strong>Đối với File PDF (2.000đ):</strong> Sau khi Admin duyệt thanh toán thành công, hệ thống sẽ tự động gửi file PDF qua Email của bạn và mở nút tải trực tiếp ngay tại đây.
+        </div>
+      </div>
+
+      <div id="resDownloadBox" style="display: none; margin: 16px 0;">
+        <a href="/Checklist-Da-Dep-3-Phut-DealNgon.pdf" download="Checklist-Da-Dep-3-Phut-DealNgon.pdf" class="btn-paid" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35); text-decoration: none; display: inline-flex;">
+          <i class="fa-solid fa-file-pdf"></i> TẢI NGAY BẢN CHECKLIST PDF (ĐÃ DUYỆT)
         </a>
       </div>
 
-      <!-- Mobile Menu Toggle -->
-      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- Background Decorative Mesh Gradients (Phong cách Kenko / Pastel Glow) -->
-  <div class="ambient-glow glow-1"></div>
-  <div class="ambient-glow glow-2"></div>
-  <div class="ambient-glow glow-3"></div>
-
-  <!-- SECTION 1: HERO SECTION -->
-  <section class="hero-section" id="hero">
-    <div class="container hero-container">
-      
-      <!-- Pill Badge -->
-      <div class="hero-pill-badge">
-        <span class="badge-dot"></span>
-        <span class="badge-text">Dành Riêng Cho Phụ Nữ 35+ Bận Rộn • Giải Pháp Làm Đẹp Tối Giản 3 Phút</span>
+      <div class="detail-card">
+        <div class="detail-row">
+          <span>Mã đơn hàng:</span>
+          <span id="resRef" style="color: var(--primary); font-weight: 800;">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Khách hàng:</span>
+          <span id="resName">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Số điện thoại:</span>
+          <span id="resPhone">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Email:</span>
+          <span id="resEmail">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Sản phẩm:</span>
+          <span id="resPackage">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Tổng số tiền:</span>
+          <span id="resAmount" style="color: var(--primary); font-weight: 800;">—</span>
+        </div>
+        <div class="detail-row" id="resAddressRow">
+          <span>Địa chỉ giao hàng:</span>
+          <span id="resAddress">—</span>
+        </div>
+        <div class="detail-row">
+          <span>Trạng thái đơn:</span>
+          <span id="resStatus" style="color: #D97706; font-weight: 700;"><i class="fa-solid fa-clock"></i> Đang chờ Admin xác nhận thanh toán</span>
+        </div>
       </div>
 
-      <!-- Main Headline (Serif thanh lịch theo ảnh mẫu) -->
-      <h1 class="hero-title">
-        Không Cần 10 Bước Phức Tạp, <br class="desktop-only">
-        3 Phút Mỗi Sáng <span class="highlight-serif">Là Đủ Đẹp Chỉn Chu Đi Làm</span>
-      </h1>
-
-      <!-- Subheadline -->
-      <p class="hero-subtitle">
-        Thật ra, phụ nữ bận rộn không cần chu trình dưỡng da cầu kỳ. Chỉ cần đúng <strong>1 giải pháp tích hợp thông minh</strong>: Vừa chống nắng bảo vệ, vừa dưỡng ẩm sâu chống lão hóa. 30 giây thoa đều, không bóng nhờn, không dính bết cổ áo — ngồi máy lạnh 8 tiếng da vẫn êm ru, nhẹ đầu bước ra khỏi nhà.
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;" id="resFooterNote">
+        Mọi thắc mắc cần hỗ trợ duyệt nhanh, bạn có thể nhắn Zalo: <strong>0977 338 876</strong> nhé! 🌸
       </p>
 
-      <!-- Pill Quick Action Bar (Input & Button liền khối như thiết kế tham khảo) -->
-      <div class="hero-quick-action">
-        <form class="quick-optin-form" onsubmit="event.preventDefault(); scrollToOrder();">
-          <i class="fa-regular fa-envelope input-icon"></i>
-          <input type="tel" id="quickPhoneInput" placeholder="Nhập số điện thoại để nhận mã ưu đãi..." required>
-          <button type="submit" class="btn-dark-pill">
-            <span>Nhận Ưu Đãi</span>
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </form>
-        <p class="micro-guarantee">
-          <i class="fa-solid fa-shield-halved"></i> Giải pháp tích hợp All-in-one • 100% Tuyển chọn chính hãng • Kiểm tra hàng trước khi thanh toán
-        </p>
-      </div>
-
-      <!-- Hero Visual Card Showcase với các Thẻ Trôi Nổi (Floating Chips) -->
-      <div class="hero-showcase-wrapper">
-        <div class="hero-product-glass-card">
-          <div class="card-inner-glow"></div>
-          
-          <!-- Image Container -->
-          <div class="product-hero-image-wrap">
-            <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=900&q=85" 
-                 alt="Shiseido Ultimune Serum" 
-                 class="main-hero-img">
-            <div class="bottle-badge-floating">
-              <span class="ribbon-red">TOP 1</span>
-              <span>Giải Pháp Tối Giản Cho Nàng Bận Rộn</span>
-            </div>
-          </div>
-
-          <!-- Floating Pill Badges xung quanh sản phẩm (Giống phong cách thiết kế Kenko) -->
-          <div class="floating-chip chip-1">
-            <div class="chip-icon bg-peach">
-              <i class="fa-solid fa-clock"></i>
-            </div>
-            <div class="chip-info">
-              <span class="chip-title">Chỉ Mất 3 Phút</span>
-              <span class="chip-desc">Tươm tất bước ra khỏi nhà</span>
-            </div>
-          </div>
-
-          <div class="floating-chip chip-2">
-            <div class="chip-icon bg-lavender">
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
-            </div>
-            <div class="chip-info">
-              <span class="chip-title">Tích Hợp All-in-one</span>
-              <span class="chip-desc">Dưỡng ẩm sâu & Chống lão hóa</span>
-            </div>
-          </div>
-
-          <div class="floating-chip chip-3">
-            <div class="chip-icon bg-mint">
-              <i class="fa-solid fa-circle-check"></i>
-            </div>
-            <div class="chip-info">
-              <span class="chip-title">Ngồi Điều Hòa 8h</span>
-              <span class="chip-desc">Không khô mốc cánh mũi</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- TRUST STRIP (Thanh cam kết chuẩn Unimart E-commerce) -->
-  <section class="trust-bar-section">
-    <div class="container trust-grid">
-      <div class="trust-item">
-        <div class="trust-icon-box">
-          <i class="fa-solid fa-award"></i>
-        </div>
-        <div class="trust-content">
-          <h4>100% Shiseido Chính Hãng</h4>
-          <p>Nhập khẩu chính ngạch từ Tokyo, Nhật Bản</p>
-        </div>
-      </div>
-
-      <div class="trust-item">
-        <div class="trust-icon-box">
-          <i class="fa-solid fa-truck-fast"></i>
-        </div>
-        <div class="trust-content">
-          <h4>Giao Hàng Hoả Tốc 0đ</h4>
-          <p>Nhận hàng trong 1-2 ngày, kiểm tra trước khi nhận</p>
-        </div>
-      </div>
-
-      <div class="trust-item">
-        <div class="trust-icon-box">
-          <i class="fa-solid fa-rotate-left"></i>
-        </div>
-        <div class="trust-content">
-          <h4>Đổi Trả Dễ Dàng Trong 7 Ngày</h4>
-          <p>Cam kết hoàn tiền 100% nếu da bị kích ứng</p>
-        </div>
-      </div>
-
-      <div class="trust-item">
-        <div class="trust-icon-box">
-          <i class="fa-solid fa-user-doctor"></i>
-        </div>
-        <div class="trust-content">
-          <h4>Chuyên Gia Soi Da 1 - 1</h4>
-          <p>Đội ngũ chuyên viên tư vấn da liễu tận tâm</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 2: VẤN ĐỀ KHÁCH HÀNG (PAIN POINTS) -->
-  <section class="problem-section" id="problem">
-    <div class="container">
-      
-      <div class="section-header text-center">
-        <span class="section-pill-tag">BẠN ĐANG TỰ HỎI?</span>
-        <h2 class="section-title">
-          Có Phải Bạn Đang Mỗi Ngày Đều <br class="desktop-only">
-          <span class="highlight-serif">Mệt Mỏi & Thiếu Tự Tin Vì Làn Da?</span>
-        </h2>
-        <p class="section-desc">
-          Hơn 85% phụ nữ hiện đại phải đối mặt với tình trạng da lão hóa sớm do căng thẳng, thức khuya và thời tiết ô nhiễm.
-        </p>
-      </div>
-
-      <div class="problem-cards-grid">
-        <!-- Card 1 -->
-        <div class="glass-card problem-card">
-          <div class="problem-icon-wrapper danger-glow">
-            <i class="fa-solid fa-face-frown-open"></i>
-          </div>
-          <h3>Da Xỉn Màu & Sạm Đen</h3>
-          <p>Mỗi sáng thức dậy nhìn vào gương chỉ thấy làn da thiếu sức sống, thâm mụn dai dẳng và không đều màu dù đã che phấn kỹ.</p>
-          <span class="problem-tag">Kém sắc, mệt mỏi</span>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="glass-card problem-card">
-          <div class="problem-icon-wrapper warning-glow">
-            <i class="fa-solid fa-hourglass-end"></i>
-          </div>
-          <h3>Ám Ảnh Chu Trình 10 Bước</h3>
-          <p>Sau ngày dài làm việc kiệt sức, bạn không còn thời gian lẫn kiên nhẫn để bôi trét cả chục lớp serum kem dưỡng phức tạp.</p>
-          <span class="problem-tag">Mất thời gian</span>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="glass-card problem-card">
-          <div class="problem-icon-wrapper purple-glow">
-            <i class="fa-solid fa-money-bill-wave"></i>
-          </div>
-          <h3>Tốn Kém Nhưng Không Hợp</h3>
-          <p>Đã từng chi tiền triệu cho đủ loại mỹ phẩm hot trend nhưng da vẫn khô bong tróc vào mùa lạnh, đổ dầu mụn vào mùa hè.</p>
-          <span class="problem-tag">Lãng phí tiền bạc</span>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="glass-card problem-card">
-          <div class="problem-icon-wrapper rose-glow">
-            <i class="fa-solid fa-shield-virus"></i>
-          </div>
-          <h3>Da Nhạy Cảm & Dễ Tổn Thương</h3>
-          <p>Làn da mỏng manh rất dễ mẩn đỏ, ngứa rát khi đổi thời tiết hoặc tiếp xúc bụi bẩn do hàng rào sinh học bị suy yếu.</p>
-          <span class="problem-tag">Dễ kích ứng</span>
-        </div>
-      </div>
-
-      <!-- Quote Banner -->
-      <div class="empathy-quote-box">
-        <i class="fa-solid fa-quote-left quote-icon"></i>
-        <p class="quote-text">
-          "Đừng để những lo lắng về làn da lấy đi nụ cười và sự tự tin vốn có của bạn. Làn da bạn không cần thêm nhiều bước phức tạp, nó chỉ cần đúng một giải pháp khoa học nuôi dưỡng từ gốc rễ."
-        </p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION 3: GIẢI PHÁP ĐỘT PHÁ CỦA SHISEIDO (THE SOLUTION) -->
-  <section class="solution-section" id="solution">
-    <div class="container">
-      <div class="solution-grid">
-        
-        <!-- Cột Hình Ảnh Sản Phẩm Tinh Tế -->
-        <div class="solution-visual">
-          <div class="glass-featured-frame">
-            <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=85" 
-                 alt="Shiseido Skincare Ritual" 
-                 class="solution-img">
-            
-            <div class="solution-badge-stat">
-              <span class="stat-number">98%</span>
-              <span class="stat-label">Khách hàng thấy da căng mọng ngay tuần đầu tiên</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Cột Nội Dung Giải Pháp -->
-        <div class="solution-content">
-          <span class="section-pill-tag">GIẢI PHÁP ĐỘT PHÁ TỪ TOKYO</span>
-          <h2 class="section-title">
-            Tối Giản Chu Trình Skincare <br>
-            <span class="highlight-serif">Chỉ Với 2 Phút Mỗi Ngày</span>
-          </h2>
-          <p class="lead-text">
-            <strong>Shiseido Ultimune Power Infusing Concentrate</strong> là kiệt tác được chắt lọc qua hơn 150 năm nghiên cứu da liễu Nhật Bản, ứng dụng công nghệ kích hoạt miễn dịch tự thân độc quyền <em>The Lifeblood™</em>.
-          </p>
-
-          <div class="solution-feature-list">
-            <div class="solution-feature-item">
-              <div class="feature-bullet">
-                <i class="fa-solid fa-dna"></i>
-              </div>
-              <div>
-                <h4>Đánh thức sức mạnh tự phục hồi của làn da</h4>
-                <p>Không chỉ che phủ bề mặt, Shiseido kích hoạt vi tuần hoàn máu dưới da, giúp tế bào liên tục tái tạo năng lượng trẻ trung.</p>
-              </div>
-            </div>
-
-            <div class="solution-feature-item">
-              <div class="feature-bullet">
-                <i class="fa-solid fa-leaf"></i>
-              </div>
-              <div>
-                <h4>Chiết xuất thảo dược quý hiếm từ Nhật Bản</h4>
-                <p>Nấm Linh Chi đỏ và rễ cây Diên Vĩ thượng hạng giúp trung hòa gốc tự do, chống oxy hóa gấp 3 lần vitamin C thông thường.</p>
-              </div>
-            </div>
-
-            <div class="solution-feature-item">
-              <div class="feature-bullet">
-                <i class="fa-solid fa-wind"></i>
-              </div>
-              <div>
-                <h4>Chất serum mỏng nhẹ tan như nước trong 10s</h4>
-                <p>Thấm sâu tức thì không hề bết rít, tạo lớp màng ngậm nước êm ái cùng hương thơm hoa hồng & hoa sen thư giãn tâm trí.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="solution-cta-row">
-            <a href="#pricing" class="btn-dark-pill">
-              <span>Xem các combo ưu đãi</span>
-              <i class="fa-solid fa-arrow-right"></i>
-            </a>
-            <div class="verified-count">
-              <div class="avatar-group">
-                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&q=80" alt="Avatar 1">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" alt="Avatar 2">
-                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80" alt="Avatar 3">
-              </div>
-              <span><strong>10.000+</strong> phụ nữ đã tin dùng</span>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 4: LỢI ÍCH VƯỢT TRỘI (BENEFITS - 3 CARDS LAYOUT THEO ẢNH MẪU KENKO) -->
-  <section class="benefits-section" id="benefits">
-    <div class="container">
-      
-      <div class="section-header text-center">
-        <span class="section-pill-tag">HIỆU QUẢ ĐƯỢC CHỨNG MINH</span>
-        <h2 class="section-title">
-          Tận Hưởng Sự Khác Biệt <br class="desktop-only">
-          <span class="highlight-serif">Trên Từng Centimet Làn Da Của Bạn</span>
-        </h2>
-        <p class="section-desc">
-          Bộ 3 tác động toàn diện giúp da bạn chuyển mình khỏe mạnh, rạng rỡ từ sâu bên trong mà không cần phụ thuộc vào kem nền.
-        </p>
-      </div>
-
-      <!-- 3-Card Grid tương tự 3 khối "Calories, Sleep Faster, Protein Power" trong ảnh thiết kế -->
-      <div class="kenko-cards-grid">
-        
-        <!-- Benefit Card 1 -->
-        <div class="benefit-card-kenko">
-          <div class="benefit-card-top glow-peach">
-            <div class="benefit-visual-circle">
-              <!-- Biểu tượng Ngôi sao toả sáng Glass Skin (Thay cho icon fa-sparkles bị thiếu) -->
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 1.5L14.3 8.7L21.5 11L14.3 13.3L12 20.5L9.7 13.3L2.5 11L9.7 8.7L12 1.5Z"/>
-                <path d="M19 14.5L19.9 17.3L22.7 18.2L19.9 19.1L19 21.9L18.1 19.1L15.3 18.2L18.1 17.3L19 14.5Z"/>
-                <path d="M5.2 2.5L5.8 4.6L7.9 5.2L5.8 5.8L5.2 7.9L4.6 5.8L2.5 5.2L4.6 4.6L5.2 2.5Z"/>
-              </svg>
-            </div>
-            <div class="mini-data-bar">
-              <div class="mini-bar-fill" style="width: 95%;"></div>
-            </div>
-            <span class="metric-text">+95% Da Sáng Hồng Tự Nhiên</span>
-          </div>
-          <div class="benefit-card-body">
-            <h3 class="benefit-name">Căng Bóng Thấu Suốt (Glass Skin)</h3>
-            <p class="benefit-desc">
-              Nuôi dưỡng sắc tố da đồng đều, làm mờ đốm nâu và sạm nám do nắng. Bạn sẽ tự tin để mặt mộc mọi lúc mọi nơi với làn da trong veo mọng nước.
-            </p>
-          </div>
-        </div>
-
-        <!-- Benefit Card 2 -->
-        <div class="benefit-card-kenko featured-middle-card">
-          <div class="benefit-card-top glow-apricot">
-            <div class="benefit-visual-circle sun-circle">
-              <i class="fa-solid fa-sun"></i>
-            </div>
-            <div class="mini-data-bar">
-              <div class="mini-bar-fill" style="width: 99%;"></div>
-            </div>
-            <span class="metric-text">Khóa Ẩm 24 Giờ Liên Tục</span>
-          </div>
-          <div class="benefit-card-body">
-            <h3 class="benefit-name">Cấp Nước Đa Tầng Tức Thì</h3>
-            <p class="benefit-desc">
-              Hàng triệu phân tử Micro-HA phân nhánh ngậm nước sâu đến lớp hạ bì, chấm dứt triệt để tình trạng da khô căng, mốc nền khi trang điểm hay đổ dầu bóng nhờn.
-            </p>
-          </div>
-        </div>
-
-        <!-- Benefit Card 3 -->
-        <div class="benefit-card-kenko">
-          <div class="benefit-card-top glow-lavender">
-            <div class="benefit-visual-circle shield-circle">
-              <i class="fa-solid fa-shield-heart"></i>
-            </div>
-            <div class="mini-data-bar">
-              <div class="mini-bar-fill" style="width: 92%;"></div>
-            </div>
-            <span class="metric-text">+92% Hàng Rào Bảo Vệ Da Khỏe</span>
-          </div>
-          <div class="benefit-card-body">
-            <h3 class="benefit-name">Tái Sinh & Kháng Lão Hóa</h3>
-            <p class="benefit-desc">
-              Thúc đẩy tăng sinh Collagen tự nhiên, xóa mờ nếp nhăn li ti khóe mắt và rãnh cười, bảo vệ tế bào da kiên cường trước ánh sáng xanh máy tính và khói bụi.
-            </p>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Tóm tắt 4 bước cảm nhận theo thời gian -->
-      <div class="timeline-box">
-        <h4 class="timeline-heading">Hành Trình Chuyển Hóa Làn Da:</h4>
-        <div class="timeline-steps">
-          <div class="timeline-item">
-            <span class="step-badge">10 Giây</span>
-            <p>Serum thấm hoàn toàn, da mát dịu và mềm mượt như lụa.</p>
-          </div>
-          <div class="timeline-item">
-            <span class="step-badge">3 Ngày</span>
-            <p>Da đủ ẩm, giảm hẳn tiết dầu nhờn vùng chữ T, không còn khô mốc.</p>
-          </div>
-          <div class="timeline-item">
-            <span class="step-badge">14 Ngày</span>
-            <p>Tông da sáng đều màu hơn, vết thâm mụn mờ dần, da có độ căng mọng.</p>
-          </div>
-          <div class="timeline-item">
-            <span class="step-badge">28 Ngày</span>
-            <p>Lỗ chân lông se khít, nền da săn chắc đàn hồi và tràn đầy sức sống.</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION 5: BẢNG GIÁ & GÓI ƯU ĐÃI (PRICING & OFFERS - CHUẨN UNIMART) -->
-  <section class="pricing-section" id="pricing">
-    <div class="container">
-      
-      <div class="section-header text-center">
-        <span class="section-pill-tag">ƯU ĐÃI CÓ HẠN</span>
-        <h2 class="section-title">
-          Chọn Gói Chăm Sóc Làn Da <br class="desktop-only">
-          <span class="highlight-serif">Nhận Quà Tặng Độc Quyền Hôm Nay</span>
-        </h2>
-        
-        <!-- Countdown Timer Block (Phong cách Flash sale E-commerce) -->
-        <div class="flash-sale-countdown">
-          <span class="sale-alert-label"><i class="fa-solid fa-bolt"></i> FLASH SALE ĐẶC BIỆT KẾT THÚC TRONG:</span>
-          <div class="timer-boxes" id="saleCountdown">
-            <div class="t-box"><span class="t-val" id="timerHours">04</span><span class="t-lbl">Giờ</span></div>
-            <div class="t-sep">:</div>
-            <div class="t-box"><span class="t-val" id="timerMinutes">25</span><span class="t-lbl">Phút</span></div>
-            <div class="t-sep">:</div>
-            <div class="t-box"><span class="t-val" id="timerSeconds">12</span><span class="t-lbl">Giây</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pricing Cards Grid -->
-      <div class="pricing-grid">
-        
-        <!-- GÓI 1: TRẢI NGHIỆM TỐI GIẢN -->
-        <div class="pricing-card glass-card">
-          <div class="pricing-header">
-            <span class="package-name">Gói 1: Trải Nghiệm Khởi Đầu (1 Bước Tối Giản)</span>
-            <h3 class="product-title">Serum Shiseido Ultimune 30ml</h3>
-            <p class="package-subtitle">Phù hợp cho bạn lần đầu thử nghiệm: 1 bước dưỡng ẩm sâu & phục hồi da ngồi máy lạnh cả ngày.</p>
-          </div>
-
-          <div class="price-wrap">
-            <span class="original-price">2.980.000đ</span>
-            <div class="sale-price-row">
-              <span class="current-price">2.480.000đ</span>
-              <span class="discount-pill">-17%</span>
-            </div>
-            <span class="shipping-info">Tiết kiệm 500.000đ • Miễn phí ship toàn quốc</span>
-          </div>
-
-          <div class="pricing-features">
-            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> 01 Chai Shiseido Ultimune 30ml chính hãng tuyển chọn</div>
-            <div class="pf-item"><i class="fa-solid fa-gift"></i> <strong>Tặng:</strong> 01 Băng đô rửa mặt nhung cao cấp</div>
-            <div class="pf-item"><i class="fa-solid fa-check"></i> Tư vấn lộ trình làm đẹp 3 phút tối giản 1-1</div>
-            <div class="pf-item"><i class="fa-solid fa-shield"></i> Cam kết đổi trả & bảo hành làn da 7 ngày</div>
-          </div>
-
-          <button class="btn-outline-pill select-package-btn" onclick="selectPackage('Gói 1: Serum 30ml - 2.480.000đ')">
-            <span>Chọn gói trải nghiệm (2.480.000đ)</span>
-            <i class="fa-solid fa-arrow-down"></i>
-          </button>
-        </div>
-
-        <!-- GÓI 2: BEST SELLER ⭐ COMBO TRỌN GÓI 3 PHÚT -->
-        <div class="pricing-card glass-card popular-card">
-          <div class="popular-ribbon">⭐ BÁN CHẠY NHẤT</div>
-          
-          <div class="pricing-header">
-            <span class="package-name">Gói 2: Combo 3 Phút Buổi Sáng</span>
-            <h3 class="product-title">Combo Ultimune 50ml + Kem Dưỡng Vital Perfection</h3>
-            <p class="package-subtitle">Bộ đôi hoàn hảo: 3 phút mỗi sáng cho làn da căng mọng, chống lão hóa, không cần 10 bước phức tạp.</p>
-          </div>
-
-          <div class="price-wrap">
-            <span class="original-price">3.280.000đ</span>
-            <div class="sale-price-row">
-              <span class="current-price">2.780.000đ</span>
-              <span class="discount-pill bg-red-pill">-15%</span>
-            </div>
-            <span class="shipping-info">Tiết kiệm tới 500.000đ • Miễn phí ship hoả tốc</span>
-          </div>
-
-          <div class="pricing-features">
-            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> 01 Serum Shiseido Ultimune 50ml bản Fullsize</div>
-            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> 01 Hũ kem dưỡng cao cấp Shiseido Vital Perfection 15ml</div>
-            <div class="pf-item"><i class="fa-solid fa-gift"></i> <strong>Tặng Hộp Quà VIP:</strong> 03 Mặt nạ lụa cấp ẩm Shiseido + Băng đô nhung (Trị giá 450.000đ)</div>
-            <div class="pf-item"><i class="fa-solid fa-check"></i> Miễn phí vận chuyển tận nhà & kiểm tra trước</div>
-            <div class="pf-item"><i class="fa-solid fa-shield"></i> Cam kết hoàn tiền 100% nếu phát hiện hàng giả</div>
-          </div>
-
-          <button class="btn-dark-pill select-package-btn w-full" onclick="selectPackage('Combo 2: Trọn Gói 3 Phút 50ml - 2.780.000đ (Bán Chạy)')">
-            <span>Chọn Combo 3 Phút (Tiết kiệm nhất - 2.780.000đ)</span>
-            <i class="fa-solid fa-arrow-down"></i>
-          </button>
-        </div>
-
-        <!-- GÓI 3: SẢN PHẨM SỐ — CHECKLIST PDF -->
-        <div class="pricing-card glass-card digital-card">
-          <div class="digital-ribbon">📄 TẢI NGAY · KHÔNG CẦN GIAO HÀNG</div>
-
-          <div class="pricing-header">
-            <span class="package-name">Sản phẩm số · Dùng được ngay hôm nay</span>
-            <h3 class="product-title">Checklist Da Đẹp 3 Phút</h3>
-            <p class="package-subtitle">1 trang A4 in được hoặc lưu vào điện thoại. Buổi sáng nhìn vào làm theo — không cần nhớ, không cần tra Google, không cần biết gì về skincare.</p>
-          </div>
-
-          <div class="price-wrap">
-            <span class="original-price">149.000đ</span>
-            <div class="sale-price-row">
-              <span class="current-price" style="color:#C8896A">2.000đ</span>
-              <span class="discount-pill" style="background:#C8896A">-98%</span>
-            </div>
-            <span class="shipping-info">Nhận file PDF ngay sau khi chuyển khoản · Không cần chờ ship</span>
-          </div>
-
-          <div class="pricing-features">
-            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> Checklist buổi sáng 5 bước · đúng 3 phút</div>
-            <div class="pf-item"><i class="fa-solid fa-circle-check"></i> Checklist buổi tối 6 bước · không bỏ sót bước nào</div>
-            <div class="pf-item"><i class="fa-solid fa-triangle-exclamation"></i> 5 dấu hiệu da đang kêu cứu (nhìn là biết ngay)</div>
-            <div class="pf-item"><i class="fa-solid fa-lightbulb"></i> 5 mẹo vàng không ai nói: đổi vỏ gối, test sản phẩm mới...</div>
-            <div class="pf-item"><i class="fa-solid fa-file-pdf" style="color:#ef4444"></i> File PDF · in được · lưu điện thoại được</div>
-          </div>
-
-          <button class="btn-outline-pill select-package-btn" style="border-color:#C8896A;color:#C8896A" onclick="openDigitalCheckout()">
-            <span>Mua &amp; Tải Ngay — 2.000đ</span>
-            <i class="fa-solid fa-download"></i>
-          </button>
-          <p style="text-align:center;font-size:.75rem;color:#A0806E;margin-top:8px">Chuyển khoản → DealNgon gửi file trong 5 phút qua Zalo</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- MODAL: Mua sản phẩm số -->
-  <div class="order-modal-overlay" id="digitalModal">
-    <div class="order-modal-card" style="max-width:440px;padding:28px 28px 24px">
-      <div style="text-align:center;margin-bottom:16px">
-        <div style="font-size:2rem;margin-bottom:6px">📄</div>
-        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">Checklist Da Đẹp 3 Phút</h3>
-        <p style="font-size:.83rem;color:#6B4C3B">Chuyển khoản <strong style="color:#C8896A">2.000đ</strong> → nhận file PDF qua Zalo trong 5 phút</p>
-      </div>
-      <div style="background:#FDF8F4;border:1px solid #E8D5C4;border-radius:12px;padding:14px;text-align:center;margin-bottom:16px">
-        <p style="font-size:.78rem;font-weight:700;color:#9E5C3A;margin-bottom:8px">💳 Quét mã chuyển khoản</p>
-        <img src="https://vietqr.app/img?bank=TPBank&acc=09771622861&template=compact&amount=2000&des=ChecklistPDF&holder=TO%20QUYNH%20ANH"
-             alt="QR thanh toán - TPBank - 09771622861 - TO QUYNH ANH"
-             style="width:175px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.12);display:block;margin:0 auto 8px" />
-        <p style="font-size:.75rem;color:#888">Nội dung: <strong>ChecklistPDF</strong> · TPBank · 09771622861</p>
-      </div>
-      <form id="digitalForm" onsubmit="submitDigitalOrder(event)">
-        <div style="margin-bottom:12px">
-          <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:5px">Số Zalo để nhận file *</label>
-          <input type="text" id="digitalContact" required placeholder="Số điện thoại Zalo của bạn"
-                 style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.88rem">
-        </div>
-        <div style="margin-bottom:16px">
-          <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:5px">Tên bạn</label>
-          <input type="text" id="digitalName" placeholder="Để mình gửi đúng người nha"
-                 style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.88rem">
-        </div>
-        <button type="submit" class="btn-dark-pill" style="width:100%;padding:12px;font-size:.9rem">
-          ✅ Đã chuyển khoản — Gửi thông tin nhận file
-        </button>
-      </form>
-      <button onclick="closeDigitalModal()" style="display:block;width:100%;margin-top:10px;background:none;border:none;color:#94a3b8;font-size:.8rem;cursor:pointer">Đóng lại</button>
-    </div>
-  </div>
-
-  <!-- SECTION 6: ĐÁNH GIÁ KHÁCH HÀNG (SOCIAL PROOF) -->
-  <section class="reviews-section" id="reviews">
-    <div class="container">
-      
-      <div class="section-header text-center">
-        <span class="section-pill-tag">PHẢN HỒI THỰC TẾ</span>
-        <h2 class="section-title">
-          Hơn 10.000+ Phụ Nữ Đã Tự Tin <br class="desktop-only">
-          <span class="highlight-serif">Cởi Bỏ Lớp Phấn Dày – Còn Bạn Thì Sao?</span>
-        </h2>
-        <div class="rating-overall">
-          <div class="stars">
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-          </div>
-          <span class="rating-score"><strong>4.9 / 5.0</strong> đánh giá hài lòng từ 3.820+ khách hàng đã sử dụng</span>
-        </div>
-      </div>
-
-      <div class="reviews-grid">
-        
-        <!-- Review 1 -->
-        <div class="review-card glass-card">
-          <div class="reviewer-meta">
-            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" alt="Chị Mai Lan" class="reviewer-avatar">
-            <div class="reviewer-info">
-              <h4>Chị Mai Lan (32 tuổi)</h4>
-              <span class="reviewer-role">Quản lý Marketing • Hà Nội</span>
-              <div class="verified-badge"><i class="fa-solid fa-circle-check"></i> Đã mua hàng chính hãng</div>
-            </div>
-          </div>
-          <div class="review-stars">★★★★★</div>
-          <p class="review-comment">
-            "Làm việc văn phòng máy lạnh 8 tiếng khiến da mình khô tróc và xỉn màu rõ rệt. Sau gần 3 tuần kiên trì dùng Shiseido Ultimune mỗi sáng tối, da căng mướt hẳn. Đi làm mình chỉ cần thoa chút son môi là tự tin, đồng nghiệp ai cũng khen dạo này da đẹp thế!"
-          </p>
-          <div class="review-tag">Khuyên dùng: Combo 50ml</div>
-        </div>
-
-        <!-- Review 2 -->
-        <div class="review-card glass-card">
-          <div class="reviewer-meta">
-            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80" alt="Bạn Thu Thảo" class="reviewer-avatar">
-            <div class="reviewer-info">
-              <h4>Bạn Thu Thảo (24 tuổi)</h4>
-              <span class="reviewer-role">Content Creator • TP. Hồ Chí Minh</span>
-              <div class="verified-badge"><i class="fa-solid fa-circle-check"></i> Đã mua hàng chính hãng</div>
-            </div>
-          </div>
-          <div class="review-stars">★★★★★</div>
-          <p class="review-comment">
-            "Da mình siêu nhạy cảm và dễ nổi mụn ẩn nên cực kỳ kén mỹ phẩm. Nhưng serum Shiseido thì êm dịu vô cùng, thoa lên mát rượi, thấm trong tích tắc không hề bí bách. Thâm mụn sau 2 tuần mờ đi trông thấy, nền da sáng khỏe rõ rệt."
-          </p>
-          <div class="review-tag">Khuyên dùng: Da dầu nhạy cảm</div>
-        </div>
-
-        <!-- Review 3 -->
-        <div class="review-card glass-card">
-          <div class="reviewer-meta">
-            <img src="https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=120&q=80" alt="Chị Hoàng Oanh" class="reviewer-avatar">
-            <div class="reviewer-info">
-              <h4>Chị Hoàng Oanh (38 tuổi)</h4>
-              <span class="reviewer-role">Mẹ bỉm sữa 2 con • Đà Nẵng</span>
-              <div class="verified-badge"><i class="fa-solid fa-circle-check"></i> Đã mua hàng chính hãng</div>
-            </div>
-          </div>
-          <div class="review-stars">★★★★★</div>
-          <p class="review-comment">
-            "Bận rộn con cái nên mình không thể nào dưỡng da 7-8 bước được. Bây giờ sáng tối chỉ cần 3 giọt serum này là da đủ ẩm mọng cả ngày dài, khóe cười cũng đỡ nhăn hơn. Giá tiền đi đôi với chất lượng, rất đáng đầu tư cho bản thân."
-          </p>
-          <div class="review-tag">Khuyên dùng: Chống lão hóa sớm</div>
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION 7: CAM KẾT VÀNG TỪ THƯƠNG HIỆU -->
-  <section class="guarantee-section">
-    <div class="container">
-      <div class="guarantee-card-box glass-card">
-        <div class="guarantee-header text-center">
-          <i class="fa-solid fa-shield-heart guarantee-shield-icon"></i>
-          <h2 class="guarantee-title">Cam Kết An Tâm Tuyệt Đối Khi Mua Sắm</h2>
-          <p class="guarantee-sub">Chúng tôi hiểu làn da của bạn là tài sản quý giá nhất. Vì vậy, sự hài lòng và an toàn của bạn luôn được đặt lên hàng đầu.</p>
-        </div>
-
-        <div class="guarantee-grid">
-          <div class="g-col">
-            <div class="g-num">01</div>
-            <h4>Đồng Kiểm Trước Khi Nhận</h4>
-            <p>Khách hàng được quyền mở hộp kiểm tra đầy đủ tem chống giả, seal niêm phong, mã QR code trước khi thanh toán cho shipper.</p>
-          </div>
-
-          <div class="g-col">
-            <div class="g-num">02</div>
-            <h4>Bảo Hành Chính Hãng 10x</h4>
-            <p>Cam kết 100% hàng nhập khẩu Shiseido chính ngạch từ Nhật Bản. Đền bù gấp 10 lần giá trị đơn hàng nếu phát hiện hàng giả, kém chất lượng.</p>
-          </div>
-
-          <div class="g-col">
-            <div class="g-num">03</div>
-            <h4>Bảo Hiểm Làn Da 7 Ngày</h4>
-            <p>Nếu trong vòng 7 ngày đầu sử dụng bạn gặp bất kỳ kích ứng hoặc phản ứng phụ nào, chúng tôi sẽ hoàn trả 100% tiền không thắc mắc.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 8: CÂU HỎI THƯỜNG GẶP (FAQ ACCORDION) -->
-  <section class="faq-section" id="faq">
-    <div class="container faq-container">
-      
-      <div class="section-header text-center">
-        <span class="section-pill-tag">GIẢI ĐÁP THẮC MẮC</span>
-        <h2 class="section-title">
-          Những Câu Hỏi Thường Gặp <br class="desktop-only">
-          <span class="highlight-serif">Trước Khi Quyết Định Đặt Hàng</span>
-        </h2>
-      </div>
-
-      <div class="faq-accordion-list">
-        
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Da mụn hoặc da cực kỳ nhạy cảm có dùng được không?</span>
-            <i class="fa-solid fa-plus"></i>
-          </button>
-          <div class="faq-answer">
-            <p>Hoàn toàn an toàn! Shiseido Ultimune đã trải qua kiểm nghiệm da liễu nghiêm ngặt trên hơn 1.200 phụ nữ có làn da nhạy cảm. Công thức không chứa cồn biến tính, không paraben, không dầu khoáng, kết cấu lỏng nhẹ thẩm thấu nhanh giúp làm dịu nốt mụn viêm và tăng sức đề kháng tự nhiên cho da.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Dùng bao lâu thì bắt đầu thấy hiệu quả rõ rệt?</span>
-            <i class="fa-solid fa-plus"></i>
-          </button>
-          <div class="faq-answer">
-            <p>Ngay sau lần thoa đầu tiên, bạn sẽ cảm nhận da mát mướt và căng mịn tức thì. Sau 7-14 ngày, độ ẩm được khóa chặt, giảm hẳn tình trạng đổ dầu và nền da sáng hồng hơn. Sau 28 ngày (chu kỳ thay da tự nhiên), các đốm nâu mờ dần và độ đàn hồi săn chắc tăng lên rõ rệt.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Cách sử dụng serum Shiseido vào lúc nào để đạt hiệu quả tốt nhất?</span>
-            <i class="fa-solid fa-plus"></i>
-          </button>
-          <div class="faq-answer">
-            <p>Rất đơn giản: Dùng 2 lần mỗi ngày (sáng và tối) sau bước rửa mặt/nước cân bằng. Lấy 2 lần nhấn (pump) ra lòng bàn tay, chấm lên 5 điểm trên mặt và mát-xa nhẹ nhàng theo hướng từ dưới lên trên, từ trong ra ngoài để nâng cơ mặt.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Phụ nữ đang mang thai hoặc cho con bú có dùng được không?</span>
-            <i class="fa-solid fa-plus"></i>
-          </button>
-          <div class="faq-answer">
-            <p>Sản phẩm có thành phần chiết xuất thảo dược tự nhiên lành tính. Tuy nhiên trong thời kỳ mang thai, nội tiết tố thay đổi nên nếu cơ địa bạn quá nhạy cảm, bạn có thể để lại thông tin để chuyên viên da liễu Shiseido tư vấn chi tiết nhất nhé.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question">
-            <span>Tôi ở tỉnh thì đặt hàng bao lâu sẽ nhận được?</span>
-            <i class="fa-solid fa-plus"></i>
-          </button>
-          <div class="faq-answer">
-            <p>Đơn hàng được đóng gói bọc chống sốc cẩn thận và gửi qua dịch vụ chuyển phát nhanh hỏa tốc. Tại Hà Nội & TP.HCM nhận hàng trong 24 giờ. Các tỉnh thành khác từ 1 - 2 ngày làm việc. Quý khách hoàn toàn được kiểm tra hàng trước khi thanh toán.</p>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION KHẢO SÁT KHÁCH HÀNG -->
-  <section class="survey-section" id="khao-sat">
-    <div class="container">
-      <div class="survey-glass-box">
-
-        <div class="survey-header">
-          <span class="section-pill-tag bg-white-pill">📋 KHẢO SÁT NHANH</span>
-          <h2 class="survey-title">Giúp Chúng Tôi Hiểu Bạn Hơn!</h2>
-          <p class="survey-subtitle">Chỉ 1 phút — Để nhận tư vấn &amp; ưu đãi phù hợp nhất với bạn 🎁</p>
-        </div>
-
-        <form class="survey-form" id="surveyForm"
-              action="https://formspree.io/f/xbgjwzbp"
-              method="POST">
-
-          <!-- Câu 1: Tên -->
-          <div class="survey-group">
-            <label class="survey-label">
-              <span class="survey-num">1</span>
-              Tên bạn là gì? <em class="survey-hint">(Để mình xưng hô cho thân thiện nhé 😊)</em>
-            </label>
-            <div class="survey-input-wrap">
-              <i class="fa-regular fa-user"></i>
-              <input type="text" name="ten" placeholder="Ví dụ: Chị Lan, Chị Mai..." required>
-            </div>
-          </div>
-
-          <!-- Câu 2: SĐT/Zalo -->
-          <div class="survey-group">
-            <label class="survey-label">
-              <span class="survey-num">2</span>
-              Số điện thoại / Zalo của bạn? <em class="survey-hint">(Mình sẽ gửi ưu đãi qua đây)</em>
-            </label>
-            <div class="survey-input-wrap">
-              <i class="fa-solid fa-phone"></i>
-              <input type="tel" name="sdt_zalo" id="surveyPhone" placeholder="Ví dụ: 0912 345 678" required>
-            </div>
-          </div>
-
-          <!-- Câu 3: Email -->
-          <div class="survey-group">
-            <label class="survey-label">
-              <span class="survey-num">3</span>
-              Địa chỉ Email của bạn? <em class="survey-hint">(Để nhận tài liệu &amp; cẩm nang làm đẹp)</em>
-            </label>
-            <div class="survey-input-wrap">
-              <i class="fa-regular fa-envelope"></i>
-              <input type="email" name="email" id="surveyEmail" placeholder="Ví dụ: lananh@gmail.com" required>
-            </div>
-          </div>
-
-          <!-- Câu 4: Kênh mua sắm -->
-          <div class="survey-group">
-            <label class="survey-label">
-              <span class="survey-num">4</span>
-              Bạn thường mua sắm mỹ phẩm / thời trang ở đâu?
-            </label>
-            <div class="survey-options">
-              <label class="survey-option">
-                <input type="radio" name="kenh_mua_sam" value="Cửa hàng trực tiếp" required>
-                <span class="survey-option-btn">🛒 Cửa hàng trực tiếp</span>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="kenh_mua_sam" value="Mua online (Shopee, TikTok...)">
-                <span class="survey-option-btn">📱 Mua online (Shopee, TikTok...)</span>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="kenh_mua_sam" value="Qua người quen giới thiệu">
-                <span class="survey-option-btn">👥 Qua người quen giới thiệu</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Câu 5: Sản phẩm quan tâm -->
-          <div class="survey-group">
-            <label class="survey-label">
-              <span class="survey-num">5</span>
-              Bạn đang quan tâm đến sản phẩm nào nhất?
-            </label>
-            <div class="survey-options">
-              <label class="survey-option">
-                <input type="radio" name="san_pham_quan_tam" value="Mỹ phẩm dưỡng da" required>
-                <span class="survey-option-btn">💄 Mỹ phẩm dưỡng da</span>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="san_pham_quan_tam" value="Son / trang điểm">
-                <span class="survey-option-btn">💋 Son / trang điểm</span>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="san_pham_quan_tam" value="Thời trang / quần áo">
-                <span class="survey-option-btn">👗 Thời trang / quần áo</span>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="san_pham_quan_tam" value="Cả hai đều thích">
-                <span class="survey-option-btn">🎁 Cả hai đều thích</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Câu 6: Mức giá -->
-          <div class="survey-group">
-            <label class="survey-label">
-              <span class="survey-num">6</span>
-              Mức giá bạn thường chi cho một sản phẩm?
-            </label>
-            <div class="survey-options">
-              <label class="survey-option">
-                <input type="radio" name="muc_gia" value="Dưới 200.000đ" required>
-                <span class="survey-option-btn">Dưới 200.000đ</span>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="muc_gia" value="200.000 – 500.000đ">
-                <span class="survey-option-btn">200.000 – 500.000đ</span>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="muc_gia" value="500.000 – 1.000.000đ">
-                <span class="survey-option-btn">500.000 – 1.000.000đ</span>
-              </label>
-              <label class="survey-option">
-                <input type="radio" name="muc_gia" value="Trên 1.000.000đ">
-                <span class="survey-option-btn">Trên 1.000.000đ</span>
-              </label>
-            </div>
-          </div>
-
-          <input type="hidden" name="_subject" value="📋 Khảo sát khách hàng mới từ Landing Page">
-          <input type="hidden" name="_captcha" value="false">
-
-          <button type="submit" class="btn-survey-submit">
-            <span>Gửi Khảo Sát &amp; Nhận Ưu Đãi 🎁</span>
-          </button>
-
-          <div id="surveySuccess" style="display:none;" class="survey-success-msg">
-            ✅ Cảm ơn bạn! Mình sẽ liên hệ sớm nhé 💕
-          </div>
-        </form>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 9: FORM ĐẶT HÀNG & CTA CHỐT HẠ (ORDER FORM SECTION) -->
-  <section class="order-section" id="order-form">
-    <div class="container">
-      <div class="order-glass-box">
-        
-        <div class="order-left-promo">
-          <span class="section-pill-tag bg-white-pill">ĐẶT HÀNG NHANH CHÓNG</span>
-          <h2 class="order-promo-title">
-            Đầu Tư Cho Làn Da <br>
-            <span class="highlight-serif">Là Khoản Đầu Tư Không Bao Giờ Lỗ!</span>
-          </h2>
-          <p class="order-promo-desc">
-            Điền thông tin bên dưới để nhận ngay <strong>ưu đãi giảm giá đến 40%</strong> kèm trọn bộ quà tặng Shiseido Premium hôm nay.
-          </p>
-
-          <div class="order-perks">
-            <div class="perk-item">
-              <i class="fa-solid fa-gift"></i>
-              <span>Tặng Hộp Quà Trị Giá <strong>450.000đ</strong></span>
-            </div>
-            <div class="perk-item">
-              <i class="fa-solid fa-truck-ramp-box"></i>
-              <span>Miễn 100% Phí Vận Chuyển Toàn Quốc</span>
-            </div>
-            <div class="perk-item">
-              <i class="fa-solid fa-hand-holding-dollar"></i>
-              <span>Kiểm Tra Hàng Thỏa Mái Trước Khi Trả Tiền</span>
-            </div>
-            <div class="perk-item">
-              <i class="fa-solid fa-headset"></i>
-              <span>Dược sĩ Da Liễu Gọi Tư Vấn Lộ Trình Riêng</span>
-            </div>
-          </div>
-
-          <div class="stock-warning">
-            <div class="pulse-indicator"></div>
-            <span>Chỉ còn <strong>09 suất quà tặng cuối cùng</strong> cho ngày hôm nay!</span>
-          </div>
-        </div>
-
-        <div class="order-right-form">
-          <form class="checkout-form" id="mainCheckoutForm" action="https://formsubmit.co/toquynhanh@gmail.com" method="POST" onsubmit="handleFormSubmit(event)">
-            <h3 class="form-title">THÔNG TIN ĐẶT HÀNG NHẬN ƯU ĐÃI</h3>
-            
-            <!-- Cấu hình ẩn cho FormSubmit gửi về email toquynhanh@gmail.com -->
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_subject" value="🌸 [ĐƠN HÀNG SHISEIDO MỚI]">
-            <input type="hidden" name="_next" id="formNextUrl" value="">
-            
-            <!-- Chọn gói sản phẩm -->
-            <div class="form-group">
-              <label class="form-label">Chọn Gói Ưu Đãi Của Bạn:</label>
-              <div class="package-radio-options">
-                
-                <label class="radio-card active">
-                  <input type="radio" name="product_package" value="Combo 2: Trọn Gói 3 Phút 50ml - 2.780.000đ" checked onchange="updateRadioSelection(this)">
-                  <div class="radio-custom"></div>
-                  <div class="radio-content">
-                    <div class="radio-title-row">
-                      <span class="r-title">Combo 3 Phút Buổi Sáng (50ml + Kem Dưỡng)</span>
-                      <span class="r-tag">BÁN CHẠY NHẤT ⭐</span>
-                    </div>
-                    <div class="r-price-row">
-                      <span class="r-new-price">2.780.000đ</span>
-                      <span class="r-old-price">3.280.000đ</span>
-                    </div>
-                    <span class="r-gift-note">+ Tặng Hộp quà 3 Mặt nạ lụa + Băng đô nhung (450k)</span>
-                  </div>
-                </label>
-
-                <label class="radio-card">
-                  <input type="radio" name="product_package" value="Gói 1: Serum 30ml - 2.480.000đ" onchange="updateRadioSelection(this)">
-                  <div class="radio-custom"></div>
-                  <div class="radio-content">
-                    <div class="radio-title-row">
-                      <span class="r-title">Serum Ultimune 30ml (Tối Giản 1 Bước)</span>
-                    </div>
-                    <div class="r-price-row">
-                      <span class="r-new-price">2.480.000đ</span>
-                      <span class="r-old-price">2.980.000đ</span>
-                    </div>
-                    <span class="r-gift-note">+ Tặng Băng đô nhung rửa mặt cao cấp</span>
-                  </div>
-                </label>
-
-                <label class="radio-card radio-card-digital">
-                  <input type="radio" name="product_package" value="Checklist Da Đẹp 3 Phút (PDF) - 2.000đ" onchange="updateRadioSelection(this)">
-                  <div class="radio-custom"></div>
-                  <div class="radio-content">
-                    <div class="radio-title-row">
-                      <span class="r-title">📄 Checklist Da Đẹp 3 Phút (PDF)</span>
-                      <span class="r-tag" style="background:#C8896A">TẢI NGAY</span>
-                    </div>
-                    <div class="r-price-row">
-                      <span class="r-new-price" style="color:#C8896A">2.000đ</span>
-                      <span class="r-old-price">149.000đ</span>
-                    </div>
-                    <span class="r-gift-note">Nhận file qua Zalo trong 5 phút · Không cần ship</span>
-                  </div>
-                </label>
-
-
-              </div>
-            </div>
-
-            <!-- Họ tên -->
-            <div class="form-group">
-              <label class="form-label" for="customerName">Họ và tên của bạn: <span class="req">*</span></label>
-              <div class="input-with-icon">
-                <i class="fa-regular fa-user"></i>
-                <input type="text" id="customerName" name="ho_va_ten" placeholder="Ví dụ: Nguyễn Thị Mai Lan" required>
-              </div>
-            </div>
-
-            <!-- Số điện thoại / Zalo -->
-            <div class="form-group">
-              <label class="form-label" for="customerPhone">Số điện thoại / Zalo: <span class="req">*</span></label>
-              <div class="input-with-icon">
-                <i class="fa-solid fa-phone"></i>
-                <input type="tel" id="customerPhone" name="so_dien_thoai" placeholder="Ví dụ: 0912 345 678" pattern="[0-9]{10,11}" required>
-              </div>
-            </div>
-
-            <!-- Email nhận xác nhận & tài liệu -->
-            <div class="form-group">
-              <label class="form-label" for="customerEmail">Địa chỉ Email nhận xác nhận &amp; tài liệu: <span class="req">*</span></label>
-              <div class="input-with-icon">
-                <i class="fa-regular fa-envelope"></i>
-                <input type="email" id="customerEmail" name="email" placeholder="Ví dụ: lananh@gmail.com" required>
-              </div>
-            </div>
-
-            <!-- Địa chỉ giao hàng -->
-            <div class="form-group" id="mainAddressGroup">
-              <label class="form-label" for="customerAddress">Địa chỉ nhận hàng (đối với mỹ phẩm): <span class="req">*</span></label>
-              <div class="input-with-icon">
-                <i class="fa-solid fa-location-dot"></i>
-                <input type="text" id="customerAddress" name="dia_chi_giao_hang" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành" required>
-              </div>
-            </div>
-
-            <!-- Ghi chú tình trạng da -->
-            <div class="form-group">
-              <label class="form-label" for="customerNote">Ghi chú hoặc tình trạng da (không bắt buộc):</label>
-              <input type="text" id="customerNote" name="tinh_trang_da" placeholder="Ví dụ: Da dầu thiếu ẩm, giao giờ hành chính...">
-            </div>
-
-            <!-- Nút gửi đơn hàng -->
-            <button type="submit" class="btn-submit-order" id="btnSubmitOrder">
-              <span class="btn-text">GỬI ĐƠN ĐẶT HÀNG NGAY</span>
-              <span class="btn-subtext">Nhận ưu đãi 40% & Quà tặng 450.000đ</span>
-            </button>
-
-            <p class="form-privacy-note">
-              <i class="fa-solid fa-lock"></i> Thông tin của bạn được bảo mật tuyệt đối theo tiêu chuẩn Shiseido Privacy.
-            </p>
-
-          </form>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER CHUẨN DOANH NGHIỆP -->
-  <footer class="site-footer">
-    <div class="container footer-content">
-      
-      <div class="footer-col brand-col">
-        <div class="footer-logo">
-          <span class="logo-kanji">資生堂</span>
-          <span class="logo-text">SHISEIDO</span>
-          <span class="logo-sub">GINZA TOKYO</span>
-        </div>
-        <p class="footer-bio">
-          Biểu tượng chăm sóc sắc đẹp và nghiên cứu da liễu hàng đầu Nhật Bản từ năm 1872. Tôn vinh vẻ đẹp tự nhiên và sức mạnh nội sinh của người phụ nữ.
-        </p>
-        <div class="footer-socials">
-          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-          <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
-        </div>
-      </div>
-
-      <div class="footer-col">
-        <h4>Về Chúng Tôi</h4>
-        <ul>
-          <li><a href="#hero">Câu chuyện Shiseido</a></li>
-          <li><a href="#solution">Công nghệ ImuGeneration</a></li>
-          <li><a href="#reviews">Đánh giá khách hàng</a></li>
-          <li><a href="#pricing">Chính sách ưu đãi</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Hỗ Trợ Khách Hàng</h4>
-        <ul>
-          <li><a href="#">Chính sách đổi trả 7 ngày</a></li>
-          <li><a href="#">Chính sách bảo mật thông tin</a></li>
-          <li><a href="#">Tra cứu đơn hàng trực tuyến</a></li>
-          <li><a href="#">Hướng dẫn phân biệt hàng chính hãng</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col contact-col">
-        <h4>Liên Hệ Trực Tiếp</h4>
-        <p><i class="fa-solid fa-location-dot"></i> Shiseido Boutique Store: Vincom Center, Bà Triệu / Đồng Khởi</p>
-        <p><i class="fa-solid fa-phone"></i> Hotline 24/7: <strong>1900 8888</strong> (Miễn phí cước gọi)</p>
-        <p><i class="fa-solid fa-envelope"></i> Email: support@shiseido-vietnam.vn</p>
-        <p><i class="fa-solid fa-clock"></i> Giờ làm việc: 08:00 - 21:30 hàng ngày</p>
-      </div>
-
+      <a href="/" class="btn-next" style="display: inline-flex; width: auto; padding: 12px 28px; text-decoration: none;">
+        <i class="fa-solid fa-house"></i> Về trang chủ
+      </a>
     </div>
 
-    <div class="footer-bottom">
-      <div class="container bottom-flex">
-        <p>© 2026 Shiseido Ginza Tokyo Vietnam. Tất cả quyền được bảo lưu.</p>
-        <p class="disclaimer-text">Sản phẩm này là mỹ phẩm dưỡng da chăm sóc sắc đẹp theo tiêu chuẩn kiểm định Bộ Y Tế.</p>
-      </div>
-    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 DealNgon · TPBank: 09771622861 · dealngon.online</p>
   </footer>
 
-  <!-- FLOATING BACK TO TOP BUTTON -->
-  <div class="floating-contact-group">
-    <button class="floating-btn back-to-top" id="backToTop" onclick="scrollToTop()" title="Lên đầu trang">
-      <i class="fa-solid fa-chevron-up"></i>
-    </button>
-  </div>
+  <script>
+    // ── Backend API Server ─────────────────────────────────────
+    const isStaticHost = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
+    const API_BASE = localStorage.getItem('adminServerUrl') || (isStaticHost ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
 
-  <!-- CHATBOT WIDGET (TƯ VẤN BÁN HÀNG THEO SALES_SCRIPT.MD) -->
-  <div class="chatbot-wrapper" id="chatbotWrapper">
-    <!-- Nút kích hoạt Chatbot nổi -->
-    <div class="chatbot-trigger-wrap">
-      <div class="chatbot-badge" id="chatBadge">1</div>
-      <div class="chatbot-teaser" id="chatTeaser" onclick="toggleChatWindow()">
-        <span class="teaser-text">💬 Chị cần tư vấn da lười 3 phút? Nhắn DealNgon nhé!</span>
-        <button class="teaser-close" onclick="event.stopPropagation(); closeChatTeaser();" aria-label="Đóng lời nhắn">&times;</button>
-      </div>
-      <button class="chatbot-btn" id="chatToggleBtn" onclick="toggleChatWindow()" aria-label="Mở khung chat tư vấn">
-        <div class="chatbot-avatar-wrap">
-          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" alt="DealNgon" class="chatbot-avatar-img">
-          <span class="chatbot-online-dot"></span>
-        </div>
-        <i class="fa-solid fa-xmark chat-close-icon"></i>
-      </button>
-    </div>
+    // ── State ──────────────────────────────────────────────────
+    let currentPackage = {
+      id: 'combo2',
+      name: 'Combo 3 Phút Buổi Sáng (50ml + Kem dưỡng)',
+      price: 2780000
+    };
+    let orderRef = 'DH' + Math.floor(1000 + Math.random() * 9000);
+    let _pollTimer = null;
+    let isPaymentDone = false;
 
-    <!-- Khung Cửa Sổ Chat -->
-    <div class="chatbot-window" id="chatWindow" aria-hidden="true">
-      <!-- Chat Header -->
-      <div class="chatbot-header">
-        <div class="chatbot-header-info">
-          <div class="header-avatar-wrap">
-            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" alt="DealNgon" class="header-avatar-img">
-            <span class="header-online-dot"></span>
-          </div>
-          <div class="header-text-wrap">
-            <h4 class="header-name">DealNgon • Làm đẹp 3 phút</h4>
-            <span class="header-status"><span class="status-pulse"></span> Trực tuyến • Sẵn sàng hỗ trợ chị</span>
-          </div>
-        </div>
-        <div class="chatbot-header-actions">
-          <button class="header-action-btn" onclick="toggleChatWindow()" title="Thu nhỏ khung chat">
-            <i class="fa-solid fa-minus"></i>
-          </button>
-        </div>
-      </div>
+    // ── Init from URL Params ───────────────────────────────────
+    function initFromParams() {
+      const params = new URLSearchParams(window.location.search);
+      const pkg = params.get('package') || params.get('goi');
+      const name = params.get('name') || params.get('ten');
+      const phone = params.get('phone') || params.get('sdt');
+      const email = params.get('email') || params.get('mail');
+      const addr = params.get('address') || params.get('diachi');
+      const note = params.get('notes') || params.get('ghichu');
+      const ref = params.get('ref') || params.get('ma');
+      const step = params.get('step');
 
-      <!-- Chat Body / Lịch sử tin nhắn -->
-      <div class="chatbot-body" id="chatBody">
-        <div class="chat-time-tag">Hôm nay</div>
-        <div class="chat-messages" id="chatMessages">
-          <!-- Tin nhắn sẽ được render động từ script.js -->
-        </div>
-        <!-- Typing indicator khi bot đang gõ -->
-        <div class="chat-typing-indicator" id="chatTyping" style="display: none;">
-          <div class="typing-bubble">
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-          </div>
-          <span class="typing-text">DealNgon đang soạn tin...</span>
-        </div>
-      </div>
+      if (ref) orderRef = ref.toUpperCase();
+      if (name) document.getElementById('custName').value = name;
+      if (phone) {
+        document.getElementById('custPhone').value = phone;
+        if (!ref && phone.length >= 4) {
+          orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
+        }
+      }
+      if (email) document.getElementById('custEmail').value = email;
+      if (addr) document.getElementById('custAddress').value = addr;
+      if (note) document.getElementById('custNotes').value = note;
 
-      <!-- Khung Gợi Ý Câu Hỏi Nhanh (FAQ Chips) -->
-      <div class="chatbot-quick-chips" id="chatQuickChips">
-        <!-- Được sinh động bởi script.js -->
-      </div>
+      if (pkg) {
+        const pLower = pkg.toLowerCase();
+        if (pLower.includes('pdf') || pLower.includes('checklist')) {
+          selectPackageItem('pdf', 2000, 'Checklist Da Đẹp 3 Phút (File PDF)');
+        } else if (pLower.includes('serum') || pLower.includes('30ml') || pLower.includes('goi1')) {
+          selectPackageItem('serum30', 2480000, 'Serum Shiseido Ultimune 30ml');
+        } else {
+          selectPackageItem('combo2', 2780000, 'Combo 3 Phút Buổi Sáng (50ml + Kem dưỡng)');
+        }
+      }
 
-      <!-- Chat Input Footer -->
-      <form class="chatbot-footer" id="chatForm" onsubmit="handleChatSubmit(event)">
-        <input type="text" id="chatInput" placeholder="Nhập câu hỏi (vd: da dầu, giá, cách dùng...)" autocomplete="off">
-        <button type="submit" id="chatSendBtn" aria-label="Gửi tin nhắn">
-          <i class="fa-solid fa-paper-plane"></i>
-        </button>
-      </form>
-    </div>
-  </div>
+      // Nếu đã có thông tin từ trang chính chuyển sang (step=2), tự động vào luôn Bước 2
+      if (step === '2' && name && phone) {
+        goToStep2Directly();
+      }
+    }
 
-  <!-- SOCIAL PROOF TOAST POPUP (Hiệu ứng chốt đơn liên tục của Unimart) -->
-  <div class="social-toast" id="socialToast">
-    <div class="toast-avatar">
-      <img id="toastImg" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&q=80" alt="Customer">
-    </div>
-    <div class="toast-content">
-      <p class="toast-title"><strong id="toastName">Chị Thanh Thủy</strong> (Hà Nội)</p>
-      <p class="toast-desc">vừa đặt mua <span id="toastPackage">Combo Trẻ Hóa 50ml</span></p>
-      <span class="toast-time" id="toastTime">2 phút trước • Đã xác nhận</span>
-    </div>
-    <button class="toast-close" onclick="closeToast()">&times;</button>
-  </div>
+    function selectPackageItem(id, price, name) {
+      currentPackage = { id, price, name };
+      
+      document.querySelectorAll('.package-item').forEach(el => el.classList.remove('active'));
+      const activeItem = document.querySelector(`.package-item input[value="${id}"]`)?.closest('.package-item');
+      if (activeItem) {
+        activeItem.classList.add('active');
+        activeItem.querySelector('input').checked = true;
+      }
 
-  <!-- ORDER SUCCESS MODAL -->
-   <div class="order-modal-overlay" id="orderModal">
-    <div class="order-modal-card order-modal-compact">
+      // Ẩn/hiện trường địa chỉ
+      const addrGroup = document.getElementById('addressGroup');
+      const addrInput = document.getElementById('custAddress');
+      if (id === 'pdf') {
+        addrGroup.style.display = 'none';
+        addrInput.required = false;
+      } else {
+        addrGroup.style.display = 'block';
+        addrInput.required = true;
+      }
+    }
 
-      <!-- Header -->
-      <div class="modal-header-row">
-        <div class="modal-success-icon modal-icon-sm">
-          <i class="fa-solid fa-circle-check"></i>
-        </div>
-        <div>
-          <h3 class="modal-title-sm">ĐẶT HÀNG THÀNH CÔNG!</h3>
-          <p class="modal-greet-sm">Cảm ơn <strong id="modalCustomerName">chị</strong> đã tin tưởng Shiseido Ginza Tokyo 🌸</p>
-        </div>
-      </div>
+    // ── BƯỚC 1: Xử lý khi bấm nút "Tiếp theo" ──────────────────
+    function goToStep2(event) {
+      if (event) event.preventDefault();
+      
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const email = document.getElementById('custEmail').value.trim();
+      const address = document.getElementById('custAddress').value.trim();
+      const notes = document.getElementById('custNotes').value.trim();
 
-      <!-- 2 cột: Thông tin + QR -->
-      <div class="modal-body-row">
+      if (!name || !phone || !email) {
+        alert('Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Địa chỉ Email!');
+        return;
+      }
+      if (currentPackage.id !== 'pdf' && !address) {
+        alert('Vui lòng nhập địa chỉ nhận hàng!');
+        return;
+      }
 
-        <!-- Cột trái: thông tin đơn hàng -->
-        <div class="modal-col-info">
-          <div class="modal-summary-box">
-            <p><strong>Gói:</strong> <span id="modalPackage">Combo Trẻ Hóa 50ml</span></p>
-            <p><strong>SĐT:</strong> <span id="modalPhone">0987654321</span></p>
-            <p><strong>Địa chỉ:</strong> <span id="modalAddress">Hà Nội</span></p>
-            <p class="modal-gift-tag">🎁 Quà VIP 450k + Freeship</p>
-          </div>
-          <p class="modal-note-sm">Chuyên viên sẽ gọi xác nhận trong <strong>15 phút</strong> tới.</p>
-          <button class="btn-dark-pill modal-close-btn" onclick="closeModal()">Đóng Lại</button>
-        </div>
+      if (phone.length >= 4 && !orderRef.includes(phone.slice(-4))) {
+        orderRef = 'DH' + phone.slice(-4) + Date.now().toString().slice(-4);
+      }
 
-        <!-- Cột phải: QR Code -->
-        <div class="modal-col-qr">
-          <p class="modal-qr-title">💳 Chuyển khoản ngay</p>
-          <div id="modalQrWrap" style="min-height:160px;display:flex;align-items:center;justify-content:center;">
-            <p id="modalQrLoading" style="color:#aaa;font-size:0.8rem;text-align:center;">⏳ Đang tạo QR...</p>
-            <img id="modalQrCode"
-                 src=""
-                 alt="QR TPBank"
-                 class="modal-qr-img"
-                 style="display:none;"
-                 onload="this.style.display='block';document.getElementById('modalQrLoading').style.display='none';"
-                 onerror="document.getElementById('modalQrLoading').innerHTML='<a href=\'#\' id=\'qrLink\' target=\'_blank\' style=\'color:#5b2d8e;font-size:0.82rem;\'>⚠️ Bấm để xem QR</a>';" />
-          </div>
-          <p class="modal-qr-note">Hoặc trả tiền mặt khi nhận hàng.</p>
-        </div>
+      // 1. Tạo Khách hàng & Đơn hàng (Pending) trên Admin
+      syncOrderToAdmin(name, phone, email, address, notes, 'pending');
 
-      </div><!-- end modal-body-row -->
-    </div>
-  </div>
+      // 2. Gửi email FormSubmit
+      sendFormSubmitEmail(name, phone, email, address, notes);
 
-  <script src="script.js"></script>
+      // 3. Chuyển sang Bước 2
+      goToStep2Directly();
+    }
+
+    function goToStep2Directly() {
+      const name = document.getElementById('custName').value.trim() || 'Quý khách';
+      const phone = document.getElementById('custPhone').value.trim() || '';
+      const email = document.getElementById('custEmail').value.trim() || '';
+
+      // Cập nhật Step indicator
+      document.getElementById('stepNode1').classList.remove('active');
+      document.getElementById('stepNode1').classList.add('completed');
+      document.getElementById('stepNode2').classList.add('active');
+
+      // Cập nhật tóm tắt Bước 2
+      document.getElementById('sumCustName').textContent = name;
+      document.getElementById('sumCustPhone').textContent = phone;
+      const sumEmail = document.getElementById('sumCustEmail');
+      if (sumEmail) sumEmail.textContent = email || '—';
+      document.getElementById('sumPackageName').textContent = currentPackage.name;
+      document.getElementById('sumAmount').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
+
+      // Cập nhật thông tin ngân hàng & QR
+      document.getElementById('txtAmountVal').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
+      document.getElementById('txtRefVal').textContent = orderRef;
+      document.getElementById('txtRefDisplay').textContent = orderRef;
+
+      // Sinh mã VietQR TPBank qua SePay
+      const qrImg = document.getElementById('qrImg');
+      const qrLoading = document.getElementById('qrLoading');
+      const qrUrl = `https://vietqr.app/img?bank=TPBank&acc=09771622861&template=compact&amount=${currentPackage.price}&des=${orderRef}&holder=TO%20QUYNH%20ANH`;
+
+      qrImg.style.display = 'none';
+      qrLoading.style.display = 'flex';
+      qrImg.src = qrUrl;
+      qrImg.onload = () => {
+        qrLoading.style.display = 'none';
+        qrImg.style.display = 'block';
+      };
+
+      // Đổi giao diện
+      document.getElementById('step1Card').style.display = 'none';
+      document.getElementById('step2Card').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Kích hoạt theo dõi SePay thanh toán tự động
+      startPaymentPolling(orderRef);
+    }
+
+    function goToStep1() {
+      if (_pollTimer) clearInterval(_pollTimer);
+      document.getElementById('stepNode2').classList.remove('active');
+      document.getElementById('stepNode1').classList.remove('completed');
+      document.getElementById('stepNode1').classList.add('active');
+
+      document.getElementById('step2Card').style.display = 'none';
+      document.getElementById('step1Card').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── BƯỚC 2: Xử lý khi bấm nút "Tôi đã chuyển khoản xong" ───
+    function handleCustomerCompletedPayment() {
+      const name = document.getElementById('custName').value.trim() || 'Quý khách';
+      const phone = document.getElementById('custPhone').value.trim() || '';
+      const email = document.getElementById('custEmail').value.trim() || '';
+      const address = document.getElementById('custAddress').value.trim() || '';
+      const notes = document.getElementById('custNotes').value.trim() || '';
+
+      const btn = document.getElementById('btnPaid');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi thông tin...';
+
+      // Ghi nhận đơn hàng với trạng thái PENDING (chờ Admin đối soát ngân hàng)
+      syncOrderToAdmin(name, phone, email, address, notes, 'pending');
+
+      setTimeout(() => {
+        showSuccessScreen(name, phone, email, address, false);
+        // Bắt đầu lắng nghe khi nào Admin duyệt đơn trên admin.html
+        startPaymentPolling(orderRef);
+      }, 500);
+    }
+
+    // ── Lắng nghe thanh toán & duyệt đơn từ Admin ─────────────
+    function startPaymentPolling(ref) {
+      if (!API_BASE) return;
+      if (_pollTimer) clearInterval(_pollTimer);
+
+      let attempts = 0;
+      _pollTimer = setInterval(async () => {
+        attempts++;
+        if (attempts > 180 || isPaymentDone) {
+          clearInterval(_pollTimer);
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/api/check-payment/${ref}`, { signal: AbortSignal.timeout(3000) });
+          if (!res.ok) return;
+          const data = await res.json();
+
+          if (data.found && (data.status === 'success' || data.status === 'confirmed')) {
+            clearInterval(_pollTimer);
+            const name = document.getElementById('custName').value.trim() || data.order?.customer_name || 'Quý khách';
+            const phone = document.getElementById('custPhone').value.trim() || '';
+            const email = document.getElementById('custEmail').value.trim() || data.order?.email || '';
+            const address = document.getElementById('custAddress').value.trim() || '';
+            showSuccessScreen(name, phone, email, address, true);
+          }
+        } catch(e) {}
+      }, 3500);
+    }
+
+    // ── Hiển thị Màn hình Đặt hàng / Chờ duyệt / Thành công ─────
+    function showSuccessScreen(name, phone, email, address, isConfirmed=false) {
+      if (isConfirmed) {
+        isPaymentDone = true;
+        if (_pollTimer) clearInterval(_pollTimer);
+      }
+
+      document.getElementById('stepIndicator').style.display = 'none';
+      document.getElementById('step1Card').style.display = 'none';
+      document.getElementById('step2Card').style.display = 'none';
+      const successCard = document.getElementById('successCard');
+      successCard.style.display = 'block';
+
+      const resIcon = document.getElementById('resIcon');
+      const resTitle = document.getElementById('successTitle');
+      const resDesc = document.getElementById('successDesc');
+      const resStatus = document.getElementById('resStatus');
+      const resPendingNotice = document.getElementById('resPendingNotice');
+      const resDownloadBox = document.getElementById('resDownloadBox');
+
+      if (isConfirmed) {
+        if (resIcon) {
+          resIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+          resIcon.style.background = '#D1FAE5';
+          resIcon.style.color = '#059669';
+        }
+        if (resTitle) {
+          resTitle.textContent = 'ĐÃ XÁC NHẬN THANH TOÁN THÀNH CÔNG! 🎉';
+          resTitle.style.color = '#065F46';
+        }
+        if (resDesc) {
+          resDesc.textContent = 'Cảm ơn bạn! Đơn hàng đã được Admin đối soát và xác nhận thanh toán thành công.';
+        }
+        if (resStatus) {
+          resStatus.innerHTML = '<span style="color:#10B981; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Đã thanh toán (Confirmed)</span>';
+        }
+        if (resPendingNotice) resPendingNotice.style.display = 'none';
+        if (currentPackage.id === 'pdf' && resDownloadBox) {
+          resDownloadBox.style.display = 'block';
+        }
+      } else {
+        if (resIcon) {
+          resIcon.innerHTML = '<i class="fa-solid fa-hourglass-half"></i>';
+          resIcon.style.background = '#FEF3C7';
+          resIcon.style.color = '#D97706';
+        }
+        if (resTitle) {
+          resTitle.textContent = 'ĐÃ GHI NHẬN THÔNG TIN CHUYỂN KHOẢN! ⏳';
+          resTitle.style.color = '#92400E';
+        }
+        if (resDesc) {
+          resDesc.textContent = 'Cảm ơn bạn! DealNgon đã ghi nhận thông báo chuyển khoản và đang đối soát với tài khoản ngân hàng.';
+        }
+        if (resStatus) {
+          resStatus.innerHTML = '<span style="color:#D97706; font-weight:700;"><i class="fa-solid fa-clock"></i> Đang chờ Admin xác nhận thanh toán</span>';
+        }
+        if (resPendingNotice) resPendingNotice.style.display = 'block';
+        if (resDownloadBox) resDownloadBox.style.display = 'none';
+      }
+
+      document.getElementById('resRef').textContent = orderRef;
+      document.getElementById('resName').textContent = name || 'Quý khách';
+      document.getElementById('resPhone').textContent = phone || '—';
+      const resEmail = document.getElementById('resEmail');
+      if (resEmail) resEmail.textContent = email || '—';
+      document.getElementById('resPackage').textContent = currentPackage.name;
+      document.getElementById('resAmount').textContent = currentPackage.price.toLocaleString('vi-VN') + 'đ';
+
+      const addrRow = document.getElementById('resAddressRow');
+      if (currentPackage.id === 'pdf' || !address) {
+        addrRow.style.display = 'none';
+      } else {
+        addrRow.style.display = 'flex';
+        document.getElementById('resAddress').textContent = address;
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Đồng bộ đơn hàng & khách hàng lên Backend Admin ────────
+    function syncOrderToAdmin(name, phone, email, address, notes, status='pending') {
+      if (!API_BASE) return;
+      fetch(`${API_BASE}/api/orders/from-checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name,
+          phone: phone,
+          email: email,
+          address: address,
+          notes: notes,
+          package: currentPackage.name,
+          payment_ref: orderRef,
+          status: status
+        })
+      }).catch(err => console.warn('Lỗi sync admin:', err));
+    }
+
+    function sendFormSubmitEmail(name, phone, email, address, notes) {
+      fetch("https://formsubmit.co/ajax/toquynhanh@gmail.com", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          "_subject": `🌸 [ĐƠN HÀNG MỚI] ${name} - ${phone} (${orderRef})`,
+          "Mã đơn hàng": orderRef,
+          "Gói sản phẩm": currentPackage.name,
+          "Số tiền": currentPackage.price.toLocaleString('vi-VN') + 'đ',
+          "Khách hàng": name,
+          "Số điện thoại": phone,
+          "Email": email,
+          "Địa chỉ": address || 'Không có (Sản phẩm số)',
+          "Ghi chú": notes,
+          "_template": "table",
+          "_captcha": "false"
+        })
+      }).catch(() => {});
+    }
+
+    // ── Copy helpers ───────────────────────────────────────────
+    function copyText(val, btn) {
+      navigator.clipboard.writeText(val).then(() => {
+        const old = btn.textContent;
+        btn.textContent = 'Đã chép!';
+        btn.style.background = '#10B981';
+        btn.style.color = '#fff';
+        setTimeout(() => {
+          btn.textContent = old;
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 1500);
+      });
+    }
+    function copyAmount(btn) { copyText(currentPackage.price.toString(), btn); }
+    function copyRef(btn) { copyText(orderRef, btn); }
+
+    // Khởi động
+    window.addEventListener('DOMContentLoaded', initFromParams);
+  </script>
 </body>
 </html>

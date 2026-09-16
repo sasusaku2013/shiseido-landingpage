@@ -522,9 +522,11 @@ const CHATBOT_KB = {
   },
 
   hesitate_survey: {
-    question: "Chưa vội mua, muốn tìm hiểu thêm & nhận cẩm nang?",
-    text: `<p>Dạ vâng không sao chị ơi! Mua đồ dưỡng da cho mình thì cứ thong thả tìm hiểu cho ưng bụng và thoải mái nhất mới mua chị ạ!</p>
-           <p>Nếu chị chưa vội mua ngay, chị lướt xuống cuối trang điền vào cái <strong>Form khảo sát nhanh 1 phút</strong> giúp em nhé. Điền xong em gửi tặng chị cẩm nang <strong>'3 Mẹo giữ ẩm cho da dân văn phòng ngồi điều hòa'</strong> qua Zalo đọc tham khảo chơi nha!</p>`,
+    question: "Để tôi nghĩ thêm / Chưa vội mua ngay?",
+    text: `<p><strong>Dạ vâng hoàn toàn không sao chị ơi!</strong> Mua đồ chăm sóc da cho mình thì chị cứ thong thả tìm hiểu kỹ, khi nào thấy thật sự cần và ưng bụng nhất thì hãy mua, không việc gì phải vội chị nha 😊</p>
+           <p>Thật ra em hiểu mà, sản phẩm tiền triệu ai cũng cần đắn đo, nhất là nỗi sợ mua về lại không hợp da hoặc bận quá rồi lười bôi bỏ xó.</p>
+           <p>Dù chị chưa mua ngay, DealNgon xin phép gửi tặng chị bản <strong>Checklist Da Đẹp 3 Phút (File PDF in dán gương)</strong> hoàn toàn miễn phí nhé! Trong này có mẹo <em>'15 giây áp tay ấm'</em> độc quyền cho dân văn phòng ngồi điều hòa — không cần mua thêm mỹ phẩm đắt tiền mà da vẫn đủ ẩm êm ru suốt 8 tiếng.</p>
+           <p style="font-size:0.82rem; color:#8E8D95; margin-top:6px;"><em>(Em đã ghi chú giữ nguyên suất Hộp quà VIP 450.000đ và giá ưu đãi này cho chị đến hết tuần. Lúc nào thảnh thơi muốn dùng, chị chỉ cần nhắn em là được nha!)</em></p>`,
     hasSurveyCard: true
   }
 };
@@ -685,12 +687,41 @@ function triggerBotReply(htmlContent, hasActionCard = false, hasSurveyCard = fal
       `;
     } else if (hasSurveyCard) {
       extraHtml = `
-        <div class="chat-action-card" style="background:#F0FDF4; border-color:#86EFAC;">
-          <div class="chat-card-title" style="color:#16A34A;"><i class="fa-solid fa-clipboard-list"></i> Khảo Sát Nhận Cẩm Nang:</div>
-          <p style="font-size:0.8rem; color:#1E3A8A; margin-bottom:8px;">Chỉ mất 1 phút điền form, em gửi cẩm nang qua Zalo và giữ suất ưu đãi 40% đến cuối tuần cho chị nhé!</p>
-          <button type="button" class="chat-cta-btn" style="background:linear-gradient(135deg, #16A34A, #10B981);" onclick="goToSurveyForm()">
-            <i class="fa-solid fa-arrow-right"></i> ĐIỀN FORM KHẢO SÁT NHẬN QUÀ (1 PHÚT)
-          </button>
+        <div class="chat-action-card chat-checklist-card" style="background:#F0FDF4; border:1.5px dashed #86EFAC; border-radius:14px; padding:12px; margin-top:10px;">
+          <div class="chat-card-title" style="color:#16A34A; font-weight:800; font-size:0.84rem; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+            <i class="fa-solid fa-gift"></i> Quà Tặng Miễn Phí Dành Riêng Cho Chị:
+          </div>
+          <div style="font-size:0.82rem; color:#1E3A8A; margin:4px 0 8px; line-height:1.5;">
+            📄 <strong>Checklist Da Đẹp 3 Phút (PDF in dán gương)</strong><br>
+            • Bí quyết 1 bước thay 5 bước mỗi sáng<br>
+            • Mẹo 15 giây áp tay ấm chống khô mốc cánh mũi suốt 8 tiếng
+          </div>
+
+          <div class="chat-email-box" style="background:#FFFFFF; border:1.5px solid #86EFAC; border-radius:10px; padding:10px; margin-top:8px;">
+            <div style="font-size:0.79rem; color:#166534; font-weight:700; display:flex; align-items:center; gap:5px; margin-bottom:6px;">
+              <i class="fa-solid fa-envelope"></i> Chị nhập email để nhận file PDF tự động nhé:
+            </div>
+            <form class="chat-email-form" onsubmit="handleChatEmailSubmit(event, this)">
+              <div style="display:flex; gap:6px;">
+                <input type="email" class="chat-inline-email" placeholder="Nhập địa chỉ email của chị..." required autocomplete="email" style="flex:1; min-width:0; padding:8px 10px; border:1.5px solid #CBD5E1; border-radius:8px; font-size:0.82rem; outline:none; background:#F8FAFC;">
+                <button type="submit" class="chat-inline-submit" style="background:linear-gradient(135deg, #16A34A 0%, #10B981 100%); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-weight:700; font-size:0.8rem; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 3px 10px rgba(16, 185, 129, 0.3);">
+                  <i class="fa-solid fa-paper-plane"></i> Gửi ngay
+                </button>
+              </div>
+              <div style="font-size:0.71rem; color:#64748B; margin-top:4px;">
+                🔒 File PDF sẽ tự động gửi vào hòm thư sau 10 giây
+              </div>
+            </form>
+          </div>
+
+          <div style="margin-top:10px; padding-top:8px; border-top:1px dashed #CBD5E1; text-align:center;">
+            <span style="font-size:0.75rem; color:#64748B;">Chị còn lăn tăn điểm nào? Bấm hỏi em giải đáp thật lòng nha:</span>
+            <div style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-top:6px;">
+              <button type="button" class="quick-chip" style="font-size:0.72rem; padding:4px 8px;" onclick="handleChipClick('faq9_price', 'Giá tiền triệu liệu có đắt quá không em?')">💰 Giá có đắt quá?</button>
+              <button type="button" class="quick-chip" style="font-size:0.72rem; padding:4px 8px;" onclick="handleChipClick('faq6_sensitive', 'Da nhạy cảm mẩn đỏ dùng có an toàn?')">🛡️ Da nhạy cảm?</button>
+              <button type="button" class="quick-chip" style="font-size:0.72rem; padding:4px 8px;" onclick="handleChipClick('faq10_lazy', 'Chị bận và lười lắm, 3 phút có ăn thua?')">😴 Lười có dùng được?</button>
+            </div>
+          </div>
         </div>
       `;
     }
@@ -712,7 +743,35 @@ function triggerBotReply(htmlContent, hasActionCard = false, hasSurveyCard = fal
 
 /* ---------------- Nhận diện từ khóa trả lời thông minh ---------------- */
 function processUserQuery(text) {
-  const norm = removeAccents(text.toLowerCase());
+  // 0. Khách nhập email trực tiếp vào ô chat -> Gửi tự động Checklist Da Đẹp 3 Phút
+  const emailRegex = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/;
+  const emailMatch = text.match(emailRegex);
+  if (emailMatch) {
+    const email = emailMatch[1];
+    sendChatbotChecklistEmail(email, null);
+    return;
+  }
+
+  // 1. Khách do dự / suy nghĩ thêm / chưa mua ngay / cân nhắc (Đặt lên đầu để không bị nhận nhầm từ khóa "mua")
+  const lower = text.toLowerCase();
+  const norm = removeAccents(lower);
+
+  const isDeNghiYeuCau = lower.includes('đề nghị') || norm.includes('de nghi giup') || norm.includes('de nghi ho tro');
+  const hesitationRegex = /(suy nghi|nghi them|nghi lai|nghi da|de\s+(?:toi|chi|em|minh|to|tao|anh)?\s*nghi)/;
+  const hesitationKeywords = [
+    'nghi them', 'suy nghi', 'can nhac', 'chua voi', 'tu tu', 'xem da', 'de xem', 'xem them',
+    'hoi chong', 'hoi y kien', 'hoi ban', 'hoi gia dinh',
+    'chua mua', 'chua muon mua', 'chua co tien', 'chua co luong', 'ket tien',
+    'tham khao', 'de do da', 'de sau', 'khi khac', 'luc khac', 'dip khac',
+    'dan do', 'phan van', 'lan tan', 'chua can', 'chua lay', 'de do',
+    'tinh sau', 'thoi de'
+  ];
+
+  if (!isDeNghiYeuCau && (hesitationRegex.test(norm) || hasKeywords(norm, hesitationKeywords))) {
+    const item = CHATBOT_KB.hesitate_survey;
+    triggerBotReply(item.text, false, true, 600);
+    return;
+  }
 
   // 1. Ý định mua hàng / xem giá / đặt hàng / combo / quà tặng -> Hiện ngay kịch bản chốt đơn & Nút danh sách chờ
   if (hasKeywords(norm, ['mua', 'dat hang', 'dat mua', 'order', 'gia', 'bao nhieu', 'combo', 'khuyen mai', 'qua tang', 'danh sach cho', 'lay 1 lo', 'lay 1 bo', 'ship', 'tien'])) {
@@ -791,19 +850,12 @@ function processUserQuery(text) {
     return;
   }
 
-  // 12. Suy nghĩ thêm / hỏi chồng / chưa mua / kẹt tiền
-  if (hasKeywords(norm, ['suy nghi', 'hoi chong', 'chua mua', 'chua co tien', 'chua co luong', 'ket tien'])) {
-    const item = CHATBOT_KB.hesitate_survey;
-    triggerBotReply(item.text, false, true, 600);
-    return;
-  }
-
-  // Fallback mặc định: Giọng tư vấn thân mật của DealNgon
+  // Fallback mặc định: Giọng tư vấn thân mật của DealNgon (không chèn bảng giá khi khách không hỏi)
   const fallbackText = `
-    <p>Dạ em DealNgon đây ạ! Chị muốn em tư vấn kỹ hơn về tình trạng da (khô mốc, đổ dầu, lão hóa...) hay chị đang muốn nhận <strong>Gói ưu đãi gom chung kèm Hộp quà VIP 450k</strong> đợt này thế chị?</p>
+    <p>Dạ em DealNgon đây ạ! Chị muốn em tư vấn thêm về tình trạng da (khô mốc, đổ dầu, lão hóa...) hay chị đang quan tâm điểm nào thế chị?</p>
     <p>Chị có thể bấm nhanh vào các nút gợi ý câu hỏi ở thanh trượt bên dưới hoặc nhắn trực tiếp cho em nha :)))</p>
   `;
-  triggerBotReply(fallbackText, true, false, 600);
+  triggerBotReply(fallbackText, false, false, 600);
 }
 
 function hasKeywords(text, keywords) {
@@ -880,6 +932,88 @@ function goToSurveyForm() {
   if (window.innerWidth <= 768) {
     toggleChatWindow(false);
   }
+}
+
+/* ---------------- Xử lý gửi email tự động nhận Checklist từ Chatbot ---------------- */
+function handleChatEmailSubmit(event, formEl) {
+  if (event) event.preventDefault();
+  const inputEl = formEl ? formEl.querySelector('input[type="email"]') : null;
+  const email = inputEl ? inputEl.value.trim() : '';
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    alert('Chị vui lòng nhập đúng định dạng email (ví dụ: ten@gmail.com) nha!');
+    return;
+  }
+  const submitBtn = formEl ? formEl.querySelector('button[type="submit"]') : null;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi...';
+  }
+  sendChatbotChecklistEmail(email, formEl);
+}
+
+async function sendChatbotChecklistEmail(email, formEl) {
+  const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
+  const ADMIN_SERVER = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
+
+  // 1. Đồng bộ lên Admin Server để kích hoạt chuỗi email Resend tự động
+  try {
+    fetch(ADMIN_SERVER + '/api/customers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Khách Chatbot',
+        email: email,
+        source: 'waitlist',
+        notes: 'Nhận Checklist Da Đẹp 3 Phút (PDF) từ Chatbot'
+      })
+    }).catch(err => console.warn('Lỗi API customers:', err));
+  } catch (e) {}
+
+  // 2. Gửi dự phòng FormSubmit
+  try {
+    fetch('https://formsubmit.co/ajax/toquynhanh@gmail.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        '_subject': `🎁 [CHATBOT NHẬN CHECKLIST] ${email}`,
+        'Email': email,
+        'Nguồn': 'Chatbot Website DealNgon',
+        'Nội dung': 'Yêu cầu gửi Checklist Da Đẹp 3 Phút (File PDF)',
+        '_template': 'table',
+        '_captcha': 'false'
+      })
+    }).catch(() => {});
+  } catch (e) {}
+
+  // 3. Cập nhật hộp email trong card tin nhắn (nếu có formEl)
+  if (formEl) {
+    const parentBox = formEl.closest('.chat-email-box');
+    if (parentBox) {
+      parentBox.innerHTML = `
+        <div style="color:#16A34A; font-weight:700; font-size:0.83rem; display:flex; align-items:center; gap:6px; padding:4px 0;">
+          <i class="fa-solid fa-circle-check" style="font-size:1.15rem; color:#10B981;"></i>
+          <span>Đã gửi thành công tới: <u style="word-break:break-all;">${escapeHtml(email)}</u></span>
+        </div>
+      `;
+    }
+  }
+
+  // 4. Chatbot gửi tin nhắn xác nhận ấm áp + Nút tải trực tiếp dự phòng
+  const confirmHtml = `
+    <p>🎉 <strong>DealNgon đã gửi tặng bản Checklist Da Đẹp 3 Phút tới hòm thư của chị rồi ạ!</strong></p>
+    <div style="background:#ECFDF5; border-left:3.5px solid #10B981; padding:8px 12px; border-radius:6px; margin:8px 0; font-weight:700; color:#065F46; font-size:0.84rem; word-break:break-all;">
+      📧 ${escapeHtml(email)}
+    </div>
+    <p>Chị mở hòm thư kiểm tra trong 1–2 phút tới nhé <em>(nếu chưa thấy chị nhớ ngó qua mục Spam hoặc Quảng cáo giúp em nha)</em>.</p>
+    <p>🎁 <strong>Một lưu ý nhỏ xinh:</strong> Em đã ghi chú giữ nguyên suất <strong>Hộp quà VIP 450.000đ</strong> và giá ưu đãi này cho chị đến hết tuần này rồi ạ. Lúc nào chị thong thả muốn trải nghiệm để da thảnh thơi, chị cứ nhắn em là được nhận quà ngay nha!</p>
+    <div style="margin-top:12px; padding:12px; background:#F8FAFC; border:1.5px dashed #CBD5E1; border-radius:12px; text-align:center;">
+      <span style="font-size:0.79rem; color:#64748B; display:block; margin-bottom:8px;">Nếu chị muốn đọc ngay trên điện thoại không cần mở mail:</span>
+      <a href="/Checklist-Da-Dep-3-Phut-DealNgon.pdf" download="Checklist-Da-Dep-3-Phut-DealNgon.pdf" target="_blank" class="chat-cta-btn" style="background:linear-gradient(135deg, #0284C7 0%, #0EA5E9 100%); box-shadow:0 4px 14px rgba(2, 132, 199, 0.35); text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; margin-top:0;">
+        <i class="fa-solid fa-file-pdf"></i> BẤM TẢI TRỰC TIẾP FILE PDF NGAY
+      </a>
+    </div>
+  `;
+  triggerBotReply(confirmHtml, false, false, 700);
 }
 
 
@@ -959,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1. Đồng bộ khách hàng lên Admin (bảng customers, source: waitlist)
       const isStatic = window.location.hostname.includes('github.io') || window.location.hostname === 'dealngon.online';
       const ADMIN_SERVER = localStorage.getItem('adminServerUrl') || (isStatic ? 'https://web-production-42cec4.up.railway.app' : window.location.origin);
-      if (ADMIN_SERVER && sdt) {
+      if (ADMIN_SERVER && (sdt || email)) {
         fetch(ADMIN_SERVER + '/api/customers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
