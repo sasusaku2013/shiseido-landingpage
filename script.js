@@ -1108,7 +1108,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(err => console.warn('Lỗi lưu waitlist admin:', err));
       }
 
-      // 2. Gửi Formspree
+      // 2. Gửi thông báo về Email Admin & Tự động gửi quà tặng cho khách (FormSubmit)
+      try {
+        fetch("https://formsubmit.co/ajax/toquynhanh@gmail.com", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({
+            "_subject": `📋 [KHẢO SÁT MỚI] ${ten || 'Khách'} - ${sdt || email}`,
+            "Họ tên": ten || 'Khách khảo sát',
+            "Số điện thoại / Zalo": sdt || '—',
+            "Email": email || '—',
+            "Kênh mua sắm": kenh || '—',
+            "Sản phẩm quan tâm": sp || '—',
+            "Mức giá": gia || '—',
+            "_replyto": email || 'toquynhanh@gmail.com',
+            "_autoresponse": `Chào ${ten || 'bạn'},\n\nCảm ơn bạn đã tham gia khảo sát tại DealNgon!\n\nDealNgon xin gửi tặng bạn bản Checklist Da Đẹp 3 Phút (File PDF in dán gương) để bạn tải về xem ngay nhé:\n👉 https://dealngon.online/Checklist-Da-Dep-3-Phut-DealNgon.pdf\n\nChúc bạn luôn rạng rỡ và thảnh thơi mỗi sớm mai! 🌸\n\nThương mến,\nDealNgon · https://dealngon.online`,
+            "_template": "table",
+            "_captcha": "false"
+          })
+        }).catch(() => {});
+      } catch (e) {}
+
+      // 3. Gửi dự phòng Formspree
       try {
         await fetch(surveyForm.action, {
           method: 'POST',
