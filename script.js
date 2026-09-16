@@ -1117,12 +1117,13 @@ document.addEventListener('DOMContentLoaded', () => {
             "_subject": `📋 [KHẢO SÁT MỚI] ${ten || 'Khách'} - ${sdt || email}`,
             "Họ tên": ten || 'Khách khảo sát',
             "Số điện thoại / Zalo": sdt || '—',
+            "email": email,
             "Email": email || '—',
             "Kênh mua sắm": kenh || '—',
             "Sản phẩm quan tâm": sp || '—',
             "Mức giá": gia || '—',
             "_replyto": email || 'toquynhanh@gmail.com',
-            "_autoresponse": `Chào ${ten || 'bạn'},\n\nCảm ơn bạn đã tham gia khảo sát tại DealNgon!\n\nDealNgon xin gửi tặng bạn bản Checklist Da Đẹp 3 Phút (File PDF in dán gương) để bạn tải về xem ngay nhé:\n👉 https://dealngon.online/Checklist-Da-Dep-3-Phut-DealNgon.pdf\n\nChúc bạn luôn rạng rỡ và thảnh thơi mỗi sớm mai! 🌸\n\nThương mến,\nDealNgon · https://dealngon.online`,
+            "_autoresponse": `Chào ${ten || 'bạn'},\n\nDealNgon cảm ơn bạn thật nhiều vì đã tin tưởng kết nối và dành 1 phút tham gia khảo sát!\n\nNhư đã hẹn, DealNgon xin phép gửi tặng bạn bản Checklist Da Đẹp 3 Phút (File PDF in dán gương) hoàn toàn miễn phí:\n👉 Bấm vào đây để tải ngay: https://dealngon.online/Checklist-Da-Dep-3-Phut-DealNgon.pdf\n\nCẩm nang này gói gọn bí quyết 1 bước thay 5 bước và mẹo 15 giây áp tay ấm giúp da căng mọng, êm ru suốt 8 tiếng ngồi máy lạnh.\n\nChúc bạn luôn rạng rỡ và thảnh thơi mỗi sớm mai! 🌸\n\nThương mến,\nDealNgon · https://dealngon.online`,
             "_template": "table",
             "_captcha": "false"
           })
